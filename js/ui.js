@@ -188,7 +188,7 @@ export function verifySolution() {
     if (
       !g ||
       g.room !== state.gameMapping.rooms[p.roomId].name ||
-      g.item !== state.gameMapping.items[p.itemId] ||
+      g.item !== state.gameMapping.items[p.itemId].name ||
       g.role !== p.role
     )
       ok = false;
