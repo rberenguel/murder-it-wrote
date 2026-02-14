@@ -57,19 +57,16 @@ export function renderUI() {
             </div>`;
     }
 
-    cc.innerHTML = state.puzzle.map((c,i) => `
-        <div class="clue-item">
-            <div class="clue-grip"><i class="ph-light ph-dots-six-vertical" style="font-size: 1.125rem;"></i></div>
-            <div class="clue-text-container">
-                <span class="clue-index">${i+1}.</span>
-                <span class="clue-text">${c.text}</span>
-            </div>
-        </div>`).join('');
+    cc.innerHTML = `<ul class="clue-list">${state.puzzle.map((c,i) => `
+        <li class="clue-item">
+            <span class="clue-handle">${i+1}.</span>
+            <span class="clue-text">${c.text}</span>
+        </li>`).join('')}</ul>`;
 
     if (state.sortable) state.sortable.destroy();
     if (typeof Sortable !== 'undefined') {
         updateState({
-            sortable: new Sortable(cc, { handle: '.clue-grip', animation: 150, ghostClass: 'sortable-ghost', delay: 100, delayOnTouchOnly: true })
+            sortable: new Sortable(cc.querySelector('.clue-list'), { handle: '.clue-handle', animation: 150, ghostClass: 'sortable-ghost', delay: 100, delayOnTouchOnly: true })
         });
     }
 
