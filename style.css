@@ -622,17 +622,66 @@ body {
 /* Transition Overlay */
 .transition-overlay {
     position: fixed;
-    inset: 0;
-    background-color: #000000;
-    z-index: 3000;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000;
+    z-index: 10000;
     opacity: 0;
+    transition: opacity 0.45s ease;
     pointer-events: none;
-    transition: opacity 0.4s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .transition-overlay.active {
     opacity: 1;
     pointer-events: auto;
+}
+
+.loader-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.4s ease 0.1s;
+}
+
+.transition-overlay.active .loader-content {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.loader-icon {
+    max-width: 256px; /* 50% of 512px */
+    height: auto;
+    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.1));
+}
+
+.loader-dots {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.loader-dots span {
+    width: 10px;
+    height: 10px;
+    background-color: #fff;
+    border-radius: 50%;
+    opacity: 0.3;
+}
+
+.loader-dots span:nth-child(1) { animation: blink 1.2s infinite 0s; }
+.loader-dots span:nth-child(2) { animation: blink 1.2s infinite 0.2s; }
+.loader-dots span:nth-child(3) { animation: blink 1.2s infinite 0.4s; }
+
+@keyframes blink {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
 }
 
 .intro-screen {
