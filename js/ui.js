@@ -152,3 +152,4 @@ window.updateGuess = (s, f, v) => {
 };
 
 window.toggleDebug = toggleDebug;
+window.renderUI = renderUI;
