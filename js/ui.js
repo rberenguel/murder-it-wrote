@@ -28,15 +28,18 @@ export function renderLocations() {
         </div>`;
 }
 
-export function renderSelect(s, f, l, opts) {
+export function renderSelect(s, f, l, opts, usedMap) {
     const v = state.userGuesses[s]?.[f] || '';
-    return `<div class="guess-row">
+    const isConflict = (f === 'room' || f === 'item') && v && usedMap?.[f]?.[v] > 1;
+
+    return `<div class="guess-row ${isConflict ? 'has-conflict' : ''}">
                 <label class="guess-label">${l}</label>
-                <select onchange="updateGuess('${s}','${f}',this.value)" class="select-input">
+                <select onchange="updateGuess('${s}','${f}',this.value); renderUI();" class="select-input">
                     <option value="">Unknown</option>
                     ${opts.map(o=>{
                         const name = typeof o === 'string' ? o : o.name;
-                        return `<option value="${name}" ${v===name?'selected':''}>${name}</option>`;
+                        const isUsedByOther = (f === 'room' || f === 'item') && usedMap?.[f]?.[name] > 0 && v !== name;
+                        return `<option value="${name}" ${v===name?'selected':''}>${name}${isUsedByOther ? ' •' : ''}</option>`;
                     }).join('')}
                 </select>
             </div>`;
@@ -76,6 +79,12 @@ export function renderUI() {
         });
     }
 
+    const usedMap = { room: {}, item: {} };
+    Object.values(state.userGuesses).forEach(g => {
+        if (g.room) usedMap.room[g.room] = (usedMap.room[g.room] || 0) + 1;
+        if (g.item) usedMap.item[g.item] = (usedMap.item[g.item] || 0) + 1;
+    });
+
     const grid = document.getElementById('notebook-grid');
     grid.innerHTML = `
         <div class="notebook-grid">
@@ -86,9 +95,9 @@ export function renderUI() {
                         ${name}
                     </h3>
                     <div class="guess-grid">
-                        ${renderSelect(name, 'room', 'Loc', state.gameMapping.rooms)}
-                        ${renderSelect(name, 'item', 'Item', state.gameMapping.items)}
-                        ${renderSelect(name, 'role', 'Role', ROLES_DEF)}
+                        ${renderSelect(name, 'room', 'Loc', state.gameMapping.rooms, usedMap)}
+                        ${renderSelect(name, 'item', 'Item', state.gameMapping.items, usedMap)}
+                        ${renderSelect(name, 'role', 'Role', ROLES_DEF, usedMap)}
                     </div>
                 </div>
             `).join('')}
