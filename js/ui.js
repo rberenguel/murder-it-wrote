@@ -2,6 +2,14 @@ import { state, updateState } from "./game-state.js";
 import { ROLES_DEF } from "./constants.js";
 import { saveGame } from "./persistence.js";
 
+export function getCaseSize(numSuspects) {
+  if (numSuspects <= 3) return "Cozy";
+  if (numSuspects === 4) return "Intimate";
+  if (numSuspects === 5) return "Tense";
+  if (numSuspects === 6) return "Complex";
+  return "Massive";
+}
+
 export function addLog(m) {
   const c = document.getElementById("log-container");
   if (c)
@@ -80,9 +88,12 @@ export function renderUI() {
     const roleStr = Object.entries(roleCounts)
       .map(([r, c]) => `${c} ${wrapRole(r)}${c > 1 ? "s" : ""}`)
       .join(", ");
+    const numSuspects = state.gameMapping.suspects.length;
+    const sizeWord = getCaseSize(numSuspects);
+    const mysteryWord = state.mysteryWord || "Mystery";
     evidenceHeader.innerHTML = `
             <div style="display: flex; flex-direction: column;">
-                <h2 class="card-title"><i class="ph-light ph-magnifying-glass"></i>Evidence</h2>
+                <h2 class="card-title" style="font-family: var(--font-sans);"><i class="ph-light ph-magnifying-glass"></i>The ${sizeWord} ${state.activeScenario.name} ${mysteryWord}</h2>
                 <span style="font-size: 0.625rem; color: var(--text-slate-400); font-weight: 400; margin-left: 1.75rem;">Manifest: 1 ${wrapRole("Killer")}, 1 ${wrapRole("Victim")}, ${roleStr}</span>
             </div>`;
   }
@@ -108,16 +119,18 @@ export function renderUI() {
         delayOnTouchOnly: true,
         onEnd: async () => {
           // Update state.puzzle to match the new DOM order
-          const clueList = document.querySelector('.clue-list');
-          const items = Array.from(clueList.querySelectorAll('.clue-item'));
-          const reorderedPuzzle = items.map(item => {
-            const clueId = item.dataset.clueId;
-            return state.puzzle.find(c => c.id === clueId);
-          }).filter(Boolean);
+          const clueList = document.querySelector(".clue-list");
+          const items = Array.from(clueList.querySelectorAll(".clue-item"));
+          const reorderedPuzzle = items
+            .map((item) => {
+              const clueId = item.dataset.clueId;
+              return state.puzzle.find((c) => c.id === clueId);
+            })
+            .filter(Boolean);
 
           updateState({ puzzle: reorderedPuzzle });
           await saveGame(); // Save after reordering
-        }
+        },
       }),
     });
   }

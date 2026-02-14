@@ -1,4 +1,4 @@
-import { IDS } from "./constants.js";
+import { IDS, MYSTERY_WORDS } from "./constants.js";
 import { LogicEngine } from "./logic-engine.js";
 import { state, updateState } from "./game-state.js";
 
@@ -179,16 +179,16 @@ function renderFact(fact, mapping, roles) {
   const generateStableId = (fact) => {
     const props = [
       fact.type,
-      fact.suspectId ?? '',
-      fact.roomId ?? '',
-      fact.itemId ?? '',
-      fact.role ?? ''
-    ].join('-');
+      fact.suspectId ?? "",
+      fact.roomId ?? "",
+      fact.itemId ?? "",
+      fact.role ?? "",
+    ].join("-");
     // Simple hash function for deterministic IDs
     let hash = 0;
     for (let i = 0; i < props.length; i++) {
       const char = props.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32bit integer
     }
     return Math.abs(hash).toString(36);
@@ -397,8 +397,9 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
       activeScenario: restoredState.activeScenario,
       gameMapping: restoredState.gameMapping,
       solution: restoredState.solution,
+      mysteryWord: restoredState.mysteryWord,
       userGuesses: restoredState.userGuesses,
-      isGenerating: false
+      isGenerating: false,
     });
 
     // Restore clues from saved data in the correct order
@@ -427,14 +428,14 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
 
     // Restore puzzle in the saved order with reconstructed functions
     const restoredPuzzle = restoredState.clueOrder
-      .map(id => restoredState.puzzleData.find(c => c.id === id))
+      .map((id) => restoredState.puzzleData.find((c) => c.id === id))
       .filter(Boolean)
-      .map(savedClue => ({
+      .map((savedClue) => ({
         text: savedClue.text,
         masks: savedClue.masks,
         id: savedClue.id,
         number: savedClue.number,
-        fn: createValidatorFromMasks(savedClue.masks)
+        fn: createValidatorFromMasks(savedClue.masks),
       }));
 
     updateState({ puzzle: restoredPuzzle });
@@ -551,13 +552,18 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
   // Shuffle and assign original numbers to each clue
   const shuffledClues = shuffle(finalClues).map((clue, index) => ({
     ...clue,
-    number: index + 1
+    number: index + 1,
   }));
+
+  // Pick a random mystery word for this case
+  const mysteryWord =
+    MYSTERY_WORDS[Math.floor(Math.random() * MYSTERY_WORDS.length)];
 
   updateState({
     gameMapping,
     puzzle: shuffledClues,
     solution: { truth, roles },
+    mysteryWord,
     userGuesses: {},
     isGenerating: false,
   });

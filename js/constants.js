@@ -6,6 +6,25 @@ export const ROLES_DEF = [
   "Accomplice",
   "Innocent",
 ];
+export const MYSTERY_WORDS = [
+  "Mystery",
+  "Case",
+  "Conundrum",
+  "Enigma",
+  "Puzzle",
+  "Affair",
+  "Investigation",
+  "Riddle",
+  "Situation",
+  "Intrigue",
+  "Riddle",
+  "Conspiracy",
+  "Crime",
+  "Homicide",
+  "Scenario",
+  "Inquiry",
+  "Scheme",
+];
 export const SCENARIOS = [
   {
     id: "stellar_voyage",
@@ -254,7 +273,7 @@ export const SCENARIOS = [
   },
   {
     id: "medieval",
-    name: "Medieval Mystery",
+    name: "Medieval Castle",
     suspects: [
       "Sir Alistair",
       "Lady Eleanor",
@@ -492,7 +511,7 @@ export const SCENARIOS = [
   },
   {
     id: "gatsby",
-    name: "The Great Gatsby",
+    name: "Great Gatsby",
     suspects: [
       "Jay Gatsby",
       "Nick Carraway",
@@ -614,7 +633,7 @@ export const SCENARIOS = [
   },
   {
     id: "falcon",
-    name: "The Maltese Falcon",
+    name: "Maltese Falcon",
     suspects: [
       "Sam Spade",
       "Brigid O'Shaughnessy",
@@ -736,7 +755,7 @@ export const SCENARIOS = [
   },
   {
     id: "continental_express",
-    name: "The Continental Express",
+    name: "Continental Express",
     suspects: [
       "Auguste Lupa",
       "M. Renaud",
@@ -974,7 +993,7 @@ export const SCENARIOS = [
   },
   {
     id: "radio_shrink",
-    name: "The Pompous Psychiatrist",
+    name: "Pompous Psychiatrist",
     suspects: [
       "Dr. Alistair Heron",
       "Dr. Malcolm Heron",
@@ -1096,7 +1115,7 @@ export const SCENARIOS = [
   },
   {
     id: "indigo_heir",
-    name: "The Indigo Heir",
+    name: "Indigo Heir",
     suspects: [
       "Julian Vance",
       "Martha Vance",
@@ -1218,7 +1237,7 @@ export const SCENARIOS = [
   },
   {
     id: "shadow_protocol",
-    name: "The Shadow Protocol",
+    name: "Shadow Protocol",
     suspects: [
       "Agent Cipher",
       "Agent Sparrow",
