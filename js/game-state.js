@@ -12,6 +12,7 @@ export let state = {
   userGuesses: {},
   isGenerating: false,
   sortable: null,
+  difficultyIcon: null,
 };
 
 export function setState(newState) {

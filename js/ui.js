@@ -10,6 +10,18 @@ export function getCaseSize(numSuspects) {
   return "Massive";
 }
 
+export function getDifficultyStars(numSuspects, iconName = "star") {
+  // Map suspects (3-7) to stars (1-5)
+  // 3: ★☆☆☆☆, 4: ★★☆☆☆, 5: ★★★☆☆, 6: ★★★★☆, 7: ★★★★★
+  const MIN_SUSPECTS = 3;
+  const MAX_SUSPECTS = 7;
+  const stars = Math.max(1, Math.min(5, numSuspects - MIN_SUSPECTS + 1));
+
+  const filled = `<i class="ph-light ph-${iconName}" style="opacity: 1; color: currentColor;"></i>`.repeat(stars);
+  const empty = `<i class="ph-light ph-${iconName}" style="opacity: 0.25;"></i>`.repeat(5 - stars);
+  return filled + empty;
+}
+
 export function addLog(m) {
   const c = document.getElementById("log-container");
   if (c)
@@ -91,9 +103,13 @@ export function renderUI() {
     const numSuspects = state.gameMapping.suspects.length;
     const sizeWord = getCaseSize(numSuspects);
     const mysteryWord = state.mysteryWord || "Mystery";
+    const difficultyStars = getDifficultyStars(numSuspects, state.difficultyIcon || "star");
     evidenceHeader.innerHTML = `
             <div style="display: flex; flex-direction: column;">
-                <h2 class="card-title" style="font-family: var(--font-sans);"><i class="ph-light ph-magnifying-glass"></i>The ${sizeWord} ${state.activeScenario.name} ${mysteryWord}</h2>
+                <h2 class="card-title" style="font-family: var(--font-sans);">
+                    <i class="ph-light ph-magnifying-glass"></i>The ${sizeWord} ${state.activeScenario.name} ${mysteryWord}
+                    <span style="margin-left: 0.5rem; font-size: 0.875rem;">${difficultyStars}</span>
+                </h2>
                 <span style="font-size: 0.625rem; color: var(--text-slate-400); font-weight: 400; margin-left: 1.75rem;">Manifest: 1 ${wrapRole("Killer")}, 1 ${wrapRole("Victim")}, ${roleStr}</span>
             </div>`;
   }

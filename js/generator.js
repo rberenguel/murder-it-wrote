@@ -1,4 +1,4 @@
-import { IDS, MYSTERY_WORDS } from "./constants.js";
+import { IDS, MYSTERY_WORDS, DIFFICULTY_ICONS } from "./constants.js";
 import { LogicEngine } from "./logic-engine.js";
 import { state, updateState } from "./game-state.js";
 
@@ -398,6 +398,7 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
       gameMapping: restoredState.gameMapping,
       solution: restoredState.solution,
       mysteryWord: restoredState.mysteryWord,
+      difficultyIcon: restoredState.difficultyIcon,
       userGuesses: restoredState.userGuesses,
       isGenerating: false,
     });
@@ -559,11 +560,16 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
   const mysteryWord =
     MYSTERY_WORDS[Math.floor(Math.random() * MYSTERY_WORDS.length)];
 
+  // Pick a random difficulty icon for this case
+  const difficultyIcon =
+    DIFFICULTY_ICONS[Math.floor(Math.random() * DIFFICULTY_ICONS.length)];
+
   updateState({
     gameMapping,
     puzzle: shuffledClues,
     solution: { truth, roles },
     mysteryWord,
+    difficultyIcon,
     userGuesses: {},
     isGenerating: false,
   });

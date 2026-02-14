@@ -25,6 +25,16 @@ export const MYSTERY_WORDS = [
   "Inquiry",
   "Scheme",
 ];
+export const DIFFICULTY_ICONS = [
+  "star",
+  "skull",
+  "sword",
+  "lightbulb",
+  "smiley-x-eyes",
+  "knife",
+  "bomb",
+  "detective",
+];
 export const SCENARIOS = [
   {
     id: "stellar_voyage",

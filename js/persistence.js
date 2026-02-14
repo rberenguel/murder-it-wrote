@@ -42,6 +42,7 @@ export async function saveGame() {
     clueOrder: extractClueOrder(), // Visual order from DOM
     solution: state.solution,
     mysteryWord: state.mysteryWord,
+    difficultyIcon: state.difficultyIcon,
     userGuesses: state.userGuesses,
   };
 
