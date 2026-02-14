@@ -889,6 +889,7 @@ body {
   filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
   border-radius: 12px; /* Slight rounding if it's a square icon */
   transform: scale(0.9);
+  -webkit-tap-highlight-color: transparent;
 }
 
 .intro-rules {
@@ -923,6 +924,7 @@ body {
   gap: 1rem;
   transition: all 0.3s ease;
   width: 100%;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .btn-start:hover {
