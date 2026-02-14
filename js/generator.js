@@ -55,7 +55,20 @@ export function generateTruth(numSuspects) {
 
 function generateSuspectFacts(truth, roles) {
   const facts = [];
+
+  // Validate all truth entries first
+  const hasInvalidEntries = truth.some(p =>
+    p.id === undefined || p.roomId === undefined || p.itemId === undefined || p.role === undefined
+  );
+
+  if (hasInvalidEntries) {
+    console.error("Invalid truth entries detected in generateSuspectFacts");
+    console.error("Full truth array:", truth);
+    throw new Error("CORRUPT_TRUTH_DATA");
+  }
+
   truth.forEach((p) => {
+
     facts.push({
       type: FACT_TYPES.SUSPECT_LOCATION,
       suspectId: p.id,
@@ -223,6 +236,14 @@ function renderFact(fact, mapping, roles) {
     case FACT_TYPES.SUSPECT_LOCATION: {
       const name = fmt("suspects", fact.suspectId);
       const rObj = mapping.rooms[fact.roomId];
+
+      if (!rObj) {
+        console.error(`Invalid roomId ${fact.roomId} in fact:`, fact);
+        text = `${name} was found in an unknown location.`;
+        fn = () => true;
+        break;
+      }
+
       const feats = mapping.features[rObj.name] || [];
 
       if (feats.length > 0 && Math.random() > 0.5) {
@@ -308,6 +329,13 @@ function renderFact(fact, mapping, roles) {
       const rText = fmtRoom(fact.roomId);
       const rObj = mapping.rooms[fact.roomId];
 
+      if (!rObj) {
+        console.error(`Invalid roomId ${fact.roomId} in ROOM_EMPTY fact:`, fact);
+        text = `An unknown location was empty.`;
+        fn = () => true;
+        break;
+      }
+
       if (Math.random() > 0.5) {
         // "The Kitchen was empty."
         text = `${rText.charAt(0).toUpperCase() + rText.slice(1)} was empty.`;
@@ -358,7 +386,7 @@ function renderFact(fact, mapping, roles) {
     }
     case FACT_TYPES.ROLE_EXCLUSION: {
       const name = fmt("suspects", fact.suspectId);
-      text = `${name} is not the ${wrapRole("killer")} or the ${wrapRole("victim")}.`;
+      text = `${name} is neither the ${wrapRole("killer")} nor the ${wrapRole("victim")}.`;
       fn = (a) =>
         getVal(a, fact.suspectId, "Role") !== "Killer" &&
         getVal(a, fact.suspectId, "Role") !== "Victim";
@@ -457,9 +485,53 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
   updateState({ isGenerating: true });
 
   const overlay = document.getElementById("transition-overlay");
+  const loaderMessage = document.getElementById("loader-message");
+  const regenerateBtn = document.getElementById("btn-regenerate");
+
+  // Reset overlay state
+  if (loaderMessage) {
+    loaderMessage.textContent = "";
+    loaderMessage.classList.add("hidden");
+  }
+  if (regenerateBtn) {
+    regenerateBtn.classList.add("hidden");
+  }
+
+  // Timers for progressive messages
+  let messageTimer = null;
+  let buttonTimer = null;
+  let shouldAbort = false;
+
   if (overlay) {
     overlay.classList.remove("hidden");
     overlay.classList.add("active");
+
+    // Show message after 30 seconds
+    messageTimer = setTimeout(() => {
+      if (loaderMessage) {
+        loaderMessage.textContent = "If this is taking so long, it's going to be a complex one...";
+        loaderMessage.classList.remove("hidden");
+      }
+    }, 30000);
+
+    // Show regenerate button after 60 seconds
+    buttonTimer = setTimeout(() => {
+      if (regenerateBtn && loaderMessage) {
+        loaderMessage.textContent = "This is taking quite a while. You can wait or try generating a new case.";
+        regenerateBtn.classList.remove("hidden");
+        regenerateBtn.onclick = () => {
+          shouldAbort = true;
+          if (messageTimer) clearTimeout(messageTimer);
+          if (buttonTimer) clearTimeout(buttonTimer);
+          updateState({ isGenerating: false });
+          overlay.classList.remove("active");
+          setTimeout(() => overlay.classList.add("hidden"), 450);
+          // Restart generation
+          setTimeout(() => handleNewCase(uiCallbacks), 500);
+        };
+      }
+    }, 60000);
+
     await new Promise((r) => setTimeout(r, 450));
   }
 
@@ -499,12 +571,84 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
   });
 
   const { truth, roles } = generateTruth(numSuspects);
-  let allFacts = generateClues(truth, roles, numSuspects);
+
+  try {
+    var allFacts = generateClues(truth, roles, numSuspects);
+  } catch (error) {
+    if (error.message === "CORRUPT_TRUTH_DATA") {
+      console.error("Corrupt truth data detected, regenerating...");
+      addLog(`⚠️ CORRUPT DATA DETECTED - Regenerating...`);
+
+      // Clear timers
+      if (messageTimer) clearTimeout(messageTimer);
+      if (buttonTimer) clearTimeout(buttonTimer);
+
+      // Hide overlay
+      if (overlay) {
+        overlay.classList.remove("active");
+        setTimeout(() => overlay.classList.add("hidden"), 450);
+      }
+
+      updateState({ isGenerating: false });
+
+      // Retry generation
+      setTimeout(() => handleNewCase(uiCallbacks), 500);
+      return;
+    }
+    throw error; // Re-throw if it's a different error
+  }
+
   allFacts = shuffle(allFacts);
   addLog(`Universe: ${allFacts.length} possibilities. Pruning...`);
 
+  // Validate facts before pruning
+  const invalidFacts = allFacts.filter((f) => {
+    // Check for undefined IDs that should be defined based on fact type
+    if (f.type === FACT_TYPES.SUSPECT_LOCATION && f.roomId === undefined) return true;
+    if (f.type === FACT_TYPES.SUSPECT_ITEM && f.itemId === undefined) return true;
+    if (f.type === FACT_TYPES.SUSPECT_LOCATION_ITEM && (f.roomId === undefined || f.itemId === undefined)) return true;
+    if (f.type === FACT_TYPES.ROOM_ITEM && (f.roomId === undefined || f.itemId === undefined)) return true;
+    if (f.type === FACT_TYPES.ROOM_EMPTY && f.roomId === undefined) return true;
+    if (f.type === FACT_TYPES.ROOM_NOT_CORPSE && f.roomId === undefined) return true;
+    if (f.type === FACT_TYPES.ITEM_NOT_MURDER_WEAPON && f.itemId === undefined) return true;
+
+    // Check for out of range IDs
+    if (f.roomId !== undefined && (f.roomId < 0 || f.roomId >= numSuspects)) return true;
+    if (f.itemId !== undefined && (f.itemId < 0 || f.itemId >= numSuspects)) return true;
+    if (f.suspectId !== undefined && (f.suspectId < 0 || f.suspectId >= numSuspects)) return true;
+    return false;
+  });
+  if (invalidFacts.length > 0) {
+    console.error(`Found ${invalidFacts.length} invalid facts before pruning:`, invalidFacts);
+    console.error(`numSuspects: ${numSuspects}, truth:`, truth);
+    console.error(`Roles:`, roles);
+    addLog(`⚠️ CORRUPT DATA DETECTED - Regenerating...`);
+
+    // Clear timers
+    if (messageTimer) clearTimeout(messageTimer);
+    if (buttonTimer) clearTimeout(buttonTimer);
+
+    // Hide overlay
+    if (overlay) {
+      overlay.classList.remove("active");
+      setTimeout(() => overlay.classList.add("hidden"), 450);
+    }
+
+    updateState({ isGenerating: false });
+
+    // Retry generation after a brief delay
+    setTimeout(() => handleNewCase(uiCallbacks), 500);
+    return;
+  }
+
   let keptFacts = [...allFacts];
   for (let i = keptFacts.length - 1; i >= 0; i--) {
+    // Check if user requested abort
+    if (shouldAbort) {
+      addLog("Generation aborted by user");
+      return;
+    }
+
     const fact = keptFacts[i];
     const testSet = keptFacts.filter((_, idx) => idx !== i);
 
@@ -576,7 +720,13 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
 
   renderUI();
 
+  // Clear timers
+  if (messageTimer) clearTimeout(messageTimer);
+  if (buttonTimer) clearTimeout(buttonTimer);
+
   if (overlay) {
+    if (loaderMessage) loaderMessage.classList.add("hidden");
+    if (regenerateBtn) regenerateBtn.classList.add("hidden");
     overlay.classList.remove("active");
     setTimeout(() => overlay.classList.add("hidden"), 450);
   }

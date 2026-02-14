@@ -200,14 +200,42 @@ async function handleGuessChange(e) {
 
 export function verifySolution() {
   if (!state.solution) return;
+
+  // Validate truth data first
+  let hasErrors = false;
+  state.solution.truth.forEach((p) => {
+    const n = state.gameMapping.suspects[p.id];
+    const room = state.gameMapping.rooms[p.roomId];
+    const item = state.gameMapping.items[p.itemId];
+
+    if (!room || !item || !n) {
+      console.error("Invalid truth entry in verifySolution:", p);
+      hasErrors = true;
+    }
+  });
+
+  if (hasErrors) {
+    addLog("⚠️ CORRUPT PUZZLE DETECTED - Regenerating...");
+    alert("This puzzle has corrupt data and is unsolvable. Generating a new case...");
+    // Trigger regeneration
+    setTimeout(() => {
+      const newCaseBtn = document.getElementById("btn-new-case");
+      if (newCaseBtn) newCaseBtn.click();
+    }, 100);
+    return;
+  }
+
   let ok = true;
   state.solution.truth.forEach((p) => {
-    const n = state.gameMapping.suspects[p.id],
-      g = state.userGuesses[n];
+    const n = state.gameMapping.suspects[p.id];
+    const g = state.userGuesses[n];
+    const room = state.gameMapping.rooms[p.roomId];
+    const item = state.gameMapping.items[p.itemId];
+
     if (
       !g ||
-      g.room !== state.gameMapping.rooms[p.roomId].name ||
-      g.item !== state.gameMapping.items[p.itemId].name ||
+      g.room !== room.name ||
+      g.item !== item.name ||
       g.role !== p.role
     )
       ok = false;
@@ -229,6 +257,32 @@ export function closeRevealModal() {
 export function performReveal() {
   closeRevealModal();
   if (!state.solution) return;
+
+  // Validate truth data first
+  let hasErrors = false;
+  state.solution.truth.forEach((p) => {
+    const n = state.gameMapping.suspects[p.id];
+    const room = state.gameMapping.rooms[p.roomId];
+    const item = state.gameMapping.items[p.itemId];
+
+    if (!room || !item || !n) {
+      console.error("Invalid truth entry in performReveal:", p);
+      console.error("Room:", room, "Item:", item, "Suspect:", n);
+      hasErrors = true;
+    }
+  });
+
+  if (hasErrors) {
+    addLog("⚠️ CORRUPT PUZZLE DETECTED - Regenerating...");
+    alert("This puzzle has corrupt data and is unsolvable. Generating a new case...");
+    // Trigger regeneration
+    setTimeout(() => {
+      const newCaseBtn = document.getElementById("btn-new-case");
+      if (newCaseBtn) newCaseBtn.click();
+    }, 100);
+    return;
+  }
+
   state.solution.truth.forEach((p) => {
     const n = state.gameMapping.suspects[p.id];
     state.userGuesses[n] = {
