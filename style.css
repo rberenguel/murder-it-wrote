@@ -648,12 +648,15 @@ body {
     gap: 2rem;
     opacity: 0;
     transform: translateY(10px);
-    transition: all 0.4s ease 0.1s;
+    /* Exit transition: fast, no delay, so it disappears with/before bg */
+    transition: all 0.2s ease;
 }
 
 .transition-overlay.active .loader-content {
     opacity: 1;
     transform: translateY(0);
+    /* Enter transition: normal speed, with delay for staggered effect */
+    transition: all 0.4s ease 0.1s;
 }
 
 .loader-icon {
