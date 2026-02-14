@@ -32,3 +32,8 @@ export const SCENARIOS = [
         items: ['Candlestick', 'Dagger', 'Lead Pipe', 'Revolver', 'Rope', 'Wrench']
     }
 ];
+
+export const CONFIG = {
+    // 85% for classic, the rest shared among others
+    classicWeight: 0.85
+};

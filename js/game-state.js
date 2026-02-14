@@ -1,7 +1,15 @@
-import { SCENARIOS } from './constants.js';
+import { SCENARIOS, CONFIG } from './constants.js';
+
+export function pickRandomScenario() {
+    const classic = SCENARIOS.find(s => s.id === 'classic');
+    const others = SCENARIOS.filter(s => s.id !== 'classic');
+    
+    if (Math.random() < CONFIG.classicWeight && classic) return classic;
+    return others.length > 0 ? others[Math.floor(Math.random() * others.length)] : classic;
+}
 
 export let state = {
-    activeScenario: SCENARIOS[0],
+    activeScenario: pickRandomScenario(),
     gameMapping: null,
     puzzle: [],
     solution: null,
