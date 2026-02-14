@@ -48,6 +48,10 @@ This process—called **Essentiality Pruning**—ensures that every single clue 
 ## Features
 
 - **Several Themes**: Play to see them all. I may add more.
+- **Dynamic Case Sizing**: Cases are labeled by complexity (Cozy, Intimate, Tense, Complex, Massive) based on the number of suspects.
+- **Whimsical Case Titles**: Each case gets a randomly selected mystery descriptor (Mystery, Conundrum, Enigma, etc.) that persists with your save.
+- **Auto-Save**: Your progress is automatically saved. Close the game and resume exactly where you left off.
+- **Clue Reordering**: Drag clues to reorder them by their handle numbers. Your custom order is preserved across sessions.
 - **Logic Grid**: A built-in notebook to track your deductions.
 - **Smart Validation**: The notebook highlights impossible combinations (e.g., assigning the same item to two people).
 - **Polished UI**: Hopefully. Theme-aware styling, scrollbars, and typography. It might need more work on mobile or to keep the style consistent though.
