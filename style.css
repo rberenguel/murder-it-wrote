@@ -992,20 +992,20 @@ body {
   font-weight: 700;
 }
 
-/* ST: TNG: LCARS Glows */
-[data-theme="tng"] [class^="entity-"] {
+/* Computer glows */
+[data-theme="stellar_voyage"] [class^="entity-"] {
   color: #bbbbbb;
 } /* Darken text slightly to let glow pop */
-[data-theme="tng"] .entity-person {
+[data-theme="stellar_voyage"] .entity-person {
   text-shadow: 0 0 4px var(--accent-primary);
 }
-[data-theme="tng"] .entity-item {
+[data-theme="stellar_voyage"] .entity-item {
   text-shadow: 0 0 4px var(--accent-primary-alt);
 }
-[data-theme="tng"] .entity-room {
+[data-theme="stellar_voyage"] .entity-room {
   text-shadow: 0 0 4px #c5a059;
 }
-[data-theme="tng"] .entity-role {
+[data-theme="stellar_voyage"] .entity-role {
   text-shadow: 0 0 4px #ff0000;
   font-style: italic;
 }
