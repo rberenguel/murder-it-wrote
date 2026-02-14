@@ -44,6 +44,11 @@ export function renderSelect(s, f, l, opts) {
 
 export function renderUI() {
     document.body.dataset.theme = state.activeScenario.id;
+    const badge = document.getElementById('status-badge');
+    if (badge) {
+        badge.classList.add('hidden');
+        badge.textContent = '';
+    }
     const cc = document.getElementById('clues-container');
     const roleCounts = state.solution.roles.reduce((a,r)=>{ if(!['Killer','Victim'].includes(r)) a[r]=(a[r]||0)+1; return a; }, {});
     const roleStr = Object.entries(roleCounts).map(([r,c]) => `${c} ${r}${c>1?'s':''}`).join(', ');
@@ -105,6 +110,16 @@ export function verifySolution() {
 }
 
 export function revealSolution() {
+    document.getElementById('reveal-modal').classList.remove('hidden');
+}
+
+export function closeRevealModal() {
+    document.getElementById('reveal-modal').classList.add('hidden');
+}
+
+export function performReveal() {
+    closeRevealModal();
+    if (!state.solution) return;
     state.solution.truth.forEach(p => {
         const n = state.gameMapping.suspects[p.id];
         state.userGuesses[n] = { room: state.gameMapping.rooms[p.roomId].name, item: state.gameMapping.items[p.itemId], role: p.role };

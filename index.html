@@ -83,6 +83,21 @@
         </div>
     </main>
 
+    <div id="reveal-modal" class="modal-overlay hidden">
+        <div class="modal-panel">
+            <div class="modal-header">
+                <h2 class="modal-title">Give up?</h2>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to reveal the solution? This will end the current investigation.</p>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-reveal-cancel" class="btn btn-outline"><span>Cancel</span></button>
+                <button id="btn-reveal-confirm" class="btn btn-dark"><span>Reveal</span></button>
+            </div>
+        </div>
+    </div>
+
     <div id="debug-overlay" class="hidden">
         <div class="debug-clickable" onclick="toggleDebug()"></div>
         <div class="debug-panel">

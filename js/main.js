@@ -1,7 +1,7 @@
 import { state, updateState, pickRandomScenario } from './game-state.js';
 import { SCENARIOS } from './constants.js';
 import { handleNewCase } from './generator.js';
-import { renderUI, renderLocations, verifySolution, revealSolution, toggleDebug, addLog } from './ui.js';
+import { renderUI, renderLocations, verifySolution, revealSolution, toggleDebug, addLog, performReveal, closeRevealModal } from './ui.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const uiCallbacks = { addLog, renderUI };
@@ -74,6 +74,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     document.getElementById('btn-verify')?.addEventListener('click', verifySolution);
     document.getElementById('btn-reveal')?.addEventListener('click', revealSolution);
+    document.getElementById('btn-reveal-confirm')?.addEventListener('click', performReveal);
+    document.getElementById('btn-reveal-cancel')?.addEventListener('click', closeRevealModal);
     document.getElementById('btn-debug-pi')?.addEventListener('click', toggleDebug);
 
     // Initial render
