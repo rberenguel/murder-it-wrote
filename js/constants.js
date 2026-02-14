@@ -146,6 +146,20 @@ export const SCENARIOS = [
         "airlock",
       ],
     },
+    roomAdjacency: {
+      // Spaceship corridor layout
+      "Command Bridge": ["Conference Lounge", "Captain's Study"],
+      "Captain's Study": ["Command Bridge"],
+      "Conference Lounge": ["Command Bridge", "The Galley"],
+      "The Galley": ["Conference Lounge", "Medical Bay"],
+      "Medical Bay": ["The Galley", "Research Lab"],
+      "Research Lab": ["Medical Bay", "Simulation Deck"],
+      "Simulation Deck": ["Research Lab"],
+      "Main Engineering": ["Storage Deck", "Hangar Bay", "Teleportation Suite"],
+      "Storage Deck": ["Main Engineering"],
+      "Hangar Bay": ["Main Engineering"],
+      "Teleportation Suite": ["Main Engineering"],
+    },
     items: [
       { name: "Pulse Pistol", isProper: false },
       { name: "Crescent Blade", isProper: false },
@@ -267,6 +281,20 @@ export const SCENARIOS = [
         "exposed beams",
       ],
     },
+    roomAdjacency: {
+      // Hall as central hub
+      Hall: ["Ballroom", "Library", "Study", "Lounge", "Dining Room"],
+      Ballroom: ["Hall", "Conservatory"],
+      Conservatory: ["Ballroom"],
+      Library: ["Hall", "Study"],
+      Study: ["Hall", "Library"],
+      Lounge: ["Hall", "Billiard Room"],
+      "Dining Room": ["Hall", "Kitchen"],
+      Kitchen: ["Dining Room", "Cellar"],
+      "Billiard Room": ["Lounge"],
+      Cellar: ["Kitchen"],
+      // Attic isolated (accessed by stairs)
+    },
     items: [
       { name: "Candlestick", isProper: false },
       { name: "Dagger", isProper: false },
@@ -382,6 +410,19 @@ export const SCENARIOS = [
         "drawbridge control",
         "boiling oil",
       ],
+    },
+    roomAdjacency: {
+      // Courtyard as central hub
+      Courtyard: ["Gatehouse", "Great Hall", "Chapel", "Stable", "Barracks"],
+      Gatehouse: ["Courtyard"],
+      "Great Hall": ["Courtyard", "Throne Room", "Armory"],
+      "Throne Room": ["Great Hall", "Tower"],
+      Armory: ["Great Hall"],
+      Chapel: ["Courtyard"],
+      Stable: ["Courtyard"],
+      Barracks: ["Courtyard"],
+      Tower: ["Throne Room"],
+      Dungeon: ["Great Hall"],
     },
     items: [
       { name: "Broadsword", isProper: false },
@@ -626,6 +667,16 @@ export const SCENARIOS = [
         "water lapping",
         "stars above",
       ],
+    },
+    roomAdjacency: {
+      // Mansion interior and grounds
+      "Gatsby's Mansion": ["Library", "Ballroom", "Garden"],
+      Library: ["Gatsby's Mansion"],
+      Ballroom: ["Gatsby's Mansion"],
+      Garden: ["Gatsby's Mansion", "Swimming Pool", "Dock"],
+      "Swimming Pool": ["Garden"],
+      Dock: ["Garden"],
+      // Distant locations not connected
     },
     items: [
       { name: "Revolver", isProper: false },
@@ -873,9 +924,13 @@ export const SCENARIOS = [
     },
     roomAdjacency: {
       // Front to back train layout
-      "Platform": ["Conductor's Cabin"],
+      Platform: ["Conductor's Cabin"],
       "Conductor's Cabin": ["Platform", "First Class Corridor"],
-      "First Class Corridor": ["Conductor's Cabin", "Sleeping Compartment", "Dining Car"],
+      "First Class Corridor": [
+        "Conductor's Cabin",
+        "Sleeping Compartment",
+        "Dining Car",
+      ],
       "Sleeping Compartment": ["First Class Corridor"],
       "Dining Car": ["First Class Corridor", "Kitchen Car", "Observation Car"],
       "Kitchen Car": ["Dining Car", "Baggage Car"],
@@ -883,7 +938,7 @@ export const SCENARIOS = [
       "Baggage Car": ["Kitchen Car", "Second Class Coach"],
       "Second Class Coach": ["Baggage Car", "Washroom"],
       "Smoking Lounge": ["Observation Car", "Washroom"],
-      "Washroom": ["Second Class Coach", "Smoking Lounge"],
+      Washroom: ["Second Class Coach", "Smoking Lounge"],
     },
     items: [
       { name: "Dagger", isProper: false },
@@ -1000,6 +1055,11 @@ export const SCENARIOS = [
         "confined space",
         "glowing displays",
       ],
+    },
+    roomAdjacency: {
+      // Roy's death scene connection
+      Rooftop: ["Finch's Workshop"],
+      "Finch's Workshop": ["Rooftop"],
     },
     items: [
       { name: "Blaster", isProper: false },
@@ -1244,6 +1304,20 @@ export const SCENARIOS = [
         "shifting walls",
         "hidden truth",
       ],
+    },
+    roomAdjacency: {
+      // Manor with secret passages
+      "Great Hall": ["Dining Room", "Library", "Chapel"],
+      "Dining Room": ["Great Hall"],
+      Library: ["Great Hall"],
+      Chapel: ["Great Hall"],
+      "Master Bedroom": ["Drafting Studio"],
+      "Drafting Studio": ["Master Bedroom"],
+      Greenhouse: ["Terrace"],
+      Terrace: ["Greenhouse"],
+      "Secret Passage": ["Observatory", "Room 99"],
+      Observatory: ["Secret Passage"],
+      "Room 99": ["Secret Passage"],
     },
     items: [
       { name: "Metal Detector", isProper: false },

@@ -16,6 +16,12 @@ const FACT_TYPES = {
   SCREAM_HEARD: "SCREAM_HEARD",
 };
 
+// Probabilistic protection for special fact types during pruning
+// Value is the probability (0-1) that the fact will be kept even if not essential
+const PROTECTED_FACT_TYPES = {
+  [FACT_TYPES.SCREAM_HEARD]: 0.8, // 80% chance to keep proximity clues
+};
+
 const getVal = (a, id, type) => a[`${id}_${type}`];
 const checkVal = (a, subId, type, val) => getVal(a, subId, type) === val;
 
@@ -64,8 +70,12 @@ function generateSuspectFacts(truth, roles) {
   const facts = [];
 
   // Validate all truth entries first
-  const hasInvalidEntries = truth.some(p =>
-    p.id === undefined || p.roomId === undefined || p.itemId === undefined || p.role === undefined
+  const hasInvalidEntries = truth.some(
+    (p) =>
+      p.id === undefined ||
+      p.roomId === undefined ||
+      p.itemId === undefined ||
+      p.role === undefined,
   );
 
   if (hasInvalidEntries) {
@@ -75,7 +85,6 @@ function generateSuspectFacts(truth, roles) {
   }
 
   truth.forEach((p) => {
-
     facts.push({
       type: FACT_TYPES.SUSPECT_LOCATION,
       suspectId: p.id,
@@ -152,7 +161,7 @@ function generateProximityFacts(truth, roles, mapping) {
   }
 
   // Find victim's room (where the scream came from)
-  const victim = truth.find(p => p.role === "Victim");
+  const victim = truth.find((p) => p.role === "Victim");
   const victimRoom = mapping.rooms[victim.roomId];
   console.log("Victim room (murder scene):", victimRoom?.name);
 
@@ -165,7 +174,7 @@ function generateProximityFacts(truth, roles, mapping) {
   if (adjacentRoomNames.length === 0) return facts;
 
   // Find people in adjacent rooms (anyone could hear the scream)
-  const listeners = truth.filter(p => {
+  const listeners = truth.filter((p) => {
     if (p.role === "Victim") return false; // Victim can't hear their own scream
     const personRoom = mapping.rooms[p.roomId];
     return personRoom && adjacentRoomNames.includes(personRoom.name);
@@ -176,7 +185,9 @@ function generateProximityFacts(truth, roles, mapping) {
   // Generate scream fact if there are listeners (100% chance for testing)
   if (listeners.length > 0) {
     const listener = listeners[Math.floor(Math.random() * listeners.length)];
-    console.log(`✓ SCREAM FACT GENERATED: ${mapping.suspects[listener.id]} in ${mapping.rooms[truth[listener.id].roomId]?.name} heard scream from ${victimRoom.name}`);
+    console.log(
+      `✓ SCREAM FACT GENERATED: ${mapping.suspects[listener.id]} in ${mapping.rooms[truth[listener.id].roomId]?.name} heard scream from ${victimRoom.name}`,
+    );
     facts.push({
       type: FACT_TYPES.SCREAM_HEARD,
       suspectId: listener.id,
@@ -381,7 +392,10 @@ function renderFact(fact, mapping, roles) {
       const rObj = mapping.rooms[fact.roomId];
 
       if (!rObj) {
-        console.error(`Invalid roomId ${fact.roomId} in ROOM_EMPTY fact:`, fact);
+        console.error(
+          `Invalid roomId ${fact.roomId} in ROOM_EMPTY fact:`,
+          fact,
+        );
         text = `An unknown location was empty.`;
         fn = () => true;
         break;
@@ -469,11 +483,14 @@ function renderFact(fact, mapping, roles) {
         if (!listenerRoomObj) return false;
 
         // Get adjacent room names
-        const adjacentRoomNames = getAdjacentRooms(listenerRoomObj.name, mapping.scenario);
+        const adjacentRoomNames = getAdjacentRooms(
+          listenerRoomObj.name,
+          mapping.scenario,
+        );
         if (adjacentRoomNames.length === 0) return false;
 
         // Find victim's room (where the scream came from)
-        const victimIdx = roles.findIndex(r => r === "Victim");
+        const victimIdx = roles.findIndex((r) => r === "Victim");
         if (victimIdx === -1) return false;
 
         const victimRoom = getVal(a, victimIdx, "Room");
@@ -595,7 +612,8 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
     // Show message after 30 seconds
     messageTimer = setTimeout(() => {
       if (loaderMessage) {
-        loaderMessage.textContent = "If this is taking so long, it's going to be a complex one...";
+        loaderMessage.textContent =
+          "If this is taking so long, it's going to be a complex one...";
         loaderMessage.classList.remove("hidden");
       }
     }, 30000);
@@ -603,7 +621,8 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
     // Show regenerate button after 60 seconds
     buttonTimer = setTimeout(() => {
       if (regenerateBtn && loaderMessage) {
-        loaderMessage.textContent = "This is taking quite a while. You can wait or try generating a new case.";
+        loaderMessage.textContent =
+          "This is taking quite a while. You can wait or try generating a new case.";
         regenerateBtn.classList.remove("hidden");
         regenerateBtn.onclick = () => {
           shouldAbort = true;
@@ -691,22 +710,43 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
   // Validate facts before pruning
   const invalidFacts = allFacts.filter((f) => {
     // Check for undefined IDs that should be defined based on fact type
-    if (f.type === FACT_TYPES.SUSPECT_LOCATION && f.roomId === undefined) return true;
-    if (f.type === FACT_TYPES.SUSPECT_ITEM && f.itemId === undefined) return true;
-    if (f.type === FACT_TYPES.SUSPECT_LOCATION_ITEM && (f.roomId === undefined || f.itemId === undefined)) return true;
-    if (f.type === FACT_TYPES.ROOM_ITEM && (f.roomId === undefined || f.itemId === undefined)) return true;
+    if (f.type === FACT_TYPES.SUSPECT_LOCATION && f.roomId === undefined)
+      return true;
+    if (f.type === FACT_TYPES.SUSPECT_ITEM && f.itemId === undefined)
+      return true;
+    if (
+      f.type === FACT_TYPES.SUSPECT_LOCATION_ITEM &&
+      (f.roomId === undefined || f.itemId === undefined)
+    )
+      return true;
+    if (
+      f.type === FACT_TYPES.ROOM_ITEM &&
+      (f.roomId === undefined || f.itemId === undefined)
+    )
+      return true;
     if (f.type === FACT_TYPES.ROOM_EMPTY && f.roomId === undefined) return true;
-    if (f.type === FACT_TYPES.ROOM_NOT_CORPSE && f.roomId === undefined) return true;
-    if (f.type === FACT_TYPES.ITEM_NOT_MURDER_WEAPON && f.itemId === undefined) return true;
+    if (f.type === FACT_TYPES.ROOM_NOT_CORPSE && f.roomId === undefined)
+      return true;
+    if (f.type === FACT_TYPES.ITEM_NOT_MURDER_WEAPON && f.itemId === undefined)
+      return true;
 
     // Check for out of range IDs
-    if (f.roomId !== undefined && (f.roomId < 0 || f.roomId >= numSuspects)) return true;
-    if (f.itemId !== undefined && (f.itemId < 0 || f.itemId >= numSuspects)) return true;
-    if (f.suspectId !== undefined && (f.suspectId < 0 || f.suspectId >= numSuspects)) return true;
+    if (f.roomId !== undefined && (f.roomId < 0 || f.roomId >= numSuspects))
+      return true;
+    if (f.itemId !== undefined && (f.itemId < 0 || f.itemId >= numSuspects))
+      return true;
+    if (
+      f.suspectId !== undefined &&
+      (f.suspectId < 0 || f.suspectId >= numSuspects)
+    )
+      return true;
     return false;
   });
   if (invalidFacts.length > 0) {
-    console.error(`Found ${invalidFacts.length} invalid facts before pruning:`, invalidFacts);
+    console.error(
+      `Found ${invalidFacts.length} invalid facts before pruning:`,
+      invalidFacts,
+    );
     console.error(`numSuspects: ${numSuspects}, truth:`, truth);
     console.error(`Roles:`, roles);
     addLog(`⚠️ CORRUPT DATA DETECTED - Regenerating...`);
@@ -773,6 +813,15 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
           break;
         }
       }
+
+      // Probabilistic protection for special fact types
+      if (!essential) {
+        const protectionChance = PROTECTED_FACT_TYPES[fact.type];
+        if (protectionChance && Math.random() < protectionChance) {
+          essential = true; // Protected! Keep this fact
+        }
+      }
+
       if (!essential) keptFacts.splice(i, 1);
     }
   }

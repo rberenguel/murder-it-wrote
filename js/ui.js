@@ -17,8 +17,14 @@ export function getDifficultyStars(numSuspects, iconName = "star") {
   const MAX_SUSPECTS = 7;
   const stars = Math.max(1, Math.min(5, numSuspects - MIN_SUSPECTS + 1));
 
-  const filled = `<i class="ph-light ph-${iconName}" style="opacity: 1; color: currentColor;"></i>`.repeat(stars);
-  const empty = `<i class="ph-light ph-${iconName}" style="opacity: 0.25;"></i>`.repeat(5 - stars);
+  const filled =
+    `<i class="ph-light ph-${iconName}" style="opacity: 1; color: currentColor;"></i>`.repeat(
+      stars,
+    );
+  const empty =
+    `<i class="ph-light ph-${iconName}" style="opacity: 0.25;"></i>`.repeat(
+      5 - stars,
+    );
   return filled + empty;
 }
 
@@ -46,15 +52,14 @@ export function renderLocations() {
     list.innerHTML = `
         <div class="locations-list">
             ${rooms
-              .map(
-                (r) => {
-                  const connectedRooms = adjacency[r.name] || [];
-                  // Filter to only show rooms that are in the current game
-                  const activeConnections = connectedRooms.filter(roomName =>
-                    rooms.some(room => room.name === roomName)
-                  );
+              .map((r) => {
+                const connectedRooms = adjacency[r.name] || [];
+                // Filter to only show rooms that are in the current game
+                const activeConnections = connectedRooms.filter((roomName) =>
+                  rooms.some((room) => room.name === roomName),
+                );
 
-                  return `
+                return `
                 <div class="location-item">
                     <h3 class="location-name">${r.name}</h3>
                     <div class="feature-list">
@@ -63,8 +68,7 @@ export function renderLocations() {
                     </div>
                 </div>
             `;
-                }
-              )
+              })
               .join("")}
         </div>`;
 }
@@ -114,7 +118,10 @@ export function renderUI() {
     const numSuspects = state.gameMapping.suspects.length;
     const sizeWord = getCaseSize(numSuspects);
     const mysteryWord = state.mysteryWord || "Mystery";
-    const difficultyStars = getDifficultyStars(numSuspects, state.difficultyIcon || "star");
+    const difficultyStars = getDifficultyStars(
+      numSuspects,
+      state.difficultyIcon || "star",
+    );
     evidenceHeader.innerHTML = `
             <div style="display: flex; flex-direction: column;">
                 <h2 class="card-title" style="font-family: var(--font-sans);">
@@ -227,7 +234,9 @@ export function verifySolution() {
 
   if (hasErrors) {
     addLog("⚠️ CORRUPT PUZZLE DETECTED - Regenerating...");
-    alert("This puzzle has corrupt data and is unsolvable. Generating a new case...");
+    alert(
+      "This puzzle has corrupt data and is unsolvable. Generating a new case...",
+    );
     // Trigger regeneration
     setTimeout(() => {
       const newCaseBtn = document.getElementById("btn-new-case");
@@ -243,12 +252,7 @@ export function verifySolution() {
     const room = state.gameMapping.rooms[p.roomId];
     const item = state.gameMapping.items[p.itemId];
 
-    if (
-      !g ||
-      g.room !== room.name ||
-      g.item !== item.name ||
-      g.role !== p.role
-    )
+    if (!g || g.room !== room.name || g.item !== item.name || g.role !== p.role)
       ok = false;
   });
   const b = document.getElementById("status-badge");
@@ -285,7 +289,9 @@ export function performReveal() {
 
   if (hasErrors) {
     addLog("⚠️ CORRUPT PUZZLE DETECTED - Regenerating...");
-    alert("This puzzle has corrupt data and is unsolvable. Generating a new case...");
+    alert(
+      "This puzzle has corrupt data and is unsolvable. Generating a new case...",
+    );
     // Trigger regeneration
     setTimeout(() => {
       const newCaseBtn = document.getElementById("btn-new-case");

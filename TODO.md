@@ -15,6 +15,7 @@
 ## Advanced Clue Types
 
 ### Blood/Weapon Details
+
 - **Blood spill clues**: Add "there was no blood spilled on X" clues where X is a feature in the corpse's room
   - Requirements:
     - Weapon categorization system (blunt/pointy/bloody vs clean/venom/etc.)
@@ -23,25 +24,28 @@
   - This adds atmospheric detail and additional deduction paths
 
 ### Room Proximity System
+
 - **Visible corpse clues**: "The corpse was visible in the distance from ROOM" for adjacent rooms
+
   - Requirements:
     - Room adjacency/connection graph
     - Visibility system between connected rooms
     - **Solver changes needed**: New clue type (multiple rooms could share adjacency to corpse room)
     - This is NOT a simple rewording - it's genuinely new information
 
-- **Sound-based clues**: "Person in adjacent room heard a scream coming from somewhere"
-  - Requirements:
-    - Room proximity graph (same as above)
-    - Weapon type system (blunt/bloody weapons = loud)
-    - Sound propagation rules
-    - **Solver changes needed**: "Somewhere" means one of several possible neighbor rooms
-    - Adds ambiguity and requires cross-referencing with other clues
+- ✅ **Sound-based clues**: "Person in adjacent room heard a scream coming from somewhere nearby" - IMPLEMENTED
+  - ✅ Room proximity graph (roomAdjacency in scenarios)
+  - ✅ Sound propagation rules (scream heard from adjacent rooms)
+  - ✅ Solver implementation (bidirectional constraint between listener and victim)
+  - ✅ Probabilistic protection system (80% chance to keep scream clues even if not essential)
+  - ✅ UI visualization (door icons showing room connections)
+  - ❌ Weapon type system (all murders generate screams regardless of weapon - could be refined)
 
 ## Notes
 
-- Proximity-based clues would significantly increase puzzle complexity and realism
+- ✅ Proximity-based clues (sound) have been implemented and significantly increase puzzle complexity and realism
 - Blood/weapon details could be added without solver changes (just flavor)
-- Room graph system would enable both visibility and sound clues
+- ✅ Room graph system implemented for sound clues, could be extended for visibility clues
 - The CSP solver ensures all puzzles remain logically solvable regardless of clue ambiguity - it validates unique solutions before presenting the puzzle
 - Ambiguous clues would increase deduction complexity for humans but the solver guarantees solvability
+- ✅ Probabilistic protection system allows marking special clue types (like proximity clues) as less likely to be pruned, ensuring they appear more frequently for better game variety
