@@ -441,6 +441,31 @@ body {
 
 .btn-icon:hover { background-color: var(--border-base); }
 
+/* Entity Highlights */
+[class^="entity-"] {
+    display: inline-block;
+    font-weight: 600;
+}
+
+/* Classic Mansion: Subtle dotted underline */
+[data-theme="classic"] [class^="entity-"] {
+    border-bottom: 1px dotted var(--accent-primary);
+    font-weight: 700;
+}
+
+/* ST: TNG: LCARS Glows */
+[data-theme="tng"] [class^="entity-"] { color: #bbbbbb; } /* Darken text slightly to let glow pop */
+[data-theme="tng"] .entity-person { text-shadow: 0 0 4px var(--accent-primary); }
+[data-theme="tng"] .entity-item { text-shadow: 0 0 4px var(--accent-primary-alt); }
+[data-theme="tng"] .entity-room { text-shadow: 0 0 4px #c5a059; }
+[data-theme="tng"] .entity-role { text-shadow: 0 0 4px #ff0000; font-style: italic; }
+
+/* Medieval Mystery: Ink & Gold */
+[data-theme="medieval"] .entity-person { color: #5d4037; border-bottom: 1px solid rgba(93, 64, 55, 0.3); }
+[data-theme="medieval"] .entity-item { color: #5d4037; font-style: italic; }
+[data-theme="medieval"] .entity-room { color: var(--accent-secondary); border-bottom: 1px solid rgba(128, 0, 32, 0.3); }
+[data-theme="medieval"] .entity-role { font-variant: small-caps; color: #4e342e; }
+
 /* Inputs */
 .select-input {
     flex: 1;

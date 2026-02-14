@@ -51,14 +51,15 @@ export function renderUI() {
     }
     const cc = document.getElementById('clues-container');
     const roleCounts = state.solution.roles.reduce((a,r)=>{ if(!['Killer','Victim'].includes(r)) a[r]=(a[r]||0)+1; return a; }, {});
-    const roleStr = Object.entries(roleCounts).map(([r,c]) => `${c} ${r}${c>1?'s':''}`).join(', ');
-    
+
     const evidenceHeader = document.querySelector('.evidence-card .card-header');
     if (evidenceHeader) {
+        const wrapRole = (r) => `<span class="entity-role">${r}</span>`;
+        const roleStr = Object.entries(roleCounts).map(([r,c]) => `${c} ${wrapRole(r)}${c>1?'s':''}`).join(', ');
         evidenceHeader.innerHTML = `
             <div style="display: flex; flex-direction: column;">
                 <h2 class="card-title"><i class="ph-light ph-magnifying-glass"></i>Evidence</h2>
-                <span style="font-size: 0.625rem; color: var(--text-slate-400); font-weight: 400; margin-left: 1.75rem;">Manifest: 1 Killer, 1 Victim, ${roleStr}</span>
+                <span style="font-size: 0.625rem; color: var(--text-slate-400); font-weight: 400; margin-left: 1.75rem;">Manifest: 1 ${wrapRole('Killer')}, 1 ${wrapRole('Victim')}, ${roleStr}</span>
             </div>`;
     }
 

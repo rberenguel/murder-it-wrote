@@ -135,11 +135,13 @@ function mergeFacts(facts) {
 }
 
 function renderFact(fact, mapping, roles) {
-    const fmt = (type, id) => mapping[type][id];
+    const fmt = (type, id) => `<span class="entity-${type === 'suspects' ? 'person' : (type === 'items' ? 'item' : 'room')}">${mapping[type][id]}</span>`;
     const fmtRoom = (rid) => {
         const r = mapping.rooms[rid];
-        return r.noArticle ? r.name : `the ${r.name}`;
+        const rName = `<span class="entity-room">${r.name}</span>`;
+        return r.noArticle ? rName : `the ${rName}`;
     };
+    const wrapRole = (r) => `<span class="entity-role">${r}</span>`;
     let text, fn, masks = [];
 
     switch (fact.type) {
@@ -175,7 +177,7 @@ function renderFact(fact, mapping, roles) {
             const name = fmt('suspects', fact.suspectId);
             const roleIndices = roles.map((r, i) => r === fact.role ? i : -1).filter(i => i !== -1);
             let roleMask = 0; roleIndices.forEach(i => roleMask |= (1 << i));
-            let rText = fact.role === 'Innocent' ? 'innocent' : `the ${fact.role.toLowerCase()}`;
+            let rText = fact.role === 'Innocent' ? 'innocent' : `the ${wrapRole(fact.role.toLowerCase())}`;
             text = `${name} is ${rText}.`;
             fn = (a) => checkVal(a, fact.suspectId, 'Role', fact.role);
             masks = [{ varIdx: fact.suspectId, mask: roleMask }];
@@ -185,7 +187,7 @@ function renderFact(fact, mapping, roles) {
             const name = fmt('suspects', fact.suspectId);
             const badIndices = roles.map((r, i) => r === fact.role ? i : -1).filter(i => i !== -1);
             let badMask = 0; badIndices.forEach(i => badMask |= (1 << i));
-            text = `${name} is not the ${fact.role.toLowerCase()}.`;
+            text = `${name} is not the ${wrapRole(fact.role.toLowerCase())}.`;
             fn = (a) => getVal(a, fact.suspectId, 'Role') !== fact.role;
             masks = [{ varIdx: fact.suspectId, mask: ~badMask }];
             break;
@@ -230,7 +232,7 @@ function renderFact(fact, mapping, roles) {
         }
         case FACT_TYPES.ROLE_EXCLUSION: {
             const name = fmt('suspects', fact.suspectId);
-            text = `${name} is not the killer or the victim.`;
+            text = `${name} is not the ${wrapRole('killer')} or the ${wrapRole('victim')}.`;
             fn = (a) => getVal(a, fact.suspectId, 'Role') !== 'Killer' && getVal(a, fact.suspectId, 'Role') !== 'Victim';
             const kIndices = roles.map((r, i) => r === 'Killer' ? i : -1).filter(i => i !== -1);
             const vIndices = roles.map((r, i) => r === 'Victim' ? i : -1).filter(i => i !== -1);
