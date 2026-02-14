@@ -105,7 +105,6 @@ export function verifySolution() {
 }
 
 export function revealSolution() {
-    if (!confirm("Give up?")) return;
     state.solution.truth.forEach(p => {
         const n = state.gameMapping.suspects[p.id];
         state.userGuesses[n] = { room: state.gameMapping.rooms[p.roomId].name, item: state.gameMapping.items[p.itemId], role: p.role };
