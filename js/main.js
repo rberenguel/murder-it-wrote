@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     document.getElementById('btn-verify')?.addEventListener('click', verifySolution);
     document.getElementById('btn-reveal')?.addEventListener('click', revealSolution);
-    document.getElementById('btn-debug')?.addEventListener('click', toggleDebug);
+    document.getElementById('btn-debug-pi')?.addEventListener('click', toggleDebug);
 
     // Initial render
     renderLocations();
