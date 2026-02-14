@@ -1,154 +1,195 @@
-import { state, updateState } from './game-state.js';
-import { ROLES_DEF } from './constants.js';
+import { state, updateState } from "./game-state.js";
+import { ROLES_DEF } from "./constants.js";
 
 export function addLog(m) {
-    const c = document.getElementById('log-container');
-    if(c) c.innerHTML += `<div class="log-entry"><span class="log-time">[${new Date().toLocaleTimeString().split(' ')[0]}]</span>${m}</div>`;
+  const c = document.getElementById("log-container");
+  if (c)
+    c.innerHTML += `<div class="log-entry"><span class="log-time">[${new Date().toLocaleTimeString().split(" ")[0]}]</span>${m}</div>`;
 }
 
 export function toggleDebug() {
-    document.getElementById('debug-overlay').classList.toggle('hidden');
+  document.getElementById("debug-overlay").classList.toggle("hidden");
 }
 
 export function renderLocations() {
-    const list = document.getElementById('locations-list');
-    const rooms = state.gameMapping ? state.gameMapping.rooms : [];
-    if (!rooms.length) { if(list) list.innerHTML = ''; return; }
-    const feats = state.activeScenario.roomFeatures;
-    if(list) list.innerHTML = `
+  const list = document.getElementById("locations-list");
+  const rooms = state.gameMapping ? state.gameMapping.rooms : [];
+  if (!rooms.length) {
+    if (list) list.innerHTML = "";
+    return;
+  }
+  const feats = state.activeScenario.roomFeatures;
+  if (list)
+    list.innerHTML = `
         <div class="locations-list">
-            ${rooms.map(r => `
+            ${rooms
+              .map(
+                (r) => `
                 <div class="location-item">
                     <h3 class="location-name">${r.name}</h3>
                     <div class="feature-list">
-                        ${(feats[r.name]||[]).map(f => `<span class="feature-badge">${f}</span>`).join('')}
+                        ${(feats[r.name] || []).map((f) => `<span class="feature-badge">${f}</span>`).join("")}
                     </div>
                 </div>
-            `).join('')}
+            `,
+              )
+              .join("")}
         </div>`;
 }
 
 export function renderSelect(s, f, l, opts, usedMap) {
-    const v = state.userGuesses[s]?.[f] || '';
-    const isConflict = (f === 'room' || f === 'item') && v && usedMap?.[f]?.[v] > 1;
+  const v = state.userGuesses[s]?.[f] || "";
+  const isConflict =
+    (f === "room" || f === "item") && v && usedMap?.[f]?.[v] > 1;
 
-    return `<div class="guess-row ${isConflict ? 'has-conflict' : ''}">
+  return `<div class="guess-row ${isConflict ? "has-conflict" : ""}">
                 <label class="guess-label">${l}</label>
                 <select onchange="updateGuess('${s}','${f}',this.value); renderUI();" class="select-input">
                     <option value="">Unknown</option>
-                    ${opts.map(o=>{
-                        const name = typeof o === 'string' ? o : o.name;
-                        const isUsedByOther = (f === 'room' || f === 'item') && usedMap?.[f]?.[name] > 0 && v !== name;
-                        return `<option value="${name}" ${v===name?'selected':''}>${name}${isUsedByOther ? ' •' : ''}</option>`;
-                    }).join('')}
+                    ${opts
+                      .map((o) => {
+                        const name = typeof o === "string" ? o : o.name;
+                        const isUsedByOther =
+                          (f === "room" || f === "item") &&
+                          usedMap?.[f]?.[name] > 0 &&
+                          v !== name;
+                        return `<option value="${name}" ${v === name ? "selected" : ""}>${name}${isUsedByOther ? " •" : ""}</option>`;
+                      })
+                      .join("")}
                 </select>
             </div>`;
 }
 
 export function renderUI() {
-    document.body.dataset.theme = state.activeScenario.id;
-    const badge = document.getElementById('status-badge');
-    if (badge) {
-        badge.classList.add('hidden');
-        badge.textContent = '';
-    }
-    const cc = document.getElementById('clues-container');
-    const roleCounts = state.solution.roles.reduce((a,r)=>{ if(!['Killer','Victim'].includes(r)) a[r]=(a[r]||0)+1; return a; }, {});
+  document.body.dataset.theme = state.activeScenario.id;
+  const badge = document.getElementById("status-badge");
+  if (badge) {
+    badge.classList.add("hidden");
+    badge.textContent = "";
+  }
+  const cc = document.getElementById("clues-container");
+  const roleCounts = state.solution.roles.reduce((a, r) => {
+    if (!["Killer", "Victim"].includes(r)) a[r] = (a[r] || 0) + 1;
+    return a;
+  }, {});
 
-    const evidenceHeader = document.querySelector('.evidence-card .card-header');
-    if (evidenceHeader) {
-        const wrapRole = (r) => `<span class="entity-role">${r}</span>`;
-        const roleStr = Object.entries(roleCounts).map(([r,c]) => `${c} ${wrapRole(r)}${c>1?'s':''}`).join(', ');
-        evidenceHeader.innerHTML = `
+  const evidenceHeader = document.querySelector(".evidence-card .card-header");
+  if (evidenceHeader) {
+    const wrapRole = (r) => `<span class="entity-role">${r}</span>`;
+    const roleStr = Object.entries(roleCounts)
+      .map(([r, c]) => `${c} ${wrapRole(r)}${c > 1 ? "s" : ""}`)
+      .join(", ");
+    evidenceHeader.innerHTML = `
             <div style="display: flex; flex-direction: column;">
                 <h2 class="card-title"><i class="ph-light ph-magnifying-glass"></i>Evidence</h2>
-                <span style="font-size: 0.625rem; color: var(--text-slate-400); font-weight: 400; margin-left: 1.75rem;">Manifest: 1 ${wrapRole('Killer')}, 1 ${wrapRole('Victim')}, ${roleStr}</span>
+                <span style="font-size: 0.625rem; color: var(--text-slate-400); font-weight: 400; margin-left: 1.75rem;">Manifest: 1 ${wrapRole("Killer")}, 1 ${wrapRole("Victim")}, ${roleStr}</span>
             </div>`;
-    }
+  }
 
-    cc.innerHTML = `<ul class="clue-list">${state.puzzle.map((c,i) => `
+  cc.innerHTML = `<ul class="clue-list">${state.puzzle
+    .map(
+      (c, i) => `
         <li class="clue-item">
-            <span class="clue-handle">${i+1}.</span>
+            <span class="clue-handle">${i + 1}.</span>
             <span class="clue-text">${c.text}</span>
-        </li>`).join('')}</ul>`;
+        </li>`,
+    )
+    .join("")}</ul>`;
 
-    if (state.sortable) state.sortable.destroy();
-    if (typeof Sortable !== 'undefined') {
-        updateState({
-            sortable: new Sortable(cc.querySelector('.clue-list'), { handle: '.clue-handle', animation: 150, ghostClass: 'sortable-ghost', delay: 100, delayOnTouchOnly: true })
-        });
-    }
-
-    const usedMap = { room: {}, item: {} };
-    Object.values(state.userGuesses).forEach(g => {
-        if (g.room) usedMap.room[g.room] = (usedMap.room[g.room] || 0) + 1;
-        if (g.item) usedMap.item[g.item] = (usedMap.item[g.item] || 0) + 1;
+  if (state.sortable) state.sortable.destroy();
+  if (typeof Sortable !== "undefined") {
+    updateState({
+      sortable: new Sortable(cc.querySelector(".clue-list"), {
+        handle: ".clue-handle",
+        animation: 150,
+        ghostClass: "sortable-ghost",
+        delay: 100,
+        delayOnTouchOnly: true,
+      }),
     });
+  }
 
-    const grid = document.getElementById('notebook-grid');
-    grid.innerHTML = `
+  const usedMap = { room: {}, item: {} };
+  Object.values(state.userGuesses).forEach((g) => {
+    if (g.room) usedMap.room[g.room] = (usedMap.room[g.room] || 0) + 1;
+    if (g.item) usedMap.item[g.item] = (usedMap.item[g.item] || 0) + 1;
+  });
+
+  const grid = document.getElementById("notebook-grid");
+  grid.innerHTML = `
         <div class="notebook-grid">
-            ${state.gameMapping.suspects.map(name => `
+            ${state.gameMapping.suspects
+              .map(
+                (name) => `
                 <div class="suspect-card">
                     <h3 class="suspect-name">
                         <span class="suspect-icon"><i class="ph-light ph-user"></i></span>
                         ${name}
                     </h3>
                     <div class="guess-grid">
-                        ${renderSelect(name, 'room', 'Loc', state.gameMapping.rooms, usedMap)}
-                        ${renderSelect(name, 'item', 'Item', state.gameMapping.items, usedMap)}
-                        ${renderSelect(name, 'role', 'Role', ROLES_DEF, usedMap)}
+                        ${renderSelect(name, "room", "Loc", state.gameMapping.rooms, usedMap)}
+                        ${renderSelect(name, "item", "Item", state.gameMapping.items, usedMap)}
+                        ${renderSelect(name, "role", "Role", ROLES_DEF, usedMap)}
                     </div>
                 </div>
-            `).join('')}
+            `,
+              )
+              .join("")}
         </div>`;
-    
-    renderLocations();
+
+  renderLocations();
 }
 
 export function verifySolution() {
-    if (!state.solution) return;
-    let ok = true;
-    state.solution.truth.forEach(p => {
-        const n = state.gameMapping.suspects[p.id], g = state.userGuesses[n];
-        if (!g || g.room !== state.gameMapping.rooms[p.roomId].name || g.item !== state.gameMapping.items[p.itemId] || g.role !== p.role) ok = false;
-    });
-    const b = document.getElementById('status-badge');
-    b.innerText = ok ? 'CORRECT' : 'INCORRECT'; 
-    b.className = `status-badge ${ok ? 'correct' : 'incorrect'}`;
-    b.classList.remove('hidden');
+  if (!state.solution) return;
+  let ok = true;
+  state.solution.truth.forEach((p) => {
+    const n = state.gameMapping.suspects[p.id],
+      g = state.userGuesses[n];
+    if (
+      !g ||
+      g.room !== state.gameMapping.rooms[p.roomId].name ||
+      g.item !== state.gameMapping.items[p.itemId] ||
+      g.role !== p.role
+    )
+      ok = false;
+  });
+  const b = document.getElementById("status-badge");
+  b.innerText = ok ? "CORRECT" : "INCORRECT";
+  b.className = `status-badge ${ok ? "correct" : "incorrect"}`;
+  b.classList.remove("hidden");
 }
 
 export function revealSolution() {
-    document.getElementById('reveal-modal').classList.remove('hidden');
+  document.getElementById("reveal-modal").classList.remove("hidden");
 }
 
 export function closeRevealModal() {
-    document.getElementById('reveal-modal').classList.add('hidden');
+  document.getElementById("reveal-modal").classList.add("hidden");
 }
 
 export function performReveal() {
-    closeRevealModal();
-    if (!state.solution) return;
-    state.solution.truth.forEach(p => {
-        const n = state.gameMapping.suspects[p.id];
-        state.userGuesses[n] = { 
-            room: state.gameMapping.rooms[p.roomId].name, 
-            item: state.gameMapping.items[p.itemId].name, 
-            role: p.role 
-        };
-    });
-    renderUI();
-    const b = document.getElementById('status-badge');
-    b.innerText = "REVEALED"; 
-    b.className = "status-badge revealed";
-    b.classList.remove('hidden');
+  closeRevealModal();
+  if (!state.solution) return;
+  state.solution.truth.forEach((p) => {
+    const n = state.gameMapping.suspects[p.id];
+    state.userGuesses[n] = {
+      room: state.gameMapping.rooms[p.roomId].name,
+      item: state.gameMapping.items[p.itemId].name,
+      role: p.role,
+    };
+  });
+  renderUI();
+  const b = document.getElementById("status-badge");
+  b.innerText = "REVEALED";
+  b.className = "status-badge revealed";
+  b.classList.remove("hidden");
 }
 
 // Attach globals for inline handlers
-window.updateGuess = (s, f, v) => { 
-    if (!state.userGuesses[s]) state.userGuesses[s] = {}; 
-    state.userGuesses[s][f] = v; 
+window.updateGuess = (s, f, v) => {
+  if (!state.userGuesses[s]) state.userGuesses[s] = {};
+  state.userGuesses[s][f] = v;
 };
 
 window.toggleDebug = toggleDebug;
