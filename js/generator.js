@@ -129,13 +129,17 @@ function mergeFacts(facts) {
 
 function renderFact(fact, mapping, roles) {
     const fmt = (type, id) => mapping[type][id];
+    const fmtRoom = (rid) => {
+        const r = mapping.rooms[rid];
+        return r.noArticle ? r.name : `the ${r.name}`;
+    };
     let text, fn, masks = [];
 
     switch (fact.type) {
         case FACT_TYPES.SUSPECT_LOCATION: {
             const name = fmt('suspects', fact.suspectId);
-            const rName = fmt('rooms', fact.roomId);
-            text = `${name} was in the ${rName}.`;
+            const rText = fmtRoom(fact.roomId);
+            text = `${name} was in ${rText}.`;
             fn = (a) => checkVal(a, fact.suspectId, 'Room', fact.roomId);
             masks = [{ varIdx: 10 + fact.suspectId, mask: (1 << fact.roomId) }];
             break;
@@ -150,9 +154,9 @@ function renderFact(fact, mapping, roles) {
         }
         case FACT_TYPES.SUSPECT_LOCATION_ITEM: {
             const name = fmt('suspects', fact.suspectId);
-            const rName = fmt('rooms', fact.roomId);
+            const rText = fmtRoom(fact.roomId);
             const item = fmt('items', fact.itemId);
-            text = `${name} was in the ${rName} with the ${item}.`;
+            text = `${name} was in ${rText} with the ${item}.`;
             fn = (a) => checkVal(a, fact.suspectId, 'Room', fact.roomId) && checkVal(a, fact.suspectId, 'Item', fact.itemId);
             masks = [
                 { varIdx: 10 + fact.suspectId, mask: (1 << fact.roomId) },
@@ -180,9 +184,9 @@ function renderFact(fact, mapping, roles) {
             break;
         }
         case FACT_TYPES.ROOM_ITEM: {
-            const rName = fmt('rooms', fact.roomId);
+            const rText = fmtRoom(fact.roomId);
             const item = fmt('items', fact.itemId);
-            text = `The person in the ${rName} had the ${item}.`;
+            text = `The person in ${rText} had the ${item}.`;
             fn = (a) => {
                  const r = IDS.filter(i => getVal(a, i, 'Room') === fact.roomId);
                  return r.length > 0 && r.some(id => checkVal(a, id, 'Item', fact.itemId));
@@ -190,8 +194,8 @@ function renderFact(fact, mapping, roles) {
             break;
         }
         case FACT_TYPES.ROOM_EMPTY: {
-            const rName = fmt('rooms', fact.roomId);
-            text = `The ${rName} was empty.`;
+            const rText = fmtRoom(fact.roomId);
+            text = `${rText.charAt(0).toUpperCase() + rText.slice(1)} was empty.`;
             fn = (a) => {
                 for (let i of IDS) if (getVal(a, i, 'Room') === fact.roomId) return false;
                 return true;
@@ -209,8 +213,8 @@ function renderFact(fact, mapping, roles) {
             break;
         }
         case FACT_TYPES.ROOM_NOT_CORPSE: {
-            const rName = fmt('rooms', fact.roomId);
-            text = `There is no corpse in the ${rName}.`;
+            const rText = fmtRoom(fact.roomId);
+            text = `There is no corpse in ${rText}.`;
             fn = (a) => {
                 const suspectsInRoom = IDS.filter(pid => checkVal(a, pid, 'Room', fact.roomId));
                 return suspectsInRoom.every(pid => getVal(a, pid, 'Role') !== 'Victim');

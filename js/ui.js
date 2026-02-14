@@ -19,9 +19,9 @@ export function renderLocations() {
         <div class="locations-list">
             ${rooms.map(r => `
                 <div class="location-item">
-                    <h3 class="location-name">${r}</h3>
+                    <h3 class="location-name">${r.name}</h3>
                     <div class="feature-list">
-                        ${(feats[r]||[]).map(f => `<span class="feature-badge">${f}</span>`).join('')}
+                        ${(feats[r.name]||[]).map(f => `<span class="feature-badge">${f}</span>`).join('')}
                     </div>
                 </div>
             `).join('')}
@@ -34,7 +34,10 @@ export function renderSelect(s, f, l, opts) {
                 <label class="guess-label">${l}</label>
                 <select onchange="updateGuess('${s}','${f}',this.value)" class="select-input">
                     <option value="">Unknown</option>
-                    ${opts.map(o=>`<option value="${o}" ${v===o?'selected':''}>${o}</option>`).join('')}
+                    ${opts.map(o=>{
+                        const name = typeof o === 'string' ? o : o.name;
+                        return `<option value="${name}" ${v===name?'selected':''}>${name}</option>`;
+                    }).join('')}
                 </select>
             </div>`;
 }
@@ -96,7 +99,7 @@ export function verifySolution() {
     let ok = true;
     state.solution.truth.forEach(p => {
         const n = state.gameMapping.suspects[p.id], g = state.userGuesses[n];
-        if (!g || g.room !== state.gameMapping.rooms[p.roomId] || g.item !== state.gameMapping.items[p.itemId] || g.role !== p.role) ok = false;
+        if (!g || g.room !== state.gameMapping.rooms[p.roomId].name || g.item !== state.gameMapping.items[p.itemId] || g.role !== p.role) ok = false;
     });
     const b = document.getElementById('status-badge');
     b.innerText = ok ? 'CORRECT' : 'INCORRECT'; 
@@ -108,7 +111,7 @@ export function revealSolution() {
     if (!confirm("Give up?")) return;
     state.solution.truth.forEach(p => {
         const n = state.gameMapping.suspects[p.id];
-        state.userGuesses[n] = { room: state.gameMapping.rooms[p.roomId], item: state.gameMapping.items[p.itemId], role: p.role };
+        state.userGuesses[n] = { room: state.gameMapping.rooms[p.roomId].name, item: state.gameMapping.items[p.itemId], role: p.role };
     });
     renderUI();
     const b = document.getElementById('status-badge');
