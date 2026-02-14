@@ -524,6 +524,13 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
 
   // Handle restoration path
   if (restoredState) {
+    // Check if user had interacted with the saved game
+    const hadInteraction =
+      Object.values(restoredState.userGuesses || {}).some(
+        (guess) => guess.room || guess.item || guess.role,
+      ) ||
+      (restoredState.clueOrder && restoredState.clueOrder.length > 0);
+
     updateState({
       activeScenario: restoredState.activeScenario,
       gameMapping: restoredState.gameMapping,
@@ -532,6 +539,7 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
       difficultyIcon: restoredState.difficultyIcon,
       userGuesses: restoredState.userGuesses,
       isGenerating: false,
+      hasInteracted: hadInteraction,
     });
 
     // Restore clues from saved data in the correct order
@@ -852,6 +860,7 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
     difficultyIcon,
     userGuesses: {},
     isGenerating: false,
+    hasInteracted: false,
   });
 
   renderUI();

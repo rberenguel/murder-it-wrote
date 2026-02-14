@@ -13,6 +13,7 @@ export let state = {
   isGenerating: false,
   sortable: null,
   difficultyIcon: null,
+  hasInteracted: false, // Track if user has dragged clues or made guesses
 };
 
 export function setState(newState) {

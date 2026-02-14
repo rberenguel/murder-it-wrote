@@ -162,7 +162,7 @@ export function renderUI() {
             })
             .filter(Boolean);
 
-          updateState({ puzzle: reorderedPuzzle });
+          updateState({ puzzle: reorderedPuzzle, hasInteracted: true });
           await saveGame(); // Save after reordering
         },
       }),
@@ -315,10 +315,24 @@ export function performReveal() {
   b.classList.remove("hidden");
 }
 
+export function showNewCaseModal() {
+  document.getElementById("new-case-modal").classList.remove("hidden");
+}
+
+export function closeNewCaseModal() {
+  document.getElementById("new-case-modal").classList.add("hidden");
+}
+
+export function hasUserProgress() {
+  // Check if user has interacted with the case (dragged clues or made guesses)
+  return state.hasInteracted;
+}
+
 // Attach globals for inline handlers
 window.updateGuess = async (s, f, v) => {
   if (!state.userGuesses[s]) state.userGuesses[s] = {};
   state.userGuesses[s][f] = v;
+  updateState({ hasInteracted: true });
   await saveGame(); // Auto-save on every guess
 };
 

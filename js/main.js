@@ -10,6 +10,9 @@ import {
   addLog,
   performReveal,
   closeRevealModal,
+  showNewCaseModal,
+  closeNewCaseModal,
+  hasUserProgress,
   getCaseSize,
 } from "./ui.js";
 import { loadGame, clearGame } from "./persistence.js";
@@ -126,13 +129,22 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // --- Button Bindings ---
+  const performNewCase = async () => {
+    await clearGame(); // Clear save before new case
+    addLog("Generating new case...", "system");
+    updateState({ activeScenario: pickRandomScenario() });
+    handleNewCase(uiCallbacks);
+  };
+
   const newCaseBtn = document.getElementById("btn-new-case");
   if (newCaseBtn) {
-    newCaseBtn.addEventListener("click", async () => {
-      await clearGame(); // Clear save before new case
-      addLog("Generating new case...", "system");
-      updateState({ activeScenario: pickRandomScenario() });
-      handleNewCase(uiCallbacks);
+    newCaseBtn.addEventListener("click", () => {
+      // Check if user has made progress
+      if (hasUserProgress()) {
+        showNewCaseModal();
+      } else {
+        performNewCase();
+      }
     });
   }
 
@@ -148,6 +160,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   document
     .getElementById("btn-reveal-cancel")
     ?.addEventListener("click", closeRevealModal);
+  document
+    .getElementById("btn-new-case-confirm")
+    ?.addEventListener("click", () => {
+      closeNewCaseModal();
+      performNewCase();
+    });
+  document
+    .getElementById("btn-new-case-cancel")
+    ?.addEventListener("click", closeNewCaseModal);
   document
     .getElementById("btn-debug-pi")
     ?.addEventListener("click", toggleDebug);
