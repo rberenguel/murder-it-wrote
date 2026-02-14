@@ -149,6 +149,381 @@
   --scrollbar-thumb: #b8860b;
 }
 
+/* ============================================
+   SHERLOCK HOLMES THEME - Victorian Detective
+   ============================================ */
+[data-theme="sherlock"] {
+  --app-bg: #1a1410;
+  --canvas-bg: #f5ebe0;
+  --surface-bg: #faf6f0;
+  --surface-bg-alt: #f0e8d8;
+
+  --text-primary: #2c1810;
+  --text-secondary: #4a3728;
+  --text-tertiary: #6b5847;
+
+  --accent-primary: #8b4513;
+  --accent-primary-alt: #a0522d;
+  --accent-primary-soft: rgba(139, 69, 19, 0.1);
+  --accent-secondary: #c19a6b;
+
+  --border-base: #d4c4b0;
+  --border-subtle: #e5dcc8;
+  --border-focus: #8b4513;
+
+  --font-sans: "Playfair Display", "Georgia", serif;
+
+  --scrollbar-track: #f0e8d8;
+  --scrollbar-thumb: #8b4513;
+}
+
+[data-theme="sherlock"] .entity-person {
+  font-style: italic;
+  border-bottom: 1px solid rgba(139, 69, 19, 0.3);
+}
+[data-theme="sherlock"] .entity-item {
+  font-variant: small-caps;
+  color: #6b5847;
+}
+[data-theme="sherlock"] .entity-room {
+  color: #8b4513;
+  font-weight: 600;
+}
+[data-theme="sherlock"] .entity-role {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.85em;
+}
+
+/* ============================================
+   THE GREAT GATSBY THEME - Art Deco 1920s
+   ============================================ */
+[data-theme="gatsby"] {
+  --app-bg: #0f0f0f;
+  --canvas-bg: #faf8f3;
+  --surface-bg: #ffffff;
+  --surface-bg-alt: #f5f2ed;
+
+  --text-primary: #1a1a1a;
+  --text-secondary: #2d2d2d;
+  --text-tertiary: #666666;
+
+  --accent-primary: #d4af37;
+  --accent-primary-alt: #ffd700;
+  --accent-primary-soft: rgba(212, 175, 55, 0.15);
+  --accent-secondary: #00bcd4;
+
+  --border-base: #d4af37;
+  --border-subtle: #e8dcc0;
+  --border-focus: #ffd700;
+
+  --font-sans: "Cormorant Garamond", "Georgia", serif;
+
+  --radius-main: 2px;
+  --radius-subtle: 1px;
+
+  --scrollbar-track: #f5f2ed;
+  --scrollbar-thumb: #d4af37;
+
+  --shadow-sm: 0 2px 4px rgba(212, 175, 55, 0.1);
+  --shadow-main: 0 4px 8px rgba(212, 175, 55, 0.15);
+  --shadow-xl: 0 8px 32px rgba(212, 175, 55, 0.2);
+}
+
+[data-theme="gatsby"] .card-title,
+[data-theme="gatsby"] .suspect-name {
+  font-family: "Bebas Neue", sans-serif;
+  letter-spacing: 2px;
+}
+
+[data-theme="gatsby"] .entity-person {
+  color: #d4af37;
+  font-weight: 600;
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+}
+[data-theme="gatsby"] .entity-item {
+  font-style: italic;
+  color: #00bcd4;
+}
+[data-theme="gatsby"] .entity-room {
+  font-variant: small-caps;
+  font-weight: 600;
+}
+[data-theme="gatsby"] .entity-role {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.9em;
+}
+
+/* ============================================
+   THE MALTESE FALCON THEME - 1940s Film Noir
+   ============================================ */
+[data-theme="falcon"] {
+  --app-bg: #0a0a0a;
+  --canvas-bg: #e8e4dc;
+  --surface-bg: #f0ebe0;
+  --surface-bg-alt: #e3ddd0;
+
+  --text-primary: #1a1a1a;
+  --text-secondary: #2d2d2d;
+  --text-tertiary: #555555;
+
+  --accent-primary: #c41e3a;
+  --accent-primary-alt: #8b0000;
+  --accent-primary-soft: rgba(196, 30, 58, 0.1);
+  --accent-secondary: #b8a490;
+
+  --border-base: #666666;
+  --border-subtle: #999999;
+  --border-focus: #c41e3a;
+
+  --font-sans: "Courier Prime", "Courier New", monospace;
+
+  --scrollbar-track: #e3ddd0;
+  --scrollbar-thumb: #666666;
+
+  --shadow-sm: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-main: 4px 4px 8px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 8px 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="falcon"] .entity-person {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+[data-theme="falcon"] .entity-item {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+[data-theme="falcon"] .entity-room {
+  font-style: italic;
+  color: #555555;
+}
+[data-theme="falcon"] .entity-role {
+  border: 1px solid #c41e3a;
+  padding: 0 4px;
+  background: rgba(196, 30, 58, 0.05);
+}
+
+/* ============================================
+   ORIENT EXPRESS THEME - 1930s Luxury Train
+   ============================================ */
+[data-theme="orient"] {
+  --app-bg: #1a1a2e;
+  --canvas-bg: #f8f5f0;
+  --surface-bg: #ffffff;
+  --surface-bg-alt: #f0ebe5;
+
+  --text-primary: #16213e;
+  --text-secondary: #2d3e5f;
+  --text-tertiary: #5a6f8f;
+
+  --accent-primary: #8b0000;
+  --accent-primary-alt: #a52a2a;
+  --accent-primary-soft: rgba(139, 0, 0, 0.1);
+  --accent-secondary: #cd7f32;
+
+  --border-base: #cd7f32;
+  --border-subtle: #d4c5b0;
+  --border-focus: #8b0000;
+
+  --font-sans: "Libre Bodoni", "Didot", "Georgia", serif;
+
+  --scrollbar-track: #f0ebe5;
+  --scrollbar-thumb: #8b0000;
+
+  --shadow-sm: 0 2px 8px rgba(139, 0, 0, 0.1);
+  --shadow-main: 0 4px 16px rgba(139, 0, 0, 0.15);
+  --shadow-xl: 0 8px 32px rgba(139, 0, 0, 0.2);
+}
+
+[data-theme="orient"] .entity-person {
+  font-variant: small-caps;
+  color: #8b0000;
+  letter-spacing: 0.5px;
+}
+[data-theme="orient"] .entity-item {
+  font-style: italic;
+  color: #cd7f32;
+}
+[data-theme="orient"] .entity-room {
+  font-weight: 600;
+  border-bottom: 1px solid rgba(205, 127, 50, 0.3);
+}
+[data-theme="orient"] .entity-role {
+  text-transform: uppercase;
+  font-size: 0.85em;
+  letter-spacing: 1px;
+}
+
+/* ============================================
+   BLADE RUNNER THEME - Cyberpunk 1982
+   ============================================ */
+[data-theme="bladerunner"] {
+  --app-bg: #000000;
+  --canvas-bg: #0d1117;
+  --surface-bg: #161b22;
+  --surface-bg-alt: #1c2128;
+
+  --text-primary: #c9d1d9;
+  --text-secondary: #8b949e;
+  --text-tertiary: #6e7681;
+
+  --accent-primary: #00d9ff;
+  --accent-primary-alt: #00b8d4;
+  --accent-primary-soft: rgba(0, 217, 255, 0.1);
+  --accent-secondary: #ff6b35;
+
+  --border-base: #30363d;
+  --border-subtle: #21262d;
+  --border-focus: #00d9ff;
+
+  --font-sans: "Orbitron", "Arial", sans-serif;
+
+  --radius-main: 2px;
+  --radius-subtle: 1px;
+
+  --scrollbar-track: #1c2128;
+  --scrollbar-thumb: #00d9ff;
+
+  --shadow-sm: 0 0 8px rgba(0, 217, 255, 0.3);
+  --shadow-main: 0 0 16px rgba(0, 217, 255, 0.4);
+  --shadow-xl: 0 0 32px rgba(0, 217, 255, 0.5);
+}
+
+[data-theme="bladerunner"] .entity-person {
+  color: #00d9ff;
+  text-shadow: 0 0 8px rgba(0, 217, 255, 0.5);
+}
+[data-theme="bladerunner"] .entity-item {
+  color: #ff6b35;
+  text-shadow: 0 0 8px rgba(255, 107, 53, 0.5);
+}
+[data-theme="bladerunner"] .entity-room {
+  color: #00ff9f;
+  text-shadow: 0 0 8px rgba(0, 255, 159, 0.4);
+}
+[data-theme="bladerunner"] .entity-role {
+  text-transform: uppercase;
+  color: #ff00ff;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+/* ============================================
+   FRASIER THEME - 1990s Seattle Sitcom
+   ============================================ */
+[data-theme="frasier"] {
+  --app-bg: #2c5f7c;
+  --canvas-bg: #f5f5f0;
+  --surface-bg: #ffffff;
+  --surface-bg-alt: #fafaf8;
+
+  --text-primary: #2c3e50;
+  --text-secondary: #34495e;
+  --text-tertiary: #7f8c8d;
+
+  --accent-primary: #9c27b0;
+  --accent-primary-alt: #7b1fa2;
+  --accent-primary-soft: rgba(156, 39, 176, 0.1);
+  --accent-secondary: #00acc1;
+
+  --border-base: #dddddd;
+  --border-subtle: #eeeeee;
+  --border-focus: #9c27b0;
+
+  --font-sans: "Lato", "Helvetica Neue", sans-serif;
+
+  --radius-main: 8px;
+  --radius-subtle: 4px;
+
+  --scrollbar-track: #fafaf8;
+  --scrollbar-thumb: #9c27b0;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-main: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="frasier"] .entity-person {
+  color: #9c27b0;
+  font-weight: 600;
+}
+[data-theme="frasier"] .entity-item {
+  font-style: italic;
+  color: #00acc1;
+}
+[data-theme="frasier"] .entity-room {
+  font-weight: 600;
+  color: #2c5f7c;
+}
+[data-theme="frasier"] .entity-role {
+  font-variant: small-caps;
+  letter-spacing: 0.5px;
+}
+
+/* ============================================
+   BLUE PRINCE THEME - Architectural Mystery
+   ============================================ */
+[data-theme="blueprince"] {
+  --app-bg: #1a1a3e;
+  --canvas-bg: #f8f6f0;
+  --surface-bg: #fffef9;
+  --surface-bg-alt: #f5f3ed;
+
+  --text-primary: #2c3e50;
+  --text-secondary: #34495e;
+  --text-tertiary: #7f8c8d;
+
+  --accent-primary: #5b7c99;
+  --accent-primary-alt: #4a6b89;
+  --accent-primary-soft: rgba(91, 124, 153, 0.15);
+  --accent-secondary: #8b7355;
+
+  --border-base: #5b7c99;
+  --border-subtle: #d4cfc8;
+  --border-focus: #4a6b89;
+
+  --font-sans: "Quicksand", "Helvetica Neue", sans-serif;
+
+  --radius-main: 4px;
+  --radius-subtle: 2px;
+
+  --scrollbar-track: #f5f3ed;
+  --scrollbar-thumb: #5b7c99;
+
+  --shadow-sm: 0 2px 8px rgba(91, 124, 153, 0.1);
+  --shadow-main: 0 4px 16px rgba(91, 124, 153, 0.15);
+  --shadow-xl: 0 8px 32px rgba(91, 124, 153, 0.2);
+}
+
+[data-theme="blueprince"] .entity-person {
+  color: #5b7c99;
+  font-weight: 600;
+}
+[data-theme="blueprince"] .entity-item {
+  color: #8b7355;
+  font-style: italic;
+}
+[data-theme="blueprince"] .entity-room {
+  color: #4a6b89;
+  font-weight: 600;
+  border-bottom: 1px dotted rgba(91, 124, 153, 0.3);
+}
+[data-theme="blueprince"] .entity-role {
+  font-variant: small-caps;
+  letter-spacing: 0.5px;
+  color: #5b7c99;
+}
+
+/* Sketch/blueprint aesthetic for Blue Prince */
+[data-theme="blueprince"] .card-title {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.9em;
+}
+
 * {
   margin: 0;
   padding: 0;
