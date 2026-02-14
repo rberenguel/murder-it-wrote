@@ -43,6 +43,7 @@ export function renderSelect(s, f, l, opts) {
 }
 
 export function renderUI() {
+    document.body.dataset.theme = state.activeScenario.id;
     const cc = document.getElementById('clues-container');
     const roleCounts = state.solution.roles.reduce((a,r)=>{ if(!['Killer','Victim'].includes(r)) a[r]=(a[r]||0)+1; return a; }, {});
     const roleStr = Object.entries(roleCounts).map(([r,c]) => `${c} ${r}${c>1?'s':''}`).join(', ');
