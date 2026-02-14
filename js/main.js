@@ -47,6 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let no = false;
     if (nt && nd) {
         nt.addEventListener('click', () => { 
+            if (window.innerWidth >= 1200) return;
             no = !no; 
             nd.style.transform = `translate3d(${no ? 0 : 100}%,0,0)`; 
             addLog(`Notebook drawer: ${no ? 'opened' : 'closed'}`, 'system');
@@ -57,6 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let lo = false;
     if (lt && ld) {
         lt.addEventListener('click', () => { 
+            if (window.innerWidth >= 1200) return;
             lo = !lo; 
             ld.style.transform = `translate3d(${lo ? 0 : -100}%,0,0)`; 
             addLog(`Locations drawer: ${lo ? 'opened' : 'closed'}`, 'system');

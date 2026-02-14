@@ -1,0 +1,17 @@
+{
+  "short_name": "Murder, it wrote",
+  "version": "0.1.0",
+  "name": "Murder, it wrote",
+  "description": "A detective logic puzzle game",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000"
+}
