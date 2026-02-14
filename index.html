@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Murder, it wrote</title>
+    <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="app-body">
+
+    <header class="app-header">
+        <h1 class="header-title">
+            <i class="ph ph-footprints"></i>
+            <span class="hidden-sm">Murder, it wrote</span>
+            <span id="scenario-badge" class="scenario-badge"></span>
+        </h1>
+        <div class="header-actions">
+            <select id="scenario-select" class="scenario-select"></select>
+            <button id="btn-debug" class="btn-icon">
+                <i class="ph ph-bug"></i>
+            </button>
+            <button id="btn-new-case" class="btn btn-primary">
+                <i class="ph ph-plus-circle"></i>
+                <span class="hidden-sm">New Case</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="app-main">
+        <div id="evidence-view" class="evidence-view">
+            <section class="evidence-card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="ph ph-magnifying-glass"></i>
+                        Evidence
+                    </h2>
+                </div>
+                <div id="clues-container" class="drawer-content">
+                    <div class="clues-empty">Press "New Case" to begin investigation.</div>
+                </div>
+            </section>
+        </div>
+
+        <div id="locations-drawer" class="drawer">
+            <div id="locations-tab" class="drawer-tab">
+                <i class="ph ph-map-trifold"></i>
+            </div>
+            <div class="card-header">
+                <h2 class="card-title">Known Locations</h2>
+            </div>
+            <div id="locations-list" class="drawer-content custom-scrollbar"></div>
+        </div>
+
+        <div id="notebook-drawer" class="drawer">
+            <div id="notebook-tab" class="drawer-tab">
+                <i class="ph ph-notebook"></i>
+            </div>
+            <div class="drawer-header">
+                <h2 class="card-title">Detective's Notes</h2>
+                <span id="status-badge" class="status-badge hidden"></span>
+            </div>
+            <div id="notebook-grid" class="drawer-content custom-scrollbar"></div>
+            <div class="drawer-footer">
+                <button id="btn-verify" class="btn btn-dark">Verify</button>
+                <button id="btn-reveal" class="btn btn-outline">
+                    <i class="ph ph-eye"></i>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <div id="debug-overlay" class="hidden">
+        <div class="debug-clickable" onclick="toggleDebug()"></div>
+        <div class="debug-panel">
+            <div class="debug-header">
+                <div class="debug-title">System Log</div>
+                <button onclick="toggleDebug()" class="debug-close">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+            <div id="log-container" class="log-container custom-scrollbar"></div>
+        </div>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
