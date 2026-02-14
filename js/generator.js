@@ -202,8 +202,17 @@ function renderFact(fact, mapping, roles) {
   switch (fact.type) {
     case FACT_TYPES.SUSPECT_LOCATION: {
       const name = fmt("suspects", fact.suspectId);
-      const rText = fmtRoom(fact.roomId);
-      text = `${name} was in ${rText}.`;
+      const rObj = mapping.rooms[fact.roomId];
+      const feats = state.activeScenario.roomFeatures[rObj.name] || [];
+      
+      if (feats.length > 0 && Math.random() > 0.5) {
+        const feat = feats[Math.floor(Math.random() * feats.length)];
+        text = `${name} was close to the ${feat}.`;
+      } else {
+        const rText = fmtRoom(fact.roomId);
+        text = `${name} was in ${rText}.`;
+      }
+      
       fn = (a) => checkVal(a, fact.suspectId, "Room", fact.roomId);
       masks = [
         { varIdx: 2 * numSuspects + fact.suspectId, mask: 1 << fact.roomId },
