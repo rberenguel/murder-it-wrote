@@ -29,6 +29,13 @@ export function generateTruth() {
     const sItems = shuffle([...IDS]);
     const sRooms = IDS.map(() => Math.floor(Math.random() * 5));
 
+    // Force Witness to be in the same room as the Victim
+    const vIdx = sRoles.indexOf('Victim');
+    const wIdx = sRoles.indexOf('Witness');
+    if (vIdx !== -1 && wIdx !== -1) {
+        sRooms[wIdx] = sRooms[vIdx];
+    }
+
     const truth = IDS.map(id => ({ id, roomId: sRooms[id], itemId: sItems[id], role: sRoles[id] }));
     return { truth, roles: sRoles };
 }

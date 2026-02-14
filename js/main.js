@@ -6,13 +6,34 @@ import { renderUI, renderLocations, verifySolution, revealSolution, toggleDebug,
 document.addEventListener('DOMContentLoaded', () => {
     const uiCallbacks = { addLog, renderUI };
 
+    // --- Intro Flow ---
+    const beginInvestigation = async () => {
+        addLog('Beginning investigation...', 'system');
+        updateState({ activeScenario: pickRandomScenario() });
+        
+        // Hide intro, show empty game UI with loading state
+        document.getElementById('intro-screen').classList.add('hidden');
+        document.getElementById('app-container').classList.remove('hidden');
+        const cluesCont = document.getElementById('clues-container');
+        if (cluesCont) cluesCont.innerHTML = '<div class="clues-empty">Generating case...</div>';
+        
+        await handleNewCase(uiCallbacks);
+        renderUI();
+    };
+
+    const startBtn = document.getElementById('btn-start');
+    if (startBtn) startBtn.addEventListener('click', beginInvestigation);
+
     // --- Global Test Hook ---
     window.miw = {
-        select: (id) => {
+        select: async (id) => {
             const s = SCENARIOS.find(x => x.id === id);
             if (s) {
                 updateState({ activeScenario: s });
-                handleNewCase(uiCallbacks);
+                document.getElementById('intro-screen').classList.add('hidden');
+                document.getElementById('app-container').classList.remove('hidden');
+                await handleNewCase(uiCallbacks);
+                renderUI();
                 addLog(`Manual Scenario Select: ${s.name}`, 'system');
             } else {
                 console.warn(`Scenario "${id}" not found.`);
@@ -23,20 +44,37 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Drawer Logic ---
     const nd = document.getElementById('notebook-drawer'), nt = document.getElementById('notebook-tab');
     let no = false;
-    nt.addEventListener('click', () => { no = !no; nd.style.transform = `translate3d(${no ? 0 : 100}%,0,0)`; });
+    if (nt && nd) {
+        nt.addEventListener('click', () => { 
+            no = !no; 
+            nd.style.transform = `translate3d(${no ? 0 : 100}%,0,0)`; 
+            addLog(`Notebook drawer: ${no ? 'opened' : 'closed'}`, 'system');
+        });
+    }
     
     const ld = document.getElementById('locations-drawer'), lt = document.getElementById('locations-tab');
     let lo = false;
-    if(lt) lt.addEventListener('click', () => { lo = !lo; ld.style.transform = `translate3d(${lo ? 0 : -100}%,0,0)`; });
+    if (lt && ld) {
+        lt.addEventListener('click', () => { 
+            lo = !lo; 
+            ld.style.transform = `translate3d(${lo ? 0 : -100}%,0,0)`; 
+            addLog(`Locations drawer: ${lo ? 'opened' : 'closed'}`, 'system');
+        });
+    }
 
     // --- Button Bindings ---
-    document.getElementById('btn-new-case').addEventListener('click', () => {
-        updateState({ activeScenario: pickRandomScenario() });
-        handleNewCase(uiCallbacks);
-    });
-    document.getElementById('btn-verify').addEventListener('click', verifySolution);
-    document.getElementById('btn-reveal').addEventListener('click', revealSolution);
-    document.getElementById('btn-debug').addEventListener('click', toggleDebug);
+    const newCaseBtn = document.getElementById('btn-new-case');
+    if (newCaseBtn) {
+        newCaseBtn.addEventListener('click', () => {
+            addLog('Generating new case...', 'system');
+            updateState({ activeScenario: pickRandomScenario() });
+            handleNewCase(uiCallbacks);
+        });
+    }
+    
+    document.getElementById('btn-verify')?.addEventListener('click', verifySolution);
+    document.getElementById('btn-reveal')?.addEventListener('click', revealSolution);
+    document.getElementById('btn-debug')?.addEventListener('click', toggleDebug);
 
     // Initial render
     renderLocations();

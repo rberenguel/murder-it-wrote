@@ -137,14 +137,23 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-body {
+/* Main Containers */
+.app-container {
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
     background-color: var(--app-bg);
+    position: relative;
+    width: 100%;
+}
+
+body {
+    background-color: #000; /* Base background for intro */
     color: var(--text-primary);
     font-family: var(--font-sans);
     overflow: hidden;
     height: 100dvh;
-    display: flex;
-    flex-direction: column;
 }
 
 /* Header */
@@ -553,6 +562,84 @@ body {
 .custom-scrollbar::-webkit-scrollbar-track { background: var(--border-subtle); }
 .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--clr-slate-300); border-radius: 3px; }
 
-@media (max-width: 640px) {
-    .hidden-sm { display: none; }
+/* Utilities */
+.hidden { display: none !important; }
+
+/* Intro Screen */
+.intro-screen {
+    position: fixed;
+    inset: 0;
+    background-color: #000000;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    padding: 2rem;
+}
+
+.intro-content {
+    max-width: 400px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.intro-title {
+    font-size: 2.5rem;
+    font-weight: 300;
+    margin-bottom: 4rem;
+    margin-top: -10vh;
+    letter-spacing: 0.1rem;
+    color: #f0f0f0;
+}
+
+.intro-rules {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.intro-rules li {
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: #bdbdbd;
+    font-weight: 300;
+}
+
+.btn-start {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    padding: 1rem 2rem;
+    border-radius: var(--radius-subtle);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.btn-start:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 215, 0, 0.3);
+}
+
+.btn-start i {
+    font-size: 2rem;
+    color: #ffd700; /* Gold */
+}
+
+.btn-start span {
+    font-size: 0.75rem;
+    letter-spacing: 0.2rem;
+    font-weight: 500;
+    opacity: 0.8;
 }
