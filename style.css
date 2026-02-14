@@ -67,7 +67,7 @@
 }
 
 /* Theme Overrides */
-[data-theme="tng"] {
+[data-theme="stellar_voyage"] {
   --app-bg: #000000;
   --canvas-bg: #050505;
   --surface-bg: #0c0c0c;
@@ -101,7 +101,7 @@
   --scrollbar-thumb: #df80ff;
 }
 
-[data-theme="classic"] {
+[data-theme="classic_manor"] {
   --app-bg: #1a4d2e; /* Billiard Green */
   --canvas-bg: #faf3e0;
   --surface-bg: #fdf6e3;
@@ -312,7 +312,7 @@
 /* ============================================
    ORIENT EXPRESS THEME - 1930s Luxury Train
    ============================================ */
-[data-theme="orient"] {
+[data-theme="continental_express"] {
   --app-bg: #1a1a2e;
   --canvas-bg: #f8f5f0;
   --surface-bg: #ffffff;
@@ -341,20 +341,20 @@
   --shadow-xl: 0 8px 32px rgba(139, 0, 0, 0.2);
 }
 
-[data-theme="orient"] .entity-person {
+[data-theme="continental_express"] .entity-person {
   font-variant: small-caps;
   color: #8b0000;
   letter-spacing: 0.5px;
 }
-[data-theme="orient"] .entity-item {
+[data-theme="continental_express"] .entity-item {
   font-style: italic;
   color: #cd7f32;
 }
-[data-theme="orient"] .entity-room {
+[data-theme="continental_express"] .entity-room {
   font-weight: 600;
   border-bottom: 1px solid rgba(205, 127, 50, 0.3);
 }
-[data-theme="orient"] .entity-role {
+[data-theme="continental_express"] .entity-role {
   text-transform: uppercase;
   font-size: 0.85em;
   letter-spacing: 1px;
@@ -363,7 +363,7 @@
 /* ============================================
    BLADE RUNNER THEME - Cyberpunk 1982
    ============================================ */
-[data-theme="bladerunner"] {
+[data-theme="edge_walker"] {
   --app-bg: #000000;
   --canvas-bg: #0d1117;
   --surface-bg: #161b22;
@@ -395,19 +395,19 @@
   --shadow-xl: 0 0 32px rgba(0, 217, 255, 0.5);
 }
 
-[data-theme="bladerunner"] .entity-person {
+[data-theme="edge_walker"] .entity-person {
   color: #00d9ff;
   text-shadow: 0 0 8px rgba(0, 217, 255, 0.5);
 }
-[data-theme="bladerunner"] .entity-item {
+[data-theme="edge_walker"] .entity-item {
   color: #ff6b35;
   text-shadow: 0 0 8px rgba(255, 107, 53, 0.5);
 }
-[data-theme="bladerunner"] .entity-room {
+[data-theme="edge_walker"] .entity-room {
   color: #00ff9f;
   text-shadow: 0 0 8px rgba(0, 255, 159, 0.4);
 }
-[data-theme="bladerunner"] .entity-role {
+[data-theme="edge_walker"] .entity-role {
   text-transform: uppercase;
   color: #ff00ff;
   font-weight: 700;
@@ -417,7 +417,7 @@
 /* ============================================
    FRASIER THEME - 1990s Seattle Sitcom
    ============================================ */
-[data-theme="frasier"] {
+[data-theme="radio_shrink"] {
   --app-bg: #2c5f7c;
   --canvas-bg: #f5f5f0;
   --surface-bg: #ffffff;
@@ -449,19 +449,19 @@
   --shadow-xl: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
-[data-theme="frasier"] .entity-person {
+[data-theme="radio_shrink"] .entity-person {
   color: #9c27b0;
   font-weight: 600;
 }
-[data-theme="frasier"] .entity-item {
+[data-theme="radio_shrink"] .entity-item {
   font-style: italic;
   color: #00acc1;
 }
-[data-theme="frasier"] .entity-room {
+[data-theme="radio_shrink"] .entity-room {
   font-weight: 600;
   color: #2c5f7c;
 }
-[data-theme="frasier"] .entity-role {
+[data-theme="radio_shrink"] .entity-role {
   font-variant: small-caps;
   letter-spacing: 0.5px;
 }
@@ -469,7 +469,7 @@
 /* ============================================
    BLUE PRINCE THEME - Architectural Mystery
    ============================================ */
-[data-theme="blueprince"] {
+[data-theme="indigo_heir"] {
   --app-bg: #1a1a3e;
   --canvas-bg: #f8f6f0;
   --surface-bg: #fffef9;
@@ -501,27 +501,27 @@
   --shadow-xl: 0 8px 32px rgba(91, 124, 153, 0.2);
 }
 
-[data-theme="blueprince"] .entity-person {
+[data-theme="indigo_heir"] .entity-person {
   color: #5b7c99;
   font-weight: 600;
 }
-[data-theme="blueprince"] .entity-item {
+[data-theme="indigo_heir"] .entity-item {
   color: #8b7355;
   font-style: italic;
 }
-[data-theme="blueprince"] .entity-room {
+[data-theme="indigo_heir"] .entity-room {
   color: #4a6b89;
   font-weight: 600;
   border-bottom: 1px dotted rgba(91, 124, 153, 0.3);
 }
-[data-theme="blueprince"] .entity-role {
+[data-theme="indigo_heir"] .entity-role {
   font-variant: small-caps;
   letter-spacing: 0.5px;
   color: #5b7c99;
 }
 
 /* Sketch/blueprint aesthetic for Blue Prince */
-[data-theme="blueprince"] .card-title {
+[data-theme="indigo_heir"] .card-title {
   text-transform: uppercase;
   letter-spacing: 1px;
   font-size: 0.9em;
