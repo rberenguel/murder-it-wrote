@@ -1123,6 +1123,23 @@ body {
   color: var(--text-tertiary);
 }
 
+.connection-badge {
+  font-size: 0.625rem;
+  background-color: var(--accent-primary-soft);
+  border: 1px solid var(--accent-primary-alt);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  color: var(--accent-primary-alt);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.connection-badge i {
+  font-size: 0.75rem;
+}
+
 /* Debug Overlay */
 #debug-overlay {
   position: fixed;

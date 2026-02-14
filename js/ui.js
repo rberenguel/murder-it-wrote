@@ -40,19 +40,30 @@ export function renderLocations() {
     return;
   }
   const feats = state.gameMapping.features || state.activeScenario.roomFeatures;
+  const adjacency = state.activeScenario?.roomAdjacency || {};
+
   if (list)
     list.innerHTML = `
         <div class="locations-list">
             ${rooms
               .map(
-                (r) => `
+                (r) => {
+                  const connectedRooms = adjacency[r.name] || [];
+                  // Filter to only show rooms that are in the current game
+                  const activeConnections = connectedRooms.filter(roomName =>
+                    rooms.some(room => room.name === roomName)
+                  );
+
+                  return `
                 <div class="location-item">
                     <h3 class="location-name">${r.name}</h3>
                     <div class="feature-list">
+                        ${activeConnections.map((roomName) => `<span class="connection-badge"><i class="ph-light ph-door-open"></i>${roomName}</span>`).join("")}
                         ${(feats[r.name] || []).map((f) => `<span class="feature-badge">${f}</span>`).join("")}
                     </div>
                 </div>
-            `,
+            `;
+                }
               )
               .join("")}
         </div>`;

@@ -13,10 +13,17 @@ const FACT_TYPES = {
   ITEM_NOT_MURDER_WEAPON: "ITEM_NOT_MURDER_WEAPON",
   ROOM_NOT_CORPSE: "ROOM_NOT_CORPSE",
   ROLE_EXCLUSION: "ROLE_EXCLUSION",
+  SCREAM_HEARD: "SCREAM_HEARD",
 };
 
 const getVal = (a, id, type) => a[`${id}_${type}`];
 const checkVal = (a, subId, type, val) => getVal(a, subId, type) === val;
+
+// Helper: Get adjacent room names for a given room
+function getAdjacentRooms(roomName, scenario) {
+  if (!scenario.roomAdjacency) return [];
+  return scenario.roomAdjacency[roomName] || [];
+}
 
 export function generateTruth(numSuspects) {
   const activeRoles = ["Killer", "Victim"];
@@ -132,6 +139,50 @@ function generateItemFacts(truth, numSuspects) {
       facts.push({ type: FACT_TYPES.ITEM_NOT_MURDER_WEAPON, itemId: iid });
     }
   }
+  return facts;
+}
+
+function generateProximityFacts(truth, roles, mapping) {
+  const facts = [];
+
+  // Only generate if scenario has adjacency data
+  if (!mapping.scenario.roomAdjacency) {
+    console.log("No adjacency data for scenario");
+    return facts;
+  }
+
+  // Find victim's room (where the scream came from)
+  const victim = truth.find(p => p.role === "Victim");
+  const victimRoom = mapping.rooms[victim.roomId];
+  console.log("Victim room (murder scene):", victimRoom?.name);
+
+  if (!victimRoom) return facts;
+
+  // Get adjacent room names
+  const adjacentRoomNames = getAdjacentRooms(victimRoom.name, mapping.scenario);
+  console.log("Adjacent rooms to murder scene:", adjacentRoomNames);
+
+  if (adjacentRoomNames.length === 0) return facts;
+
+  // Find people in adjacent rooms (anyone could hear the scream)
+  const listeners = truth.filter(p => {
+    if (p.role === "Victim") return false; // Victim can't hear their own scream
+    const personRoom = mapping.rooms[p.roomId];
+    return personRoom && adjacentRoomNames.includes(personRoom.name);
+  });
+
+  console.log("Potential listeners:", listeners.length);
+
+  // Generate scream fact if there are listeners (100% chance for testing)
+  if (listeners.length > 0) {
+    const listener = listeners[Math.floor(Math.random() * listeners.length)];
+    console.log(`✓ SCREAM FACT GENERATED: ${mapping.suspects[listener.id]} in ${mapping.rooms[truth[listener.id].roomId]?.name} heard scream from ${victimRoom.name}`);
+    facts.push({
+      type: FACT_TYPES.SCREAM_HEARD,
+      suspectId: listener.id,
+    });
+  }
+
   return facts;
 }
 
@@ -402,16 +453,51 @@ function renderFact(fact, mapping, roles) {
       masks = [{ varIdx: fact.suspectId, mask: ~mask }];
       break;
     }
+    case FACT_TYPES.SCREAM_HEARD: {
+      const name = fmt("suspects", fact.suspectId);
+      text = `${name} heard a scream coming from somewhere nearby.`;
+
+      // No masks - this is a relational constraint between listener and victim
+      masks = [];
+
+      fn = (a) => {
+        // Get listener's room
+        const listenerRoom = getVal(a, fact.suspectId, "Room");
+        if (listenerRoom === undefined) return true; // Not yet assigned
+
+        const listenerRoomObj = mapping.rooms[listenerRoom];
+        if (!listenerRoomObj) return false;
+
+        // Get adjacent room names
+        const adjacentRoomNames = getAdjacentRooms(listenerRoomObj.name, mapping.scenario);
+        if (adjacentRoomNames.length === 0) return false;
+
+        // Find victim's room (where the scream came from)
+        const victimIdx = roles.findIndex(r => r === "Victim");
+        if (victimIdx === -1) return false;
+
+        const victimRoom = getVal(a, victimIdx, "Room");
+        if (victimRoom === undefined) return true; // Not yet assigned
+
+        const victimRoomObj = mapping.rooms[victimRoom];
+        if (!victimRoomObj) return false;
+
+        // Check if victim's room is adjacent to listener's room
+        return adjacentRoomNames.includes(victimRoomObj.name);
+      };
+      break;
+    }
   }
 
   return { text, fn, masks, id: generateStableId(fact) };
 }
 
-export function generateClues(truth, roles, numSuspects) {
+export function generateClues(truth, roles, numSuspects, mapping) {
   return [
     ...generateSuspectFacts(truth, roles),
     ...generateRoomFacts(truth, numSuspects),
     ...generateItemFacts(truth, numSuspects),
+    ...generateProximityFacts(truth, roles, mapping),
   ];
 }
 
@@ -560,6 +646,7 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
     suspects: getSubset(s.suspects, numSuspects),
     rooms: getSubset(s.rooms, numSuspects),
     items: getSubset(s.items, numSuspects),
+    scenario: s, // Store scenario for adjacency data
   };
 
   // Generate feature subsets for this specific case
@@ -573,7 +660,7 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
   const { truth, roles } = generateTruth(numSuspects);
 
   try {
-    var allFacts = generateClues(truth, roles, numSuspects);
+    var allFacts = generateClues(truth, roles, numSuspects, gameMapping);
   } catch (error) {
     if (error.message === "CORRUPT_TRUTH_DATA") {
       console.error("Corrupt truth data detected, regenerating...");

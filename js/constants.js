@@ -871,6 +871,20 @@ export const SCENARIOS = [
         "footprints",
       ],
     },
+    roomAdjacency: {
+      // Front to back train layout
+      "Platform": ["Conductor's Cabin"],
+      "Conductor's Cabin": ["Platform", "First Class Corridor"],
+      "First Class Corridor": ["Conductor's Cabin", "Sleeping Compartment", "Dining Car"],
+      "Sleeping Compartment": ["First Class Corridor"],
+      "Dining Car": ["First Class Corridor", "Kitchen Car", "Observation Car"],
+      "Kitchen Car": ["Dining Car", "Baggage Car"],
+      "Observation Car": ["Dining Car", "Smoking Lounge"],
+      "Baggage Car": ["Kitchen Car", "Second Class Coach"],
+      "Second Class Coach": ["Baggage Car", "Washroom"],
+      "Smoking Lounge": ["Observation Car", "Washroom"],
+      "Washroom": ["Second Class Coach", "Smoking Lounge"],
+    },
     items: [
       { name: "Dagger", isProper: false },
       { name: "Vial of Laudanum", isProper: false },
