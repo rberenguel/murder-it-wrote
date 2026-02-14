@@ -53,7 +53,7 @@ export function renderSelect(s, f, l, opts, usedMap) {
 
   return `<div class="guess-row ${isConflict ? "has-conflict" : ""}">
                 <label class="guess-label">${l}</label>
-                <select onchange="updateGuess('${s}','${f}',this.value); renderUI();" class="select-input">
+                <select class="select-input" data-suspect="${s}" data-field="${f}">
                     <option value="">Unknown</option>
                     ${opts
                       .map((o) => {
@@ -162,7 +162,21 @@ export function renderUI() {
               .join("")}
         </div>`;
 
+  // Event delegation for select changes
+  grid.removeEventListener("change", handleGuessChange);
+  grid.addEventListener("change", handleGuessChange);
+
   renderLocations();
+}
+
+async function handleGuessChange(e) {
+  if (e.target.matches("select.select-input")) {
+    const suspect = e.target.dataset.suspect;
+    const field = e.target.dataset.field;
+    const value = e.target.value;
+    await window.updateGuess(suspect, field, value);
+    renderUI();
+  }
 }
 
 export function verifySolution() {
