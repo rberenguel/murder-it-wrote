@@ -55,3 +55,35 @@ This process—called **Essentiality Pruning**—ensures that every single clue 
 - **Logic Grid**: A built-in notebook to track your deductions.
 - **Smart Validation**: The notebook highlights impossible combinations (e.g., assigning the same item to two people).
 - **Polished UI**: Hopefully. Theme-aware styling, scrollbars, and typography. It might need more work on mobile or to keep the style consistent though.
+
+## Credits / references
+
+### Icon
+
+The icon was created by Gemini, I just asked for a typewriter and got this. I edited it a bit on GIMP. I love it, because it reminds me of the art of two authors I have bought stuff from, and you should check: [Danny Gregory](https://www.dannygregory.com/) and [Michael Nobbs](https://www.gogently.co/).
+
+### Fonts
+
+This project uses the following typefaces:
+
+- **[Phosphor Icons](https://phosphoricons.com/)** - A flexible open-source icon family for interfaces
+- **[Reforma 1969](https://pampatype.com/reforma)** - Designed by PampaType for Universidad Nacional de Córdoba (Creative Commons)
+- **[Monoid](https://larsenwork.com/monoid/)** - A coding font by Tyler Finck / [Andreas Larsen](https://github.com/larsenwork/monoid) (SIL OFL 1.1)
+- **[Cinzel](https://fonts.google.com/specimen/Cinzel)** - Designed by Natanael Gama (SIL OFL 1.1)
+- **[Inter](https://rsms.me/inter/)** - Designed by [Rasmus Andersson](https://github.com/rsms/inter) (SIL OFL 1.1)
+- **[Caviar Dreams](https://www.dafont.com/caviar-dreams.font)** - Designed by Lauren Thompson (Free for personal and commercial use)
+- **[Playfair Display](https://fonts.google.com/specimen/Playfair+Display)** - Google Fonts (SIL OFL 1.1)
+- **[Libre Bodoni](https://fonts.google.com/specimen/Libre+Bodoni)** - Google Fonts (SIL OFL 1.1)
+- **[Orbitron](https://fonts.google.com/specimen/Orbitron)** - Google Fonts (SIL OFL 1.1)
+- **[Lato](https://fonts.google.com/specimen/Lato)** - Designed by Łukasz Dziedzic (SIL OFL 1.1)
+- **[Quicksand](https://fonts.google.com/specimen/Quicksand)** - Designed by Andrew Paglinawan (SIL OFL 1.1)
+
+Additional fonts in the fonts folder (not currently used):
+
+- **[Roboto](https://fonts.google.com/specimen/Roboto)** - Designed by Christian Robertson for Google (Apache 2.0)
+- **[Sixtyfour](https://fonts.google.com/specimen/Sixtyfour)** - Designed by Jens Kutilek (SIL OFL 1.1)
+- **[Ostrich Sans](https://www.theleagueofmoveabletype.com/ostrich-sans)** - Designed by Tyler Finck (SIL OFL 1.1)
+
+### Libraries
+
+- **[idb-keyval](https://github.com/jakearchibald/idb-keyval)** - A super-simple promise-based keyval store by [Jake Archibald](https://github.com/jakearchibald) (Apache 2.0)
