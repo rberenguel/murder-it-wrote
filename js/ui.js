@@ -1,5 +1,6 @@
 import { state, updateState } from "./game-state.js";
 import { ROLES_DEF } from "./constants.js";
+import { saveGame } from "./persistence.js";
 
 export function addLog(m) {
   const c = document.getElementById("log-container");
@@ -88,9 +89,9 @@ export function renderUI() {
 
   cc.innerHTML = `<ul class="clue-list">${state.puzzle
     .map(
-      (c, i) => `
-        <li class="clue-item">
-            <span class="clue-handle">${i + 1}.</span>
+      (c) => `
+        <li class="clue-item" data-clue-id="${c.id}">
+            <span class="clue-handle">${c.number}.</span>
             <span class="clue-text">${c.text}</span>
         </li>`,
     )
@@ -105,6 +106,18 @@ export function renderUI() {
         ghostClass: "sortable-ghost",
         delay: 100,
         delayOnTouchOnly: true,
+        onEnd: async () => {
+          // Update state.puzzle to match the new DOM order
+          const clueList = document.querySelector('.clue-list');
+          const items = Array.from(clueList.querySelectorAll('.clue-item'));
+          const reorderedPuzzle = items.map(item => {
+            const clueId = item.dataset.clueId;
+            return state.puzzle.find(c => c.id === clueId);
+          }).filter(Boolean);
+
+          updateState({ puzzle: reorderedPuzzle });
+          await saveGame(); // Save after reordering
+        }
       }),
     });
   }
@@ -186,9 +199,10 @@ export function performReveal() {
 }
 
 // Attach globals for inline handlers
-window.updateGuess = (s, f, v) => {
+window.updateGuess = async (s, f, v) => {
   if (!state.userGuesses[s]) state.userGuesses[s] = {};
   state.userGuesses[s][f] = v;
+  await saveGame(); // Auto-save on every guess
 };
 
 window.toggleDebug = toggleDebug;

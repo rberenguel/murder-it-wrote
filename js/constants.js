@@ -714,7 +714,7 @@ export const SCENARIOS = [
       ],
       Warehouse: [
         "stacked crates",
-        "dust motes",
+        "elevator",
         "high windows",
         "loading bay",
         "chain hoist",

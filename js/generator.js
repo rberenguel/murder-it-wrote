@@ -174,6 +174,26 @@ function mergeFacts(facts) {
 
 function renderFact(fact, mapping, roles) {
   const numSuspects = mapping.suspects.length;
+
+  // Generate stable ID based on fact properties
+  const generateStableId = (fact) => {
+    const props = [
+      fact.type,
+      fact.suspectId ?? '',
+      fact.roomId ?? '',
+      fact.itemId ?? '',
+      fact.role ?? ''
+    ].join('-');
+    // Simple hash function for deterministic IDs
+    let hash = 0;
+    for (let i = 0; i < props.length; i++) {
+      const char = props.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    return Math.abs(hash).toString(36);
+  };
+
   const fmt = (type, id) => {
     const item = mapping[type][id];
     const rawName = typeof item === "string" ? item : item.name;
@@ -344,7 +364,7 @@ function renderFact(fact, mapping, roles) {
     }
   }
 
-  return { text, fn, masks, id: Math.random() };
+  return { text, fn, masks, id: generateStableId(fact) };
 }
 
 export function generateClues(truth, roles, numSuspects) {
@@ -355,9 +375,71 @@ export function generateClues(truth, roles, numSuspects) {
   ];
 }
 
-export async function handleNewCase(uiCallbacks) {
+export async function handleNewCase(uiCallbacks, restoredState = null) {
   const { addLog, renderUI } = uiCallbacks;
   if (state.isGenerating) return;
+
+  // Handle restoration path
+  if (restoredState) {
+    updateState({
+      activeScenario: restoredState.activeScenario,
+      gameMapping: restoredState.gameMapping,
+      solution: restoredState.solution,
+      userGuesses: restoredState.userGuesses,
+      isGenerating: false
+    });
+
+    // Restore clues from saved data in the correct order
+    // We need to reconstruct validation functions from saved clues
+    const numSuspects = restoredState.gameMapping.suspects.length;
+    const roles = restoredState.solution.roles;
+
+    // Helper to reconstruct validation function from masks
+    const createValidatorFromMasks = (masks) => {
+      if (!masks || masks.length === 0) {
+        // For clues without masks (like ROOM_ITEM, ROOM_EMPTY, etc.)
+        // we'll create a permissive validator since these are harder to reconstruct
+        return () => true;
+      }
+
+      // Create validator from masks
+      return (assignment) => {
+        // Check if assignment satisfies all mask constraints
+        return masks.every(({ varIdx, mask }) => {
+          const value = assignment[varIdx];
+          if (value === undefined) return true; // Allow undefined values
+          return (1 << value) & mask;
+        });
+      };
+    };
+
+    // Restore puzzle in the saved order with reconstructed functions
+    const restoredPuzzle = restoredState.clueOrder
+      .map(id => restoredState.puzzleData.find(c => c.id === id))
+      .filter(Boolean)
+      .map(savedClue => ({
+        text: savedClue.text,
+        masks: savedClue.masks,
+        id: savedClue.id,
+        number: savedClue.number,
+        fn: createValidatorFromMasks(savedClue.masks)
+      }));
+
+    updateState({ puzzle: restoredPuzzle });
+    addLog("Investigation restored", "system");
+    renderUI();
+
+    // Wait for overlay animation to complete before removing
+    const overlay = document.getElementById("transition-overlay");
+    if (overlay) {
+      await new Promise((r) => setTimeout(r, 800));
+      overlay.classList.remove("active");
+      setTimeout(() => overlay.classList.add("hidden"), 450);
+    }
+
+    return;
+  }
+
   updateState({ isGenerating: true });
 
   const overlay = document.getElementById("transition-overlay");
@@ -454,9 +536,15 @@ export async function handleNewCase(uiCallbacks) {
   const finalFacts = mergeFacts(keptFacts);
   const finalClues = finalFacts.map((f) => renderFact(f, gameMapping, roles));
 
+  // Shuffle and assign original numbers to each clue
+  const shuffledClues = shuffle(finalClues).map((clue, index) => ({
+    ...clue,
+    number: index + 1
+  }));
+
   updateState({
     gameMapping,
-    puzzle: shuffle(finalClues),
+    puzzle: shuffledClues,
     solution: { truth, roles },
     userGuesses: {},
     isGenerating: false,

@@ -11,15 +11,16 @@ import {
   performReveal,
   closeRevealModal,
 } from "./ui.js";
+import { loadGame, clearGame } from "./persistence.js";
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const uiCallbacks = { addLog, renderUI };
 
-  // --- Intro Flow ---
-  const beginInvestigation = async () => {
-    addLog("Beginning investigation...", "system");
-    updateState({ activeScenario: pickRandomScenario() });
+  // Check for saved game
+  const savedGame = await loadGame();
 
+  // --- Intro Flow ---
+  const beginInvestigation = async (restore = false) => {
     const overlay = document.getElementById("transition-overlay");
     if (overlay) {
       overlay.classList.remove("hidden");
@@ -29,11 +30,53 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("intro-screen").classList.add("hidden");
     document.getElementById("app-container").classList.remove("hidden");
 
-    await handleNewCase(uiCallbacks);
+    if (restore && savedGame) {
+      addLog("Restoring investigation...", "system");
+      await handleNewCase(uiCallbacks, savedGame);
+    } else {
+      addLog("Beginning investigation...", "system");
+      updateState({ activeScenario: pickRandomScenario() });
+      await handleNewCase(uiCallbacks);
+    }
   };
 
+  // Update intro screen based on saved game
+  const introButtons = document.getElementById("intro-buttons");
   const startBtn = document.getElementById("btn-start");
-  if (startBtn) startBtn.addEventListener("click", beginInvestigation);
+
+  if (savedGame) {
+    // Apply saved theme to intro screen for font styling
+    document.body.dataset.theme = savedGame.activeScenario.id;
+
+    // Show Continue and New Case buttons
+    introButtons.classList.add("has-saved-game");
+    startBtn.innerHTML = `
+      <i class="ph-light ph-sign-in"></i>
+      <span>CONTINUE</span>
+      <span class="scenario-subtitle">${savedGame.activeScenario.name}</span>
+    `;
+
+    const newCaseBtn = document.createElement("button");
+    newCaseBtn.id = "btn-new-case-intro";
+    newCaseBtn.className = "btn-new-case";
+    newCaseBtn.innerHTML = `
+      <i class="ph-light ph-magic-wand"></i>
+      <span>NEW CASE</span>
+    `;
+    introButtons.appendChild(newCaseBtn);
+
+    // Continue button
+    startBtn.addEventListener("click", () => beginInvestigation(true));
+
+    // New Case button
+    newCaseBtn.addEventListener("click", async () => {
+      await clearGame();
+      beginInvestigation(false);
+    });
+  } else {
+    // Show only Begin button (default)
+    startBtn.addEventListener("click", () => beginInvestigation(false));
+  }
 
   // --- Global Test Hook ---
   window.miw = {
@@ -79,7 +122,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Button Bindings ---
   const newCaseBtn = document.getElementById("btn-new-case");
   if (newCaseBtn) {
-    newCaseBtn.addEventListener("click", () => {
+    newCaseBtn.addEventListener("click", async () => {
+      await clearGame(); // Clear save before new case
       addLog("Generating new case...", "system");
       updateState({ activeScenario: pickRandomScenario() });
       handleNewCase(uiCallbacks);
