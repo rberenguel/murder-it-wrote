@@ -1337,6 +1337,14 @@ body {
   font-family: "Monoid", monospace;
 }
 
+.intro-author {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 0.15rem;
+  font-family: "Monoid", monospace;
+  letter-spacing: 0.1rem;
+}
+
 .intro-version {
   font-size: 0.7rem;
   color: rgba(255, 255, 255, 0.4);
@@ -1376,7 +1384,7 @@ body {
 
 .btn-start {
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid transparent;
   color: #ffffff;
   padding: 1rem 2rem;
   border-radius: var(--radius-subtle);
