@@ -306,7 +306,19 @@ function renderFact(fact, mapping, roles) {
     }
     case FACT_TYPES.ROOM_EMPTY: {
       const rText = fmtRoom(fact.roomId);
-      text = `${rText.charAt(0).toUpperCase() + rText.slice(1)} was empty.`;
+      const rObj = mapping.rooms[fact.roomId];
+
+      if (Math.random() > 0.5) {
+        // "The Kitchen was empty."
+        text = `${rText.charAt(0).toUpperCase() + rText.slice(1)} was empty.`;
+      } else {
+        // "There was nobody at the Kitchen" or "There was nobody at Kitchen"
+        const name = rObj.isProper ? rObj.name : rObj.name.toLowerCase();
+        const rName = `<span class="entity-room">${name}</span>`;
+        const atLocation = rObj.noArticle ? rName : `the ${rName}`;
+        text = `There was nobody at ${atLocation}.`;
+      }
+
       fn = (a) => {
         for (let i = 0; i < numSuspects; i++)
           if (getVal(a, i, "Room") === fact.roomId) return false;
