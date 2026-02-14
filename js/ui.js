@@ -18,7 +18,7 @@ export function renderLocations() {
     if (list) list.innerHTML = "";
     return;
   }
-  const feats = state.activeScenario.roomFeatures;
+  const feats = state.gameMapping.features || state.activeScenario.roomFeatures;
   if (list)
     list.innerHTML = `
         <div class="locations-list">

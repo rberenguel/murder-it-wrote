@@ -203,7 +203,7 @@ function renderFact(fact, mapping, roles) {
     case FACT_TYPES.SUSPECT_LOCATION: {
       const name = fmt("suspects", fact.suspectId);
       const rObj = mapping.rooms[fact.roomId];
-      const feats = state.activeScenario.roomFeatures[rObj.name] || [];
+      const feats = mapping.features[rObj.name] || [];
       
       if (feats.length > 0 && Math.random() > 0.5) {
         const feat = feats[Math.floor(Math.random() * feats.length)];
@@ -393,6 +393,14 @@ export async function handleNewCase(uiCallbacks) {
     rooms: getSubset(s.rooms, numSuspects),
     items: getSubset(s.items, numSuspects),
   };
+
+  // Generate feature subsets for this specific case
+  gameMapping.features = {};
+  gameMapping.rooms.forEach(room => {
+      const allFeats = s.roomFeatures[room.name] || [];
+      const count = Math.floor(Math.random() * 2) + 2; // Pick 2 or 3 features
+      gameMapping.features[room.name] = shuffle([...allFeats]).slice(0, count);
+  });
 
   const { truth, roles } = generateTruth(numSuspects);
   let allFacts = generateClues(truth, roles, numSuspects);
