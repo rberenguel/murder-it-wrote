@@ -136,15 +136,24 @@ function mergeFacts(facts) {
 
 function renderFact(fact, mapping, roles) {
     const numSuspects = mapping.suspects.length;
-    const fmt = (type, id) => `<span class="entity-${type === 'suspects' ? 'person' : (type === 'items' ? 'item' : 'room')}">${mapping[type][id]}</span>`;
+    const fmt = (type, id) => {
+        const item = mapping[type][id];
+        const rawName = typeof item === 'string' ? item : item.name;
+        const className = type === 'suspects' ? 'person' : (type === 'items' ? 'item' : 'room');
+        return `<span class="entity-${className}">${rawName}</span>`;
+    };
     const fmtRoom = (rid) => {
         const r = mapping.rooms[rid];
-        if (!r) {
-            console.error('fmtRoom error:', { rid, mappingRoomsLength: mapping.rooms.length, fact });
-            return 'a mysterious room';
-        }
-        const rName = `<span class="entity-room">${r.name}</span>`;
+        if (!r) return 'a mysterious room';
+        const name = r.isProper ? r.name : r.name.toLowerCase();
+        const rName = `<span class="entity-room">${name}</span>`;
         return r.noArticle ? rName : `the ${rName}`;
+    };
+    const fmtItem = (iid) => {
+        const item = mapping.items[iid];
+        const name = item.isProper ? item.name : item.name.toLowerCase();
+        const iText = `<span class="entity-item">${name}</span>`;
+        return item.isProper ? iText : `the ${iText}`;
     };
     const wrapRole = (r) => `<span class="entity-role">${r}</span>`;
     let text, fn, masks = [];
@@ -160,8 +169,8 @@ function renderFact(fact, mapping, roles) {
         }
         case FACT_TYPES.SUSPECT_ITEM: {
             const name = fmt('suspects', fact.suspectId);
-            const item = fmt('items', fact.itemId);
-            text = `${name} had the ${item}.`;
+            const item = fmtItem(fact.itemId);
+            text = `${name} had ${item}.`;
             fn = (a) => checkVal(a, fact.suspectId, 'Item', fact.itemId);
             masks = [{ varIdx: numSuspects + fact.suspectId, mask: (1 << fact.itemId) }];
             break;
@@ -169,8 +178,8 @@ function renderFact(fact, mapping, roles) {
         case FACT_TYPES.SUSPECT_LOCATION_ITEM: {
             const name = fmt('suspects', fact.suspectId);
             const rText = fmtRoom(fact.roomId);
-            const item = fmt('items', fact.itemId);
-            text = `${name} was in ${rText} with the ${item}.`;
+            const item = fmtItem(fact.itemId);
+            text = `${name} was in ${rText} with ${item}.`;
             fn = (a) => checkVal(a, fact.suspectId, 'Room', fact.roomId) && checkVal(a, fact.suspectId, 'Item', fact.itemId);
             masks = [
                 { varIdx: 2 * numSuspects + fact.suspectId, mask: (1 << fact.roomId) },
@@ -199,8 +208,8 @@ function renderFact(fact, mapping, roles) {
         }
         case FACT_TYPES.ROOM_ITEM: {
             const rText = fmtRoom(fact.roomId);
-            const item = fmt('items', fact.itemId);
-            text = `The person in ${rText} had the ${item}.`;
+            const item = fmtItem(fact.itemId);
+            text = `The person in ${rText} had ${item}.`;
             fn = (a) => {
                  const occupants = Array.from({length: numSuspects}, (_, i) => i);
                  const r = occupants.filter(i => getVal(a, i, 'Room') === fact.roomId);
@@ -219,8 +228,9 @@ function renderFact(fact, mapping, roles) {
             break;
         }
         case FACT_TYPES.ITEM_NOT_MURDER_WEAPON: {
-            const item = fmt('items', fact.itemId);
-            text = `The ${item} was not the murder weapon.`;
+            const item = fmtItem(fact.itemId);
+            const capItem = item.charAt(0).toUpperCase() + item.slice(1);
+            text = `${capItem} was not the murder weapon.`;
             fn = (a) => {
                 const owner = Array.from({length: numSuspects}, (_, i) => i).find(pid => checkVal(a, pid, 'Item', fact.itemId));
                 return owner !== undefined && getVal(a, owner, 'Role') !== 'Killer';
@@ -313,7 +323,14 @@ export async function handleNewCase(uiCallbacks) {
             const rendered = renderFact(fact, gameMapping, roles);
             const otherTexts = testSet.map(f => renderFact(f, gameMapping, roles).text);
             let essential = false;
-            const terms = [...gameMapping.suspects, ...gameMapping.rooms];
+            
+            // Collect all raw names (not formatted HTML) for search
+            const terms = [
+                ...gameMapping.suspects, 
+                ...gameMapping.rooms.map(r => r.name),
+                ...gameMapping.items.map(i => i.name)
+            ];
+            
             for (let t of terms) {
                 if (rendered.text.includes(t) && !otherTexts.some(ot => ot.includes(t))) {
                     essential = true; break;

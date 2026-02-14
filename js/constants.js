@@ -5,17 +5,17 @@ export const SCENARIOS = [
         id: 'tng', name: 'Star Trek: TNG',
         suspects: ['Capt. Picard', 'Cmdr. Riker', 'Lt. Cmdr. Data', 'Counselor Troi', 'Lt. Worf', 'Dr. Crusher', 'Lt. Cmdr. La Forge', 'Guinan', 'Lt. Barclay', 'Chief O\'Brien', 'Q', 'Ro Laren', 'Tasha Yar'],
         rooms: [
-            { name: 'Bridge', noArticle: false },
-            { name: 'Ten Forward', noArticle: true },
-            { name: 'Engineering', noArticle: true },
-            { name: 'Holodeck', noArticle: false },
-            { name: 'Sickbay', noArticle: true },
-            { name: 'Transporter Room', noArticle: false },
-            { name: 'Ready Room', noArticle: false },
-            { name: 'Science Lab', noArticle: false },
-            { name: 'Shuttlebay', noArticle: false },
-            { name: 'Observation Lounge', noArticle: false },
-            { name: 'Cargo Bay', noArticle: false }
+            { name: 'Bridge', noArticle: false, isProper: true },
+            { name: 'Ten Forward', noArticle: true, isProper: true },
+            { name: 'Engineering', noArticle: true, isProper: true },
+            { name: 'Holodeck', noArticle: false, isProper: true },
+            { name: 'Sickbay', noArticle: true, isProper: true },
+            { name: 'Transporter Room', noArticle: false, isProper: true },
+            { name: 'Ready Room', noArticle: false, isProper: true },
+            { name: 'Science Lab', noArticle: false, isProper: true },
+            { name: 'Shuttlebay', noArticle: false, isProper: true },
+            { name: 'Observation Lounge', noArticle: false, isProper: true },
+            { name: 'Cargo Bay', noArticle: false, isProper: true }
         ],
         roomFeatures: { 
             'Bridge': ['Captain\'s chair', 'tactical station'], 
@@ -30,23 +30,35 @@ export const SCENARIOS = [
             'Observation Lounge': ['model ships', 'long table'],
             'Cargo Bay': ['containers', 'anti-grav sled']
         },
-        items: ['Type-2 Phaser', 'Bat\'leth', 'Tricorder', 'Hypospray', 'Disruptor', 'PADD', 'Horga\'hn', 'Ressikan Flute', 'Self-Sealing Stem Bolt', 'Isolinear Chip', 'Klingon Dagger']
+        items: [
+            { name: 'Type-2 Phaser', isProper: true },
+            { name: 'Bat\'leth', isProper: true },
+            { name: 'Tricorder', isProper: true },
+            { name: 'Hypospray', isProper: true },
+            { name: 'Disruptor', isProper: true },
+            { name: 'PADD', isProper: true },
+            { name: 'Horga\'hn', isProper: true },
+            { name: 'Ressikan Flute', isProper: true },
+            { name: 'Self-Sealing Stem Bolt', isProper: true },
+            { name: 'Isolinear Chip', isProper: true },
+            { name: 'Klingon Dagger', isProper: true }
+        ]
     },
     {
         id: 'classic', name: 'Classic Mansion',
         suspects: ['Col. Mustard', 'Miss Scarlet', 'Prof. Plum', 'Mr. Green', 'Mrs. Peacock', 'Mme. Rose', 'Sgt. Gray', 'Miss Peach', 'Mrs. White', 'Capt. Brown'],
         rooms: [
-            { name: 'Kitchen', noArticle: false },
-            { name: 'Ballroom', noArticle: false },
-            { name: 'Conservatory', noArticle: false },
-            { name: 'Library', noArticle: false },
-            { name: 'Study', noArticle: false },
-            { name: 'Hall', noArticle: false },
-            { name: 'Lounge', noArticle: false },
-            { name: 'Dining Room', noArticle: false },
-            { name: 'Billiard Room', noArticle: false },
-            { name: 'Cellar', noArticle: false },
-            { name: 'Attic', noArticle: false }
+            { name: 'Kitchen', noArticle: false, isProper: false },
+            { name: 'Ballroom', noArticle: false, isProper: false },
+            { name: 'Conservatory', noArticle: false, isProper: false },
+            { name: 'Library', noArticle: false, isProper: false },
+            { name: 'Study', noArticle: false, isProper: false },
+            { name: 'Hall', noArticle: false, isProper: false },
+            { name: 'Lounge', noArticle: false, isProper: false },
+            { name: 'Dining Room', noArticle: false, isProper: false },
+            { name: 'Billiard Room', noArticle: false, isProper: false },
+            { name: 'Cellar', noArticle: false, isProper: false },
+            { name: 'Attic', noArticle: false, isProper: false }
         ],
         roomFeatures: { 
             'Kitchen': ['stove', 'pantry'], 
@@ -61,22 +73,34 @@ export const SCENARIOS = [
             'Cellar': ['wine barrels'],
             'Attic': ['old trunks', 'dusty mirrors']
         },
-        items: ['Candlestick', 'Dagger', 'Lead Pipe', 'Revolver', 'Rope', 'Wrench', 'Poison', 'Horseshoe', 'Trophy', 'Poker', 'Axe']
+        items: [
+            { name: 'Candlestick', isProper: false },
+            { name: 'Dagger', isProper: false },
+            { name: 'Lead Pipe', isProper: false },
+            { name: 'Revolver', isProper: false },
+            { name: 'Rope', isProper: false },
+            { name: 'Wrench', isProper: false },
+            { name: 'Poison', isProper: false },
+            { name: 'Horseshoe', isProper: false },
+            { name: 'Trophy', isProper: false },
+            { name: 'Poker', isProper: false },
+            { name: 'Axe', isProper: false }
+        ]
     },
     {
         id: 'medieval', name: 'Medieval Mystery',
         suspects: ['Sir Alistair', 'Lady Eleanor', 'The Friar', 'The Minstrel', 'The Blacksmith', 'Princess Isabella', 'The Jester', 'The Alchemist', 'The Squire', 'The Abbess', 'The Huntsman', 'The Herbalist', 'The Knight'],
         rooms: [
-            { name: 'Throne Room', noArticle: false },
-            { name: 'Great Hall', noArticle: false },
-            { name: 'Dungeon', noArticle: false },
-            { name: 'Armory', noArticle: false },
-            { name: 'Chapel', noArticle: false },
-            { name: 'Stable', noArticle: false },
-            { name: 'Tower', noArticle: false },
-            { name: 'Courtyard', noArticle: false },
-            { name: 'Barracks', noArticle: false },
-            { name: 'Gatehouse', noArticle: false }
+            { name: 'Throne Room', noArticle: false, isProper: false },
+            { name: 'Great Hall', noArticle: false, isProper: false },
+            { name: 'Dungeon', noArticle: false, isProper: false },
+            { name: 'Armory', noArticle: false, isProper: false },
+            { name: 'Chapel', noArticle: false, isProper: false },
+            { name: 'Stable', noArticle: false, isProper: false },
+            { name: 'Tower', noArticle: false, isProper: false },
+            { name: 'Courtyard', noArticle: false, isProper: false },
+            { name: 'Barracks', noArticle: false, isProper: false },
+            { name: 'Gatehouse', noArticle: false, isProper: false }
         ],
         roomFeatures: { 
             'Throne Room': ['throne', 'banners'], 
@@ -90,7 +114,19 @@ export const SCENARIOS = [
             'Barracks': ['bunks', 'armor stands'],
             'Gatehouse': ['portcullis', 'winch']
         },
-        items: ['Broadsword', 'Chalice', 'Crossbow', 'Poison Ring', 'Mace', 'Scroll', 'Morning Star', 'Mandragora', 'Gauntlet', 'Dagger', 'Poisoned Wine']
+        items: [
+            { name: 'Broadsword', isProper: false },
+            { name: 'Chalice', isProper: false },
+            { name: 'Crossbow', isProper: false },
+            { name: 'Poison Ring', isProper: false },
+            { name: 'Mace', isProper: false },
+            { name: 'Scroll', isProper: false },
+            { name: 'Morning Star', isProper: false },
+            { name: 'Mandragora', isProper: true }, /* Exotic/Proper name arguably */
+            { name: 'Gauntlet', isProper: false },
+            { name: 'Dagger', isProper: false },
+            { name: 'Poisoned Wine', isProper: false }
+        ]
     }
 ];
 

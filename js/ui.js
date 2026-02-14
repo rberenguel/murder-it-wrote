@@ -123,7 +123,11 @@ export function performReveal() {
     if (!state.solution) return;
     state.solution.truth.forEach(p => {
         const n = state.gameMapping.suspects[p.id];
-        state.userGuesses[n] = { room: state.gameMapping.rooms[p.roomId].name, item: state.gameMapping.items[p.itemId], role: p.role };
+        state.userGuesses[n] = { 
+            room: state.gameMapping.rooms[p.roomId].name, 
+            item: state.gameMapping.items[p.itemId].name, 
+            role: p.role 
+        };
     });
     renderUI();
     const b = document.getElementById('status-badge');
