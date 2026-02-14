@@ -39,8 +39,8 @@ export function renderLocations() {
 
 export function renderSelect(s, f, l, opts, usedMap) {
   const v = state.userGuesses[s]?.[f] || "";
-  const isConflict =
-    (f === "room" || f === "item") && v && usedMap?.[f]?.[v] > 1;
+  // Only Items must be unique. Rooms and Roles can be shared.
+  const isConflict = f === "item" && v && usedMap?.[f]?.[v] > 1;
 
   return `<div class="guess-row ${isConflict ? "has-conflict" : ""}">
                 <label class="guess-label">${l}</label>
@@ -50,7 +50,7 @@ export function renderSelect(s, f, l, opts, usedMap) {
                       .map((o) => {
                         const name = typeof o === "string" ? o : o.name;
                         const isUsedByOther =
-                          (f === "room" || f === "item") &&
+                          f === "item" &&
                           usedMap?.[f]?.[name] > 0 &&
                           v !== name;
                         return `<option value="${name}" ${v === name ? "selected" : ""}>${name}${isUsedByOther ? " •" : ""}</option>`;
@@ -109,9 +109,8 @@ export function renderUI() {
     });
   }
 
-  const usedMap = { room: {}, item: {} };
+  const usedMap = { item: {} };
   Object.values(state.userGuesses).forEach((g) => {
-    if (g.room) usedMap.room[g.room] = (usedMap.room[g.room] || 0) + 1;
     if (g.item) usedMap.item[g.item] = (usedMap.item[g.item] || 0) + 1;
   });
 
