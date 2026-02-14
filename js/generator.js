@@ -11,7 +11,8 @@ const FACT_TYPES = {
     ROOM_ITEM: 'ROOM_ITEM',
     ROOM_EMPTY: 'ROOM_EMPTY',
     ITEM_NOT_MURDER_WEAPON: 'ITEM_NOT_MURDER_WEAPON',
-    ROOM_NOT_CORPSE: 'ROOM_NOT_CORPSE'
+    ROOM_NOT_CORPSE: 'ROOM_NOT_CORPSE',
+    ROLE_EXCLUSION: 'ROLE_EXCLUSION'
 };
 
 const getVal = (a, id, type) => a[`${id}_${type}`];
@@ -83,7 +84,7 @@ function generateItemFacts(truth) {
 
 function mergeFacts(facts) {
     const merged = [];
-    const suspectFacts = {}; // Maps suspectId to { location, item }
+    const suspectFacts = {}; // Maps suspectId to { location, item, notKiller, notVictim }
 
     facts.forEach(f => {
         if (f.type === FACT_TYPES.SUSPECT_LOCATION) {
@@ -92,6 +93,11 @@ function mergeFacts(facts) {
         } else if (f.type === FACT_TYPES.SUSPECT_ITEM) {
             if (!suspectFacts[f.suspectId]) suspectFacts[f.suspectId] = {};
             suspectFacts[f.suspectId].item = f;
+        } else if (f.type === FACT_TYPES.SUSPECT_NOT_ROLE) {
+            if (!suspectFacts[f.suspectId]) suspectFacts[f.suspectId] = {};
+            if (f.role === 'Killer') suspectFacts[f.suspectId].notKiller = f;
+            else if (f.role === 'Victim') suspectFacts[f.suspectId].notVictim = f;
+            else merged.push(f);
         } else {
             merged.push(f);
         }
@@ -99,15 +105,19 @@ function mergeFacts(facts) {
 
     Object.keys(suspectFacts).forEach(sidStr => {
         const sid = parseInt(sidStr);
-        const { location, item } = suspectFacts[sid];
-        // 70% chance to merge if both exist
-        if (location && item && Math.random() > 0.3) {
-            merged.push({
-                type: FACT_TYPES.SUSPECT_LOCATION_ITEM,
-                suspectId: sid,
-                roomId: location.roomId,
-                itemId: item.itemId
-            });
+        const { location, item, notKiller, notVictim } = suspectFacts[sid];
+
+        // 1. Double Exclusion Merge
+        if (notKiller && notVictim) {
+            merged.push({ type: FACT_TYPES.ROLE_EXCLUSION, suspectId: sid });
+        } else {
+            if (notKiller) merged.push(notKiller);
+            if (notVictim) merged.push(notVictim);
+        }
+
+        // 2. Location/Item Merge
+        if (location && item) {
+            merged.push({ type: FACT_TYPES.SUSPECT_LOCATION_ITEM, suspectId: sid, roomId: location.roomId, itemId: item.itemId });
         } else {
             if (location) merged.push(location);
             if (item) merged.push(item);
@@ -192,28 +202,29 @@ function renderFact(fact, mapping, roles) {
         case FACT_TYPES.ITEM_NOT_MURDER_WEAPON: {
             const item = fmt('items', fact.itemId);
             text = `The ${item} was not the murder weapon.`;
-            // Whoever has this item is NOT the Killer
-            const killerIndices = roles.map((r, i) => r === 'Killer' ? i : -1).filter(i => i !== -1);
-            let killerMask = 0; killerIndices.forEach(i => killerMask |= (1 << i));
             fn = (a) => {
                 const owner = IDS.find(pid => checkVal(a, pid, 'Item', fact.itemId));
                 return owner !== undefined && getVal(a, owner, 'Role') !== 'Killer';
             };
-            // Propagate: For each suspect, if they have this item, they are not the killer
-            // This is hard to represent with a simple mask on one variable.
-            // But we can add a constraint function.
             break;
         }
         case FACT_TYPES.ROOM_NOT_CORPSE: {
             const rName = fmt('rooms', fact.roomId);
             text = `There is no corpse in the ${rName}.`;
-            // Whoever was in this room is NOT the Victim
-            const victimIndices = roles.map((r, i) => r === 'Victim' ? i : -1).filter(i => i !== -1);
-            let victimMask = 0; victimIndices.forEach(i => victimMask |= (1 << i));
             fn = (a) => {
                 const suspectsInRoom = IDS.filter(pid => checkVal(a, pid, 'Room', fact.roomId));
                 return suspectsInRoom.every(pid => getVal(a, pid, 'Role') !== 'Victim');
             };
+            break;
+        }
+        case FACT_TYPES.ROLE_EXCLUSION: {
+            const name = fmt('suspects', fact.suspectId);
+            text = `${name} is not the killer or the victim.`;
+            fn = (a) => getVal(a, fact.suspectId, 'Role') !== 'Killer' && getVal(a, fact.suspectId, 'Role') !== 'Victim';
+            const kIndices = roles.map((r, i) => r === 'Killer' ? i : -1).filter(i => i !== -1);
+            const vIndices = roles.map((r, i) => r === 'Victim' ? i : -1).filter(i => i !== -1);
+            let mask = 0; kIndices.forEach(i => mask |= (1 << i)); vIndices.forEach(i => mask |= (1 << i));
+            masks = [{ varIdx: fact.suspectId, mask: ~mask }];
             break;
         }
     }
@@ -221,16 +232,12 @@ function renderFact(fact, mapping, roles) {
     return { text, fn, masks, id: Math.random() };
 }
 
-export function generateClues(truth, roles, mapping) {
-    const rawFacts = [
+export function generateClues(truth, roles) {
+    return [
         ...generateSuspectFacts(truth, roles),
         ...generateRoomFacts(truth),
         ...generateItemFacts(truth)
     ];
-
-    const mergedFacts = mergeFacts(rawFacts);
-    
-    return mergedFacts.map(f => renderFact(f, mapping, roles));
 }
 
 export async function handleNewCase(uiCallbacks) {
@@ -249,46 +256,52 @@ export async function handleNewCase(uiCallbacks) {
     };
 
     const { truth, roles } = generateTruth();
-    let allClues = generateClues(truth, roles, gameMapping);
-    allClues = shuffle(allClues);
-    addLog(`Universe: ${allClues.length} facts. Pruning...`);
+    let allFacts = generateClues(truth, roles);
+    allFacts = shuffle(allFacts);
+    addLog(`Universe: ${allFacts.length} possibilities. Pruning...`);
 
-    let keptClues = [...allClues];
-    for (let i = keptClues.length - 1; i >= 0; i--) {
-        const clue = keptClues[i];
-        const testSet = keptClues.filter((_, idx) => idx !== i);
+    let keptFacts = [...allFacts];
+    for (let i = keptFacts.length - 1; i >= 0; i--) {
+        const fact = keptFacts[i];
+        const testSet = keptFacts.filter((_, idx) => idx !== i);
         
         const engine = new LogicEngine(roles);
-        
-        testSet.forEach(c => {
-            engine.addConstraint(c.fn);
-            if (c.masks) c.masks.forEach(m => engine.restrict(m.varIdx, m.mask));
+        testSet.forEach(f => {
+            engine.addConstraint(f.fn || renderFact(f, gameMapping, roles).fn);
+            const masks = f.masks || renderFact(f, gameMapping, roles).masks;
+            if (masks) masks.forEach(m => engine.restrict(m.varIdx, m.mask));
         });
 
         if (i % 10 === 0) await new Promise(r => setTimeout(r, 0));
 
-        const solutions = engine.solve(2);
-
-        if (solutions.length === 1) {
+        if (engine.solve(2).length === 1) {
+            // Check if essential (covers a term not covered by others)
+            // For facts, we need to check the rendered text
+            const rendered = renderFact(fact, gameMapping, roles);
+            const otherTexts = testSet.map(f => renderFact(f, gameMapping, roles).text);
             let essential = false;
-            const req = [...gameMapping.suspects, ...gameMapping.rooms];
-            for (let term of req) {
-                if (clue.text.includes(term) && !testSet.some(c => c.text.includes(term))) {
+            const terms = [...gameMapping.suspects, ...gameMapping.rooms];
+            for (let t of terms) {
+                if (rendered.text.includes(t) && !otherTexts.some(ot => ot.includes(t))) {
                     essential = true; break;
                 }
             }
-            if (!essential) keptClues.splice(i, 1);
+            if (!essential) keptFacts.splice(i, 1);
         }
     }
 
+    // Post-Pruning Merge and Render
+    const finalFacts = mergeFacts(keptFacts);
+    const finalClues = finalFacts.map(f => renderFact(f, gameMapping, roles));
+
     updateState({
         gameMapping,
-        puzzle: keptClues,
+        puzzle: shuffle(finalClues),
         solution: { truth, roles },
         userGuesses: {},
         isGenerating: false
     });
     
     renderUI();
-    addLog(`Success. Pruned to ${keptClues.length} clues.`, 'system');
+    addLog(`Success. Pruned to ${finalClues.length} clues.`, 'system');
 }
