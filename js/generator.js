@@ -9,7 +9,9 @@ const FACT_TYPES = {
     SUSPECT_NOT_ROLE: 'SUSPECT_NOT_ROLE',
     SUSPECT_LOCATION_ITEM: 'SUSPECT_LOCATION_ITEM',
     ROOM_ITEM: 'ROOM_ITEM',
-    ROOM_EMPTY: 'ROOM_EMPTY'
+    ROOM_EMPTY: 'ROOM_EMPTY',
+    ITEM_NOT_MURDER_WEAPON: 'ITEM_NOT_MURDER_WEAPON',
+    ROOM_NOT_CORPSE: 'ROOM_NOT_CORPSE'
 };
 
 const getVal = (a, id, type) => a[`${id}_${type}`];
@@ -57,6 +59,23 @@ function generateRoomFacts(truth) {
             facts.push({ type: FACT_TYPES.ROOM_ITEM, roomId: rid, itemId: residents[0].itemId });
         } else if (residents.length === 0) {
             facts.push({ type: FACT_TYPES.ROOM_EMPTY, roomId: rid });
+        }
+
+        // ROOM_NOT_CORPSE: True if the Victim was NOT in this room
+        if (!residents.some(r => r.role === 'Victim')) {
+            facts.push({ type: FACT_TYPES.ROOM_NOT_CORPSE, roomId: rid });
+        }
+    });
+    return facts;
+}
+
+function generateItemFacts(truth) {
+    const facts = [];
+    IDS.forEach(iid => {
+        const owner = truth.find(p => p.itemId === iid);
+        // ITEM_NOT_MURDER_WEAPON: True if the Killer does NOT have this item
+        if (owner && owner.role !== 'Killer') {
+            facts.push({ type: FACT_TYPES.ITEM_NOT_MURDER_WEAPON, itemId: iid });
         }
     });
     return facts;
@@ -170,6 +189,33 @@ function renderFact(fact, mapping, roles) {
             masks = IDS.map(pid => ({ varIdx: 10 + pid, mask: ~(1 << fact.roomId) }));
             break;
         }
+        case FACT_TYPES.ITEM_NOT_MURDER_WEAPON: {
+            const item = fmt('items', fact.itemId);
+            text = `The ${item} was not the murder weapon.`;
+            // Whoever has this item is NOT the Killer
+            const killerIndices = roles.map((r, i) => r === 'Killer' ? i : -1).filter(i => i !== -1);
+            let killerMask = 0; killerIndices.forEach(i => killerMask |= (1 << i));
+            fn = (a) => {
+                const owner = IDS.find(pid => checkVal(a, pid, 'Item', fact.itemId));
+                return owner !== undefined && getVal(a, owner, 'Role') !== 'Killer';
+            };
+            // Propagate: For each suspect, if they have this item, they are not the killer
+            // This is hard to represent with a simple mask on one variable.
+            // But we can add a constraint function.
+            break;
+        }
+        case FACT_TYPES.ROOM_NOT_CORPSE: {
+            const rName = fmt('rooms', fact.roomId);
+            text = `There is no corpse in the ${rName}.`;
+            // Whoever was in this room is NOT the Victim
+            const victimIndices = roles.map((r, i) => r === 'Victim' ? i : -1).filter(i => i !== -1);
+            let victimMask = 0; victimIndices.forEach(i => victimMask |= (1 << i));
+            fn = (a) => {
+                const suspectsInRoom = IDS.filter(pid => checkVal(a, pid, 'Room', fact.roomId));
+                return suspectsInRoom.every(pid => getVal(a, pid, 'Role') !== 'Victim');
+            };
+            break;
+        }
     }
 
     return { text, fn, masks, id: Math.random() };
@@ -178,7 +224,8 @@ function renderFact(fact, mapping, roles) {
 export function generateClues(truth, roles, mapping) {
     const rawFacts = [
         ...generateSuspectFacts(truth, roles),
-        ...generateRoomFacts(truth)
+        ...generateRoomFacts(truth),
+        ...generateItemFacts(truth)
     ];
 
     const mergedFacts = mergeFacts(rawFacts);
