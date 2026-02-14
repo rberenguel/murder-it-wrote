@@ -140,6 +140,9 @@ export function renderUI() {
     if (g.item) usedMap.item[g.item] = (usedMap.item[g.item] || 0) + 1;
   });
 
+  // Get unique roles present in this scenario
+  const availableRoles = [...new Set(state.solution.roles)];
+
   const grid = document.getElementById("notebook-grid");
   grid.innerHTML = `
         <div class="notebook-grid">
@@ -154,7 +157,7 @@ export function renderUI() {
                     <div class="guess-grid">
                         ${renderSelect(name, "room", "Loc", state.gameMapping.rooms, usedMap)}
                         ${renderSelect(name, "item", "Item", state.gameMapping.items, usedMap)}
-                        ${renderSelect(name, "role", "Role", ROLES_DEF, usedMap)}
+                        ${renderSelect(name, "role", "Role", availableRoles, usedMap)}
                     </div>
                 </div>
             `,
