@@ -30,6 +30,21 @@ export const SCENARIOS = [
         ],
         roomFeatures: { 'Kitchen': ['stove'], 'Ballroom': ['piano'], 'Conservatory': ['plants'], 'Library': ['books'], 'Study': ['fireplace'], 'Hall': ['staircase'], 'Lounge': ['sofa'] },
         items: ['Candlestick', 'Dagger', 'Lead Pipe', 'Revolver', 'Rope', 'Wrench']
+    },
+    {
+        id: 'medieval', name: 'Medieval Mystery',
+        suspects: ['Sir Alistair', 'Lady Eleanor', 'The Friar', 'The Minstrel', 'The Blacksmith', 'Princess Isabella', 'The Jester', 'The Alchemist'],
+        rooms: [
+            { name: 'Throne Room', noArticle: false },
+            { name: 'Great Hall', noArticle: false },
+            { name: 'Dungeon', noArticle: false },
+            { name: 'Armory', noArticle: false },
+            { name: 'Chapel', noArticle: false },
+            { name: 'Stable', noArticle: false },
+            { name: 'Tower', noArticle: false }
+        ],
+        roomFeatures: { 'Throne Room': ['throne'], 'Great Hall': ['long table'], 'Dungeon': ['chains'], 'Armory': ['shield rack'], 'Chapel': ['altar'], 'Stable': ['hay'], 'Tower': ['spiral stairs'] },
+        items: ['Broadsword', 'Chalice', 'Crossbow', 'Poison Ring', 'Mace', 'Scroll']
     }
 ];
 

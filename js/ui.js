@@ -52,14 +52,14 @@ export function renderUI() {
     if (evidenceHeader) {
         evidenceHeader.innerHTML = `
             <div style="display: flex; flex-direction: column;">
-                <h2 class="card-title"><i class="ph ph-magnifying-glass"></i>Evidence</h2>
+                <h2 class="card-title"><i class="ph-light ph-magnifying-glass"></i>Evidence</h2>
                 <span style="font-size: 0.625rem; color: var(--text-slate-400); font-weight: 400; margin-left: 1.75rem;">Manifest: 1 Killer, 1 Victim, ${roleStr}</span>
             </div>`;
     }
 
     cc.innerHTML = state.puzzle.map((c,i) => `
         <div class="clue-item">
-            <div class="clue-grip"><i class="ph ph-dots-six-vertical" style="font-size: 1.125rem;"></i></div>
+            <div class="clue-grip"><i class="ph-light ph-dots-six-vertical" style="font-size: 1.125rem;"></i></div>
             <div class="clue-text-container">
                 <span class="clue-index">${i+1}.</span>
                 <span class="clue-text">${c.text}</span>
@@ -79,7 +79,7 @@ export function renderUI() {
             ${state.gameMapping.suspects.map(name => `
                 <div class="suspect-card">
                     <h3 class="suspect-name">
-                        <span class="suspect-icon"><i class="ph ph-user"></i></span>
+                        <span class="suspect-icon"><i class="ph-light ph-user"></i></span>
                         ${name}
                     </h3>
                     <div class="guess-grid">
@@ -91,7 +91,6 @@ export function renderUI() {
             `).join('')}
         </div>`;
     
-    document.getElementById('scenario-badge').innerText = state.activeScenario.name;
     renderLocations();
 }
 

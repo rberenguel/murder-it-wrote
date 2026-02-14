@@ -61,13 +61,78 @@
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-/* Theme Overrides Placeholder */
+/* Theme Overrides */
 [data-theme="tng"] {
-    /* Future: Trek aesthetics (LCARS colors, specific fonts) */
+    --app-bg: #000000;
+    --canvas-bg: #050505;
+    --surface-bg: #0c0c0c;
+    --surface-bg-alt: #121212;
+    
+    --text-primary: #f8f8f8;
+    --text-secondary: #dddddd;
+    --text-tertiary: #aaaaaa;
+    --text-muted: #555555;
+    
+    --accent-primary: #ff9d00; /* LCARS Orange */
+    --accent-primary-alt: #df80ff; /* Shinier LCARS Purple */
+    --accent-primary-soft: rgba(223, 128, 255, 0.1);
+    --accent-secondary: #ffff99; /* ST Lt Yellow */
+    
+    --border-base: #2a2a2a;
+    --border-subtle: #1a1a1a;
+    --border-focus: #df80ff;
+    
+    --radius-main: 0.25rem;
+    --radius-subtle: 0.125rem;
+
+    --font-sans: "Monoid", monospace;
+
+    /* Neon Glows */
+    --shadow-sm: 0 0 5px rgba(223, 128, 255, 0.2);
+    --shadow-main: 0 0 10px rgba(223, 128, 255, 0.3);
+    --shadow-xl: 0 0 30px rgba(223, 128, 255, 0.2);
 }
 
 [data-theme="classic"] {
-    /* Future: Mystery aesthetics (Deep woods, paper textures) */
+    --app-bg: #1a4d2e; /* Billiard Green */
+    --canvas-bg: #faf3e0;
+    --surface-bg: #fdf6e3;
+    --surface-bg-alt: #f5eedc;
+    
+    --text-primary: #2c1810;
+    --text-secondary: #4a3728;
+    
+    --accent-primary: #8b0000; /* Dark Mahogany */
+    --accent-primary-alt: #a52a2a;
+    --accent-primary-soft: rgba(139, 0, 0, 0.1);
+    --accent-secondary: #daa520; /* Gold */
+    
+    --border-base: #dcd0b9;
+    --border-subtle: #e8dfcc;
+    --border-focus: #8b0000;
+    
+    --font-sans: "reforma", "Georgia", serif;
+}
+
+[data-theme="medieval"] {
+    --app-bg: #2b2b2b; /* Stone Gray */
+    --canvas-bg: #e3d5b8; /* Old Parchment */
+    --surface-bg: #ebdeca;
+    --surface-bg-alt: #dfcfb4;
+    
+    --text-primary: #1c1c1c;
+    --text-secondary: #333333;
+    
+    --accent-primary: #b8860b; /* Dark Goldenrod */
+    --accent-primary-alt: #8b4513; /* Saddle Brown */
+    --accent-primary-soft: rgba(184, 134, 11, 0.1);
+    --accent-secondary: #000080; /* Navy Blue */
+    
+    --border-base: #c1b094;
+    --border-subtle: #d3c4a9;
+    --border-focus: #b8860b;
+    
+    --font-sans: "Cinzel", "reforma", serif;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -169,7 +234,8 @@ body {
 /* Drawers */
 .drawer {
     position: absolute;
-    inset-y: 0;
+    top: 0;
+    bottom: 0;
     background-color: var(--surface-bg);
     box-shadow: var(--shadow-xl);
     z-index: 40;
@@ -306,7 +372,7 @@ body {
 
 .suspect-name {
     font-weight: 700;
-    color: var(--clr-slate-800);
+    color: var(--text-primary);
     margin-bottom: 0.5rem;
     display: flex;
     align-items: center;

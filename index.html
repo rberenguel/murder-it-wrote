@@ -5,24 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Murder, it wrote</title>
     <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <!-- Local Assets -->
+    <link rel="stylesheet" href="fonts/phosphor/phosphor.css">
+    <link rel="stylesheet" href="fonts/reforma.css">
+    <link rel="stylesheet" href="fonts/monoid.css">
+    <link rel="stylesheet" href="fonts/cinzel.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="app-body">
 
     <header class="app-header">
         <h1 class="header-title">
-            <i class="ph ph-footprints"></i>
-            <span class="hidden-sm">Murder, it wrote</span>
-            <span id="scenario-badge" class="scenario-badge"></span>
+            <i class="ph-light ph-footprints"></i>
         </h1>
         <div class="header-actions">
             <button id="btn-debug" class="btn-icon">
-                <i class="ph ph-bug"></i>
+                <i class="ph-light ph-bug"></i>
             </button>
             <button id="btn-new-case" class="btn btn-primary">
-                <i class="ph ph-plus-circle"></i>
+                <i class="ph-light ph-plus-circle"></i>
                 <span class="hidden-sm">New Case</span>
             </button>
         </div>
@@ -33,7 +35,7 @@
             <section class="evidence-card">
                 <div class="card-header">
                     <h2 class="card-title">
-                        <i class="ph ph-magnifying-glass"></i>
+                        <i class="ph-light ph-magnifying-glass"></i>
                         Evidence
                     </h2>
                 </div>
@@ -45,7 +47,7 @@
 
         <div id="locations-drawer" class="drawer">
             <div id="locations-tab" class="drawer-tab">
-                <i class="ph ph-map-trifold"></i>
+                <i class="ph-light ph-map-trifold"></i>
             </div>
             <div class="card-header">
                 <h2 class="card-title">Known Locations</h2>
@@ -55,7 +57,7 @@
 
         <div id="notebook-drawer" class="drawer">
             <div id="notebook-tab" class="drawer-tab">
-                <i class="ph ph-notebook"></i>
+                <i class="ph-light ph-notebook"></i>
             </div>
             <div class="drawer-header">
                 <h2 class="card-title">Detective's Notes</h2>
@@ -65,7 +67,7 @@
             <div class="drawer-footer">
                 <button id="btn-verify" class="btn btn-dark">Verify</button>
                 <button id="btn-reveal" class="btn btn-outline">
-                    <i class="ph ph-eye"></i>
+                    <i class="ph-light ph-eye"></i>
                 </button>
             </div>
         </div>
@@ -77,7 +79,7 @@
             <div class="debug-header">
                 <div class="debug-title">System Log</div>
                 <button onclick="toggleDebug()" class="debug-close">
-                    <i class="ph ph-x"></i>
+                    <i class="ph-light ph-x"></i>
                 </button>
             </div>
             <div id="log-container" class="log-container custom-scrollbar"></div>
