@@ -104,4 +104,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Initial render
   renderLocations();
+
+  // Fetch and display version from manifest.json
+  fetch("manifest.json")
+    .then((res) => res.json())
+    .then((manifest) => {
+      const versionDisplay = document.getElementById("intro-version");
+      if (versionDisplay && manifest.version) {
+        versionDisplay.textContent = `v${manifest.version}`;
+      }
+    })
+    .catch((err) => {
+      console.warn("Could not load version from manifest:", err);
+    });
 });

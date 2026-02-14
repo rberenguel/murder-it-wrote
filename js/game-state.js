@@ -1,13 +1,7 @@
-import { SCENARIOS, CONFIG } from "./constants.js";
+import { SCENARIOS } from "./constants.js";
 
 export function pickRandomScenario() {
-  const classic = SCENARIOS.find((s) => s.id === "classic");
-  const others = SCENARIOS.filter((s) => s.id !== "classic");
-
-  if (Math.random() < CONFIG.classicWeight && classic) return classic;
-  return others.length > 0
-    ? others[Math.floor(Math.random() * others.length)]
-    : classic;
+  return SCENARIOS[Math.floor(Math.random() * SCENARIOS.length)];
 }
 
 export let state = {

@@ -11,10 +11,6 @@
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <link rel="manifest" href="manifest.json" />
     <link rel="apple-touch-icon" href="icon.png" />
-    <!-- Google Fonts for Scenario Themes -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Bebas+Neue&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Libre+Bodoni:wght@400;700&family=Orbitron:wght@400;700&family=Lato:ital,wght@0,400;0,700;1,400&family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <!-- Local Assets -->
@@ -22,6 +18,7 @@
     <link rel="stylesheet" href="fonts/reforma.css" />
     <link rel="stylesheet" href="fonts/monoid.css" />
     <link rel="stylesheet" href="fonts/cinzel.css" />
+    <link rel="stylesheet" href="fonts/scenario-themes.css" />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body class="app-body">
@@ -29,6 +26,7 @@
     <div id="intro-screen" class="intro-screen">
       <div class="intro-content">
         <h1 class="intro-title">Murder, it wrote</h1>
+        <div id="intro-version" class="intro-version"></div>
         <img src="icon.png" class="intro-icon" alt="Murder, it wrote Icon" />
         <ul class="intro-rules">
           <li>You must determine the roles of all participants.</li>

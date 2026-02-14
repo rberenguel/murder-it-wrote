@@ -200,24 +200,24 @@
    ============================================ */
 [data-theme="gatsby"] {
   --app-bg: #0f0f0f;
-  --canvas-bg: #faf8f3;
-  --surface-bg: #ffffff;
-  --surface-bg-alt: #f5f2ed;
+  --canvas-bg: #f0ebe0;
+  --surface-bg: #f8f3eb;
+  --surface-bg-alt: #ebe6da;
 
   --text-primary: #1a1a1a;
   --text-secondary: #2d2d2d;
   --text-tertiary: #666666;
 
-  --accent-primary: #d4af37;
-  --accent-primary-alt: #ffd700;
-  --accent-primary-soft: rgba(212, 175, 55, 0.15);
-  --accent-secondary: #00bcd4;
+  --accent-primary: #9d7f1a;
+  --accent-primary-alt: #b8941f;
+  --accent-primary-soft: rgba(157, 127, 26, 0.15);
+  --accent-secondary: #0097a7;
 
   --border-base: #d4af37;
   --border-subtle: #e8dcc0;
   --border-focus: #ffd700;
 
-  --font-sans: "Cormorant Garamond", "Georgia", serif;
+  --font-sans: "Caviar Dreams", "Georgia", serif;
 
   --radius-main: 2px;
   --radius-subtle: 1px;
@@ -232,14 +232,17 @@
 
 [data-theme="gatsby"] .card-title,
 [data-theme="gatsby"] .suspect-name {
-  font-family: "Bebas Neue", sans-serif;
+  font-family: "Caviar Dreams", sans-serif;
   letter-spacing: 2px;
+  text-transform: uppercase;
 }
 
 [data-theme="gatsby"] .entity-person {
-  color: #d4af37;
+  color: #e6c645;
   font-weight: 600;
-  text-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+  background: #33333388;
+  padding: 1px 6px;
+  border-radius: 6px;
 }
 [data-theme="gatsby"] .entity-item {
   font-style: italic;
@@ -277,7 +280,7 @@
   --border-subtle: #999999;
   --border-focus: #c41e3a;
 
-  --font-sans: "Courier Prime", "Courier New", monospace;
+  --font-sans: "Reforma", "Georgia", serif;
 
   --scrollbar-track: #e3ddd0;
   --scrollbar-thumb: #666666;
@@ -522,6 +525,83 @@
   text-transform: uppercase;
   letter-spacing: 1px;
   font-size: 0.9em;
+}
+
+/* ============================================
+   SHADOW PROTOCOL THEME - Cold War Espionage
+   ============================================ */
+[data-theme="shadow_protocol"] {
+  --app-bg: #2a2a2a;
+  --canvas-bg: #d8d5cc;
+  --surface-bg: #e8e5dc;
+  --surface-bg-alt: #d0cdc4;
+
+  --text-primary: #1a1a1a;
+  --text-secondary: #3a3a3a;
+  --text-tertiary: #666666;
+
+  --accent-primary: #8b0000;
+  --accent-primary-alt: #a52a2a;
+  --accent-primary-soft: rgba(139, 0, 0, 0.1);
+  --accent-secondary: #556b2f;
+
+  --border-base: #8b8b7a;
+  --border-subtle: #a5a59a;
+  --border-focus: #8b0000;
+
+  --font-sans: "Monoid", "Courier New", monospace;
+
+  --radius-main: 2px;
+  --radius-subtle: 1px;
+
+  --scrollbar-track: #d0cdc4;
+  --scrollbar-thumb: #8b0000;
+
+  --shadow-sm: 1px 1px 3px rgba(0, 0, 0, 0.2);
+  --shadow-main: 2px 2px 6px rgba(0, 0, 0, 0.3);
+  --shadow-xl: 4px 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="shadow_protocol"] .entity-person {
+  font-family: "Monoid", monospace;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.95em;
+  color: #8b0000;
+  background: rgba(139, 0, 0, 0.08);
+  padding: 2px 6px;
+  border-left: 3px solid #8b0000;
+}
+
+[data-theme="shadow_protocol"] .entity-item {
+  color: #556b2f;
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-style: solid;
+  text-decoration-color: rgba(85, 107, 47, 0.3);
+}
+
+[data-theme="shadow_protocol"] .entity-room {
+  font-variant: small-caps;
+  color: #3a3a3a;
+  border-bottom: 2px solid rgba(139, 0, 0, 0.2);
+  font-weight: 600;
+}
+
+[data-theme="shadow_protocol"] .entity-role {
+  text-transform: uppercase;
+  font-size: 0.85em;
+  letter-spacing: 1.5px;
+  color: #8b0000;
+  font-weight: 700;
+}
+
+/* Classified document aesthetic */
+[data-theme="shadow_protocol"] .card-title {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 700;
+  border-bottom: 2px solid #8b0000;
 }
 
 * {
@@ -1250,11 +1330,19 @@ body {
 .intro-title {
   font-size: 1.5rem;
   font-weight: 700;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
   text-transform: uppercase;
   letter-spacing: 2px;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
   font-family: "Monoid", monospace;
+}
+
+.intro-version {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 0.5rem;
+  font-family: "Monoid", monospace;
+  letter-spacing: 0.1rem;
 }
 
 .intro-icon {
@@ -1307,9 +1395,14 @@ body {
   border-color: rgba(255, 215, 0, 0.3);
 }
 
+.btn-start:hover i {
+  color: #ffd700;
+}
+
 .btn-start i {
   font-size: 2rem;
-  color: #ffd700; /* Gold */
+  color: rgba(255, 255, 255, 0.4);
+  transition: color 0.3s ease;
 }
 
 .btn-start span {
