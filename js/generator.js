@@ -18,16 +18,16 @@ const FACT_TYPES = {
 const getVal = (a, id, type) => a[`${id}_${type}`];
 const checkVal = (a, subId, type, val) => getVal(a, subId, type) === val;
 
-export function generateTruth() {
+export function generateTruth(numSuspects) {
     const activeRoles = ['Killer', 'Victim'];
     if (Math.random() > 0.6) activeRoles.push('Witness');
     if (Math.random() > 0.7) activeRoles.push('Accomplice');
-    while (activeRoles.length < 5) activeRoles.push('Innocent');
+    while (activeRoles.length < numSuspects) activeRoles.push('Innocent');
     
     const shuffle = (a) => { for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]} return a; };
     const sRoles = shuffle([...activeRoles]);
-    const sItems = shuffle([...IDS]);
-    const sRooms = IDS.map(() => Math.floor(Math.random() * 5));
+    const sItems = shuffle([...Array(numSuspects).keys()]);
+    const sRooms = Array.from({length: numSuspects}, () => Math.floor(Math.random() * numSuspects));
 
     // Force Witness to be in the same room as the Victim
     const vIdx = sRoles.indexOf('Victim');
@@ -36,7 +36,7 @@ export function generateTruth() {
         sRooms[wIdx] = sRooms[vIdx];
     }
 
-    const truth = IDS.map(id => ({ id, roomId: sRooms[id], itemId: sItems[id], role: sRoles[id] }));
+    const truth = Array.from({length: numSuspects}, (_, id) => ({ id, roomId: sRooms[id], itemId: sItems[id], role: sRoles[id] }));
     return { truth, roles: sRoles };
 }
 
@@ -59,9 +59,9 @@ function generateSuspectFacts(truth, roles) {
     return facts;
 }
 
-function generateRoomFacts(truth) {
+function generateRoomFacts(truth, numSuspects) {
     const facts = [];
-    IDS.forEach(rid => {
+    for (let rid = 0; rid < numSuspects; rid++) {
         const residents = truth.filter(p => p.roomId === rid);
         if (residents.length === 1) {
             facts.push({ type: FACT_TYPES.ROOM_ITEM, roomId: rid, itemId: residents[0].itemId });
@@ -73,19 +73,19 @@ function generateRoomFacts(truth) {
         if (!residents.some(r => r.role === 'Victim')) {
             facts.push({ type: FACT_TYPES.ROOM_NOT_CORPSE, roomId: rid });
         }
-    });
+    }
     return facts;
 }
 
-function generateItemFacts(truth) {
+function generateItemFacts(truth, numSuspects) {
     const facts = [];
-    IDS.forEach(iid => {
+    for (let iid = 0; iid < numSuspects; iid++) {
         const owner = truth.find(p => p.itemId === iid);
         // ITEM_NOT_MURDER_WEAPON: True if the Killer does NOT have this item
         if (owner && owner.role !== 'Killer') {
             facts.push({ type: FACT_TYPES.ITEM_NOT_MURDER_WEAPON, itemId: iid });
         }
-    });
+    }
     return facts;
 }
 
@@ -135,9 +135,14 @@ function mergeFacts(facts) {
 }
 
 function renderFact(fact, mapping, roles) {
+    const numSuspects = mapping.suspects.length;
     const fmt = (type, id) => `<span class="entity-${type === 'suspects' ? 'person' : (type === 'items' ? 'item' : 'room')}">${mapping[type][id]}</span>`;
     const fmtRoom = (rid) => {
         const r = mapping.rooms[rid];
+        if (!r) {
+            console.error('fmtRoom error:', { rid, mappingRoomsLength: mapping.rooms.length, fact });
+            return 'a mysterious room';
+        }
         const rName = `<span class="entity-room">${r.name}</span>`;
         return r.noArticle ? rName : `the ${rName}`;
     };
@@ -150,7 +155,7 @@ function renderFact(fact, mapping, roles) {
             const rText = fmtRoom(fact.roomId);
             text = `${name} was in ${rText}.`;
             fn = (a) => checkVal(a, fact.suspectId, 'Room', fact.roomId);
-            masks = [{ varIdx: 10 + fact.suspectId, mask: (1 << fact.roomId) }];
+            masks = [{ varIdx: 2 * numSuspects + fact.suspectId, mask: (1 << fact.roomId) }];
             break;
         }
         case FACT_TYPES.SUSPECT_ITEM: {
@@ -158,7 +163,7 @@ function renderFact(fact, mapping, roles) {
             const item = fmt('items', fact.itemId);
             text = `${name} had the ${item}.`;
             fn = (a) => checkVal(a, fact.suspectId, 'Item', fact.itemId);
-            masks = [{ varIdx: 5 + fact.suspectId, mask: (1 << fact.itemId) }];
+            masks = [{ varIdx: numSuspects + fact.suspectId, mask: (1 << fact.itemId) }];
             break;
         }
         case FACT_TYPES.SUSPECT_LOCATION_ITEM: {
@@ -168,8 +173,8 @@ function renderFact(fact, mapping, roles) {
             text = `${name} was in ${rText} with the ${item}.`;
             fn = (a) => checkVal(a, fact.suspectId, 'Room', fact.roomId) && checkVal(a, fact.suspectId, 'Item', fact.itemId);
             masks = [
-                { varIdx: 10 + fact.suspectId, mask: (1 << fact.roomId) },
-                { varIdx: 5 + fact.suspectId, mask: (1 << fact.itemId) }
+                { varIdx: 2 * numSuspects + fact.suspectId, mask: (1 << fact.roomId) },
+                { varIdx: numSuspects + fact.suspectId, mask: (1 << fact.itemId) }
             ];
             break;
         }
@@ -197,7 +202,8 @@ function renderFact(fact, mapping, roles) {
             const item = fmt('items', fact.itemId);
             text = `The person in ${rText} had the ${item}.`;
             fn = (a) => {
-                 const r = IDS.filter(i => getVal(a, i, 'Room') === fact.roomId);
+                 const occupants = Array.from({length: numSuspects}, (_, i) => i);
+                 const r = occupants.filter(i => getVal(a, i, 'Room') === fact.roomId);
                  return r.length > 0 && r.some(id => checkVal(a, id, 'Item', fact.itemId));
             };
             break;
@@ -206,17 +212,17 @@ function renderFact(fact, mapping, roles) {
             const rText = fmtRoom(fact.roomId);
             text = `${rText.charAt(0).toUpperCase() + rText.slice(1)} was empty.`;
             fn = (a) => {
-                for (let i of IDS) if (getVal(a, i, 'Room') === fact.roomId) return false;
+                for (let i = 0; i < numSuspects; i++) if (getVal(a, i, 'Room') === fact.roomId) return false;
                 return true;
             };
-            masks = IDS.map(pid => ({ varIdx: 10 + pid, mask: ~(1 << fact.roomId) }));
+            masks = Array.from({length: numSuspects}, (_, pid) => ({ varIdx: 2 * numSuspects + pid, mask: ~(1 << fact.roomId) }));
             break;
         }
         case FACT_TYPES.ITEM_NOT_MURDER_WEAPON: {
             const item = fmt('items', fact.itemId);
             text = `The ${item} was not the murder weapon.`;
             fn = (a) => {
-                const owner = IDS.find(pid => checkVal(a, pid, 'Item', fact.itemId));
+                const owner = Array.from({length: numSuspects}, (_, i) => i).find(pid => checkVal(a, pid, 'Item', fact.itemId));
                 return owner !== undefined && getVal(a, owner, 'Role') !== 'Killer';
             };
             break;
@@ -225,7 +231,8 @@ function renderFact(fact, mapping, roles) {
             const rText = fmtRoom(fact.roomId);
             text = `There is no corpse in ${rText}.`;
             fn = (a) => {
-                const suspectsInRoom = IDS.filter(pid => checkVal(a, pid, 'Room', fact.roomId));
+                const occupants = Array.from({length: numSuspects}, (_, i) => i);
+                const suspectsInRoom = occupants.filter(pid => checkVal(a, pid, 'Room', fact.roomId));
                 return suspectsInRoom.every(pid => getVal(a, pid, 'Role') !== 'Victim');
             };
             break;
@@ -245,11 +252,11 @@ function renderFact(fact, mapping, roles) {
     return { text, fn, masks, id: Math.random() };
 }
 
-export function generateClues(truth, roles) {
+export function generateClues(truth, roles, numSuspects) {
     return [
         ...generateSuspectFacts(truth, roles),
-        ...generateRoomFacts(truth),
-        ...generateItemFacts(truth)
+        ...generateRoomFacts(truth, numSuspects),
+        ...generateItemFacts(truth, numSuspects)
     ];
 }
 
@@ -257,19 +264,32 @@ export async function handleNewCase(uiCallbacks) {
     const { addLog, renderUI } = uiCallbacks;
     if (state.isGenerating) return;
     updateState({ isGenerating: true });
-    addLog(`Generating Universe...`);
+
+    const overlay = document.getElementById('transition-overlay');
+    if (overlay) {
+        overlay.classList.remove('hidden');
+        overlay.classList.add('active');
+        await new Promise(r => setTimeout(r, 450));
+    }
+    
+    // Choose dynamic suspect count between 3 and the minimum availability in current scenario
+    const s = state.activeScenario;
+    const maxAvailable = Math.min(s.suspects.length, s.rooms.length, s.items.length);
+    const numSuspects = Math.floor(Math.random() * (Math.min(maxAvailable, 7) - 3 + 1)) + 3;
+
+    addLog(`Generating Universe (${numSuspects} suspects)...`);
     
     const shuffle = (a) => { for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]} return a; };
     const getSubset = (arr, count) => shuffle([...arr]).slice(0, count);
     
     const gameMapping = {
-        suspects: getSubset(state.activeScenario.suspects, 5),
-        rooms: getSubset(state.activeScenario.rooms, 5),
-        items: getSubset(state.activeScenario.items, 5)
+        suspects: getSubset(s.suspects, numSuspects),
+        rooms: getSubset(s.rooms, numSuspects),
+        items: getSubset(s.items, numSuspects)
     };
 
-    const { truth, roles } = generateTruth();
-    let allFacts = generateClues(truth, roles);
+    const { truth, roles } = generateTruth(numSuspects);
+    let allFacts = generateClues(truth, roles, numSuspects);
     allFacts = shuffle(allFacts);
     addLog(`Universe: ${allFacts.length} possibilities. Pruning...`);
 
@@ -278,7 +298,7 @@ export async function handleNewCase(uiCallbacks) {
         const fact = keptFacts[i];
         const testSet = keptFacts.filter((_, idx) => idx !== i);
         
-        const engine = new LogicEngine(roles);
+        const engine = new LogicEngine(numSuspects, roles);
         testSet.forEach(f => {
             engine.addConstraint(f.fn || renderFact(f, gameMapping, roles).fn);
             const masks = f.masks || renderFact(f, gameMapping, roles).masks;
@@ -316,5 +336,11 @@ export async function handleNewCase(uiCallbacks) {
     });
     
     renderUI();
+    
+    if (overlay) {
+        overlay.classList.remove('active');
+        setTimeout(() => overlay.classList.add('hidden'), 450);
+    }
+    
     addLog(`Success. Pruned to ${finalClues.length} clues.`, 'system');
 }

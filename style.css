@@ -578,6 +578,22 @@ body {
 .hidden { display: none !important; }
 
 /* Intro Screen */
+/* Transition Overlay */
+.transition-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: #000000;
+    z-index: 3000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease-in-out;
+}
+
+.transition-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
 .intro-screen {
     position: fixed;
     inset: 0;

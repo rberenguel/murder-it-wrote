@@ -11,14 +11,16 @@ document.addEventListener('DOMContentLoaded', () => {
         addLog('Beginning investigation...', 'system');
         updateState({ activeScenario: pickRandomScenario() });
         
-        // Hide intro, show empty game UI with loading state
+        const overlay = document.getElementById('transition-overlay');
+        if (overlay) {
+            overlay.classList.remove('hidden');
+            overlay.classList.add('active');
+        }
+
         document.getElementById('intro-screen').classList.add('hidden');
         document.getElementById('app-container').classList.remove('hidden');
-        const cluesCont = document.getElementById('clues-container');
-        if (cluesCont) cluesCont.innerHTML = '<div class="clues-empty">Generating case...</div>';
         
         await handleNewCase(uiCallbacks);
-        renderUI();
     };
 
     const startBtn = document.getElementById('btn-start');
@@ -33,7 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('intro-screen').classList.add('hidden');
                 document.getElementById('app-container').classList.remove('hidden');
                 await handleNewCase(uiCallbacks);
-                renderUI();
                 addLog(`Manual Scenario Select: ${s.name}`, 'system');
             } else {
                 console.warn(`Scenario "${id}" not found.`);

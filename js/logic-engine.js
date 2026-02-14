@@ -13,11 +13,15 @@ import { IDS } from './constants.js';
  * - Initial domain for each variable is 31 (binary 11111), indicating all 5 values (0-4) are possible.
  */
 export class LogicEngine {
-    constructor(roleBag) {
-        this.numVars = 15;
+    constructor(numSuspects, roleBag) {
+        // Vars: 0..n-1 Role, n..2n-1 Item, 2n..3n-1 Room
+        this.numSuspects = numSuspects;
+        this.numVars = numSuspects * 3;
         this.roleBag = roleBag;
         this.constraints = []; 
-        this.initialDomains = new Int32Array(this.numVars).fill(31); 
+        // Domain mask: if n=5, 31 (11111); if n=4, 15 (1111)
+        this.fullMask = (1 << numSuspects) - 1;
+        this.initialDomains = new Int32Array(this.numVars).fill(this.fullMask); 
     }
 
     /**
@@ -54,8 +58,7 @@ export class LogicEngine {
 
         // 1. MRV (Minimum Remaining Values) Heuristic
         // Find the unassigned variable with the smallest domain (fewest possibilities).
-        // This fails fast if a domain becomes empty (Domain Wipeout).
-        let bestVar = -1, minOptions = 6;
+        let bestVar = -1, minOptions = this.numSuspects + 1;
         for (let i = 0; i < this.numVars; i++) {
             const mask = currentDomains[i];
             if (mask === 0) return; // Domain Wipeout: This branch is invalid.
@@ -72,13 +75,14 @@ export class LogicEngine {
         // If all variables have only 1 option, we have a candidate assignment.
         if (bestVar === -1) {
             const assignment = {};
-            for (let i = 0; i < 5; i++) {
+            const n = this.numSuspects;
+            for (let i = 0; i < n; i++) {
                 const rIdx = Math.log2(currentDomains[i]);
-                const iIdx = Math.log2(currentDomains[i+5]);
-                const lIdx = Math.log2(currentDomains[i+10]);
+                const iIdx = Math.log2(currentDomains[i + n]);
+                const lIdx = Math.log2(currentDomains[i + 2 * n]);
                 assignment[`${i}_Role`] = this.roleBag[rIdx];
-                assignment[`${i}_Item`] = IDS[iIdx];
-                assignment[`${i}_Room`] = IDS[lIdx];
+                assignment[`${i}_Item`] = IDS.slice(0, n)[iIdx];
+                assignment[`${i}_Room`] = IDS.slice(0, n)[lIdx];
             }
             
             // Final check against complex functional constraints.
@@ -96,7 +100,8 @@ export class LogicEngine {
         // 3. Branching
         // Pick individual values from the domain of the chosen variable and recurse.
         const originalMask = currentDomains[bestVar];
-        for (let val = 0; val < 5; val++) {
+        const n = this.numSuspects;
+        for (let val = 0; val < n; val++) {
             if (!((originalMask >> val) & 1)) continue;
 
             const nextDomains = new Int32Array(currentDomains);
@@ -106,14 +111,14 @@ export class LogicEngine {
             // Roles and Items are unique. If we assign a value to one suspect, 
             // no other suspect can have that same value.
             let possible = true;
-            if (bestVar < 10) { // Variables 0-9 are Roles and Items.
-                const start = bestVar < 5 ? 0 : 5;
-                const end = bestVar < 5 ? 5 : 10;
+            if (bestVar < 2 * n) { // Variables 0..2n-1 are Roles and Items.
+                const start = bestVar < n ? 0 : n;
+                const end = bestVar < n ? n : 2 * n;
                 const remove = ~(1 << val);
-                for (let n = start; n < end; n++) {
-                    if (n === bestVar) continue;
-                    nextDomains[n] &= remove;
-                    if (nextDomains[n] === 0) { possible = false; break; }
+                for (let k = start; k < end; k++) {
+                    if (k === bestVar) continue;
+                    nextDomains[k] &= remove;
+                    if (nextDomains[k] === 0) { possible = false; break; }
                 }
             }
 
