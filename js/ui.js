@@ -64,7 +64,7 @@ export function renderLocations() {
                     <h3 class="location-name">${r.name}</h3>
                     <div class="feature-list">
                         ${activeConnections.map((roomName) => `<span class="connection-badge"><i class="ph-light ph-door-open"></i>${roomName}</span>`).join("")}
-                        ${(feats[r.name] || []).map((f) => `<span class="feature-badge">${f}</span>`).join("")}
+                        ${(feats[r.name] || []).map((f) => `<span class="feature-badge">${f.name}</span>`).join("")}
                     </div>
                 </div>
             `;

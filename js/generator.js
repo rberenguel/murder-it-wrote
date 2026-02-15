@@ -349,11 +349,7 @@ function generateBloodFacts(truth, roles, mapping) {
   const allFeatures = mapping.features[victimRoom.name] || [];
 
   // Filter to only spillable features (physical objects, not abstract concepts)
-  const spillableFeatures = allFeatures.filter(f => {
-    // Handle both string features (old format) and object features (new format)
-    const spillable = typeof f === 'string' ? true : (f.spillable !== false);
-    return spillable;
-  });
+  const spillableFeatures = allFeatures.filter(f => f.spillable !== false);
 
   if (spillableFeatures.length === 0) {
     return facts;
@@ -366,12 +362,10 @@ function generateBloodFacts(truth, roles, mapping) {
     .slice(0, numBloodFacts);
 
   selectedFeatures.forEach((feature) => {
-    // Handle both string features (old format) and object features (new format)
-    const featureName = typeof feature === 'string' ? feature : feature.name;
     facts.push({
       type: FACT_TYPES.BLOOD_ON_FEATURE,
       roomId: victim.roomId,
-      featureName: featureName,
+      featureName: feature.name,
     });
   });
 
@@ -443,6 +437,8 @@ function renderFact(fact, mapping, roles) {
       fact.roomId ?? "",
       fact.itemId ?? "",
       fact.role ?? "",
+      fact.featureName ?? "",
+      fact.relationshipTerm ?? "",
     ].join("-");
     // Simple hash function for deterministic IDs
     let hash = 0;
@@ -495,9 +491,7 @@ function renderFact(fact, mapping, roles) {
 
       if (feats.length > 0 && Math.random() > 0.5) {
         const feat = feats[Math.floor(Math.random() * feats.length)];
-        // Handle both string features (old format) and object features (new format)
-        const featName = typeof feat === 'string' ? feat : feat.name;
-        text = `${name} was close to the ${featName}.`;
+        text = `${name} was close to the ${feat.name}.`;
       } else {
         const rText = fmtRoom(fact.roomId);
         text = `${name} was in ${rText}.`;

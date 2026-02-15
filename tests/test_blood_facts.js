@@ -285,9 +285,7 @@ describe("Blood Spill Clues", function () {
 
             // Feature should be in victim's room's feature list
             const roomFeatures = mapping.features[victimRoom.name] || [];
-            const featureNames = roomFeatures.map((f) =>
-              typeof f === "string" ? f : f.name,
-            );
+            const featureNames = roomFeatures.map((f) => f.name);
             expect(featureNames).to.include(fact.featureName);
           });
 
@@ -347,6 +345,74 @@ describe("Blood Spill Clues", function () {
       }
 
       this.skip();
+    });
+
+    it("blood facts should have unique IDs when referencing different features", function () {
+      const scenario = SCENARIOS.find((s) => s.id === "classic_manor");
+
+      // Manually construct a scenario that will produce multiple blood facts
+      const numSuspects = 5;
+      const mapping = {
+        suspects: scenario.suspects.slice(0, numSuspects),
+        rooms: scenario.rooms.slice(0, numSuspects),
+        // Make sure first item is bloody (Candlestick)
+        items: scenario.items.slice(0, numSuspects),
+        scenario: scenario,
+      };
+
+      // Set up features for the first room (Kitchen) with multiple spillable features
+      mapping.features = {};
+      mapping.rooms.forEach((room, idx) => {
+        if (idx === 0) {
+          // First room gets multiple features
+          mapping.features[room.name] = scenario.roomFeatures[room.name].slice(
+            0,
+            3,
+          );
+        } else {
+          mapping.features[room.name] = scenario.roomFeatures[room.name].slice(
+            0,
+            2,
+          );
+        }
+      });
+
+      // Manually construct truth: killer with bloody weapon, victim in first room
+      const truth = [
+        { id: 0, role: "Killer", roomId: 1, itemId: 0 }, // Killer has Candlestick (bloody)
+        { id: 1, role: "Victim", roomId: 0, itemId: 1 }, // Victim in first room
+        { id: 2, role: "Witness", roomId: 2, itemId: 2 },
+        { id: 3, role: "Accomplice", roomId: 3, itemId: 3 },
+        { id: 4, role: "Innocent", roomId: 4, itemId: 4 },
+      ];
+      const roles = ["Killer", "Victim", "Witness", "Accomplice", "Innocent"];
+
+      // Generate clues with this controlled setup
+      const clues = generateClues(truth, roles, numSuspects, mapping);
+
+      const bloodFacts = clues.filter((c) => c.type === "BLOOD_ON_FEATURE");
+
+      // Should have blood facts since weapon is bloody
+      expect(bloodFacts.length).to.be.greaterThan(0);
+
+      // If we have multiple blood facts, verify they're unique
+      if (bloodFacts.length > 1) {
+        const featureNames = bloodFacts.map((f) => f.featureName);
+        const uniqueFeatures = new Set(featureNames);
+
+        expect(
+          uniqueFeatures.size,
+          "Blood facts should reference different features (no duplicates)",
+        ).to.equal(bloodFacts.length);
+
+        // Verify all facts are in the victim's room
+        bloodFacts.forEach((fact) => {
+          expect(fact.roomId).to.equal(
+            0,
+            "All blood facts should be in victim's room",
+          );
+        });
+      }
     });
   });
 });
