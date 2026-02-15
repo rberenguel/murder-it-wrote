@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Murder It Wrote Tests</title>
+    <link rel="stylesheet" href="mocha.css" />
+    <style>
+      body {
+        background-color: #111;
+        color: #ddd;
+        font-family: monospace;
+      }
+      #mocha .test.fail pre {
+        color: #fdd;
+      }
+      #mocha .test.pass.fast .duration {
+        color: #ddd;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="mocha"></div>
+    <script src="mocha.js"></script>
+    <script src="chai.js"></script>
+
+    <!-- Test runner setup -->
+    <script src="test_runner.js"></script>
+
+    <!-- Tests -->
+    <script type="module" src="test_generator.js"></script>
+    <script type="module" src="test_logic_engine.js"></script>
+  </body>
+</html>
