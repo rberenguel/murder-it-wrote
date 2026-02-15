@@ -50,11 +50,15 @@ export function generateTruth(numSuspects) {
     Math.floor(Math.random() * numSuspects),
   );
 
-  // Force Witness to be in the same room as the Victim
+  // Force Witness and Accomplice to be in the same room as the Victim (murder room)
   const vIdx = sRoles.indexOf("Victim");
   const wIdx = sRoles.indexOf("Witness");
+  const aIdx = sRoles.indexOf("Accomplice");
   if (vIdx !== -1 && wIdx !== -1) {
     sRooms[wIdx] = sRooms[vIdx];
+  }
+  if (vIdx !== -1 && aIdx !== -1) {
+    sRooms[aIdx] = sRooms[vIdx];
   }
 
   const truth = Array.from({ length: numSuspects }, (_, id) => ({
@@ -96,7 +100,7 @@ function generateSuspectFacts(truth, roles) {
       itemId: p.itemId,
     });
 
-    if (!["Killer", "Victim"].includes(p.role)) {
+    if (!["Killer", "Victim", "Accomplice"].includes(p.role)) {
       facts.push({
         type: FACT_TYPES.SUSPECT_ROLE,
         suspectId: p.id,
@@ -104,7 +108,7 @@ function generateSuspectFacts(truth, roles) {
       });
     }
 
-    ["Killer", "Victim"].forEach((bad) => {
+    ["Killer", "Victim", "Accomplice"].forEach((bad) => {
       if (p.role !== bad) {
         facts.push({
           type: FACT_TYPES.SUSPECT_NOT_ROLE,
@@ -199,7 +203,7 @@ function generateProximityFacts(truth, roles, mapping) {
 
 function mergeFacts(facts) {
   const merged = [];
-  const suspectFacts = {}; // Maps suspectId to { location, item, notKiller, notVictim }
+  const suspectFacts = {}; // Maps suspectId to { location, item, notKiller, notVictim, notAccomplice }
 
   facts.forEach((f) => {
     if (f.type === FACT_TYPES.SUSPECT_LOCATION) {
@@ -212,6 +216,7 @@ function mergeFacts(facts) {
       if (!suspectFacts[f.suspectId]) suspectFacts[f.suspectId] = {};
       if (f.role === "Killer") suspectFacts[f.suspectId].notKiller = f;
       else if (f.role === "Victim") suspectFacts[f.suspectId].notVictim = f;
+      else if (f.role === "Accomplice") suspectFacts[f.suspectId].notAccomplice = f;
       else merged.push(f);
     } else {
       merged.push(f);
@@ -220,14 +225,15 @@ function mergeFacts(facts) {
 
   Object.keys(suspectFacts).forEach((sidStr) => {
     const sid = parseInt(sidStr);
-    const { location, item, notKiller, notVictim } = suspectFacts[sid];
+    const { location, item, notKiller, notVictim, notAccomplice } = suspectFacts[sid];
 
-    // 1. Double Exclusion Merge
-    if (notKiller && notVictim) {
+    // 1. Triple Exclusion Merge (not Killer, not Victim, not Accomplice)
+    if (notKiller && notVictim && notAccomplice) {
       merged.push({ type: FACT_TYPES.ROLE_EXCLUSION, suspectId: sid });
     } else {
       if (notKiller) merged.push(notKiller);
       if (notVictim) merged.push(notVictim);
+      if (notAccomplice) merged.push(notAccomplice);
     }
 
     // 2. Location/Item Merge
@@ -451,19 +457,24 @@ function renderFact(fact, mapping, roles) {
     }
     case FACT_TYPES.ROLE_EXCLUSION: {
       const name = fmt("suspects", fact.suspectId);
-      text = `${name} is neither the ${wrapRole("killer")} nor the ${wrapRole("victim")}.`;
+      text = `${name} is neither the ${wrapRole("killer")} nor the ${wrapRole("victim")} nor the ${wrapRole("accomplice")}.`;
       fn = (a) =>
         getVal(a, fact.suspectId, "Role") !== "Killer" &&
-        getVal(a, fact.suspectId, "Role") !== "Victim";
+        getVal(a, fact.suspectId, "Role") !== "Victim" &&
+        getVal(a, fact.suspectId, "Role") !== "Accomplice";
       const kIndices = roles
         .map((r, i) => (r === "Killer" ? i : -1))
         .filter((i) => i !== -1);
       const vIndices = roles
         .map((r, i) => (r === "Victim" ? i : -1))
         .filter((i) => i !== -1);
+      const aIndices = roles
+        .map((r, i) => (r === "Accomplice" ? i : -1))
+        .filter((i) => i !== -1);
       let mask = 0;
       kIndices.forEach((i) => (mask |= 1 << i));
       vIndices.forEach((i) => (mask |= 1 << i));
+      aIndices.forEach((i) => (mask |= 1 << i));
       masks = [{ varIdx: fact.suspectId, mask: ~mask }];
       break;
     }
