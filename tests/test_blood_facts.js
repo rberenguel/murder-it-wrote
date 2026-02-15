@@ -285,7 +285,10 @@ describe("Blood Spill Clues", function () {
 
             // Feature should be in victim's room's feature list
             const roomFeatures = mapping.features[victimRoom.name] || [];
-            expect(roomFeatures).to.include(fact.featureName);
+            const featureNames = roomFeatures.map((f) =>
+              typeof f === "string" ? f : f.name,
+            );
+            expect(featureNames).to.include(fact.featureName);
           });
 
           // Found a case with blood facts, test passed

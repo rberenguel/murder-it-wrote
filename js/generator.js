@@ -346,18 +346,28 @@ function generateBloodFacts(truth, roles, mapping) {
   }
 
   // Get features in victim's room
-  const features = mapping.features[victimRoom.name] || [];
-  if (features.length === 0) {
+  const allFeatures = mapping.features[victimRoom.name] || [];
+
+  // Filter to only spillable features (physical objects, not abstract concepts)
+  const spillableFeatures = allFeatures.filter(f => {
+    // Handle both string features (old format) and object features (new format)
+    const spillable = typeof f === 'string' ? true : (f.spillable !== false);
+    return spillable;
+  });
+
+  if (spillableFeatures.length === 0) {
     return facts;
   }
 
-  // Generate 1-2 blood facts for random features in the corpse's room
-  const numBloodFacts = Math.min(2, features.length);
-  const selectedFeatures = [...features]
+  // Generate 1-2 blood facts for random spillable features in the corpse's room
+  const numBloodFacts = Math.min(2, spillableFeatures.length);
+  const selectedFeatures = [...spillableFeatures]
     .sort(() => Math.random() - 0.5)
     .slice(0, numBloodFacts);
 
-  selectedFeatures.forEach((featureName) => {
+  selectedFeatures.forEach((feature) => {
+    // Handle both string features (old format) and object features (new format)
+    const featureName = typeof feature === 'string' ? feature : feature.name;
     facts.push({
       type: FACT_TYPES.BLOOD_ON_FEATURE,
       roomId: victim.roomId,
@@ -485,7 +495,9 @@ function renderFact(fact, mapping, roles) {
 
       if (feats.length > 0 && Math.random() > 0.5) {
         const feat = feats[Math.floor(Math.random() * feats.length)];
-        text = `${name} was close to the ${feat}.`;
+        // Handle both string features (old format) and object features (new format)
+        const featName = typeof feat === 'string' ? feat : feat.name;
+        text = `${name} was close to the ${featName}.`;
       } else {
         const rText = fmtRoom(fact.roomId);
         text = `${name} was in ${rText}.`;
