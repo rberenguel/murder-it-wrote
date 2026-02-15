@@ -1303,14 +1303,13 @@ export const SCENARIOS = [
     id: "indigo_heir",
     name: "Indigo Heir",
     suspects: [
-      "Julian Vance",
-      "Martha Vance",
-      "Horace Ashford",
-      "Cecily Elkins",
+      "Simon B. Evans",
+      "Cecily M. Evans",
+      "David Evans",
+      "Baron Horace M. Ashford",
+      "Julian H. Ashford",
+      "Martha Larsen",
       "Inspector Val Monet",
-      "Julian Ashford",
-      "David Vance",
-      "Viscount Horace",
       "The Landscaper",
       "The Valet",
       "The Governess",
@@ -1436,36 +1435,60 @@ export const SCENARIOS = [
     ],
     relationships: [
       {
-        type: "married",
+        type: "siblings",
         suspects: [
-          { name: "Julian Vance", term: "husband" },
-          { name: "Martha Vance", term: "wife" },
+          { name: "Baron Horace M. Ashford", term: "brother" },
+          { name: "Julian H. Ashford", term: "brother" },
         ],
       },
       {
-        type: "siblings",
+        type: "married",
         suspects: [
-          { name: "Julian Vance", term: "brother" },
-          { name: "David Vance", term: "brother" },
+          { name: "Julian H. Ashford", term: "husband" },
+          { name: "Martha Larsen", term: "wife" },
         ],
       },
       {
         type: "parent-child",
         suspects: [
-          { name: "Horace Ashford", term: "father" },
-          { name: "Julian Ashford", term: "son" },
+          { name: "Julian H. Ashford", term: "father" },
+          { name: "Cecily M. Evans", term: "daughter" },
         ],
-        optional: true,
-        probability: 0.7,
       },
       {
-        type: "cousins",
+        type: "parent-child",
         suspects: [
-          { name: "Julian Vance", term: "cousin" },
-          { name: "Cecily Elkins", term: "cousin" },
+          { name: "Martha Larsen", term: "mother" },
+          { name: "Cecily M. Evans", term: "daughter" },
         ],
-        optional: true,
-        probability: 0.5,
+      },
+      {
+        type: "married",
+        suspects: [
+          { name: "David Evans", term: "husband" },
+          { name: "Cecily M. Evans", term: "wife" },
+        ],
+      },
+      {
+        type: "parent-child",
+        suspects: [
+          { name: "Cecily M. Evans", term: "mother" },
+          { name: "Simon B. Evans", term: "son" },
+        ],
+      },
+      {
+        type: "parent-child",
+        suspects: [
+          { name: "David Evans", term: "father" },
+          { name: "Simon B. Evans", term: "son" },
+        ],
+      },
+      {
+        type: "uncle-nephew",
+        suspects: [
+          { name: "Baron Horace M. Ashford", term: "great-uncle" },
+          { name: "Simon B. Evans", term: "great-nephew" },
+        ],
       },
     ],
   },
