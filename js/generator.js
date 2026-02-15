@@ -17,12 +17,14 @@ const FACT_TYPES = {
   RELATIONSHIP_LOCATION: "RELATIONSHIP_LOCATION",
   RELATIONSHIP_ITEM: "RELATIONSHIP_ITEM",
   RELATIONSHIP_HAS_TRAIT: "RELATIONSHIP_HAS_TRAIT",
+  BLOOD_ON_FEATURE: "BLOOD_ON_FEATURE",
 };
 
 // Probabilistic protection for special fact types during pruning
 // Value is the probability (0-1) that the fact will be kept even if not essential
 const PROTECTED_FACT_TYPES = {
   [FACT_TYPES.SCREAM_HEARD]: 0.8, // 80% chance to keep proximity clues
+  [FACT_TYPES.BLOOD_ON_FEATURE]: 0.85, // 85% chance to keep blood clues (atmospheric)
 };
 
 const getVal = (a, id, type) => a[`${id}_${type}`];
@@ -308,6 +310,58 @@ function generateRelationshipFacts(truth, roles, mapping) {
           relationshipType: relationship.type,
         });
       }
+    });
+  });
+
+  return facts;
+}
+
+function generateBloodFacts(truth, roles, mapping) {
+  const facts = [];
+
+  // Only generate if mapping has features
+  if (!mapping.features) {
+    return facts;
+  }
+
+  // Find victim and killer
+  const victim = truth.find((p) => p.role === "Victim");
+  const killer = truth.find((p) => p.role === "Killer");
+
+  if (!victim || !killer) {
+    return facts;
+  }
+
+  // Get killer's weapon
+  const weapon = mapping.items[killer.itemId];
+  if (!weapon || !weapon.bloody) {
+    // No blood facts if weapon is not bloody
+    return facts;
+  }
+
+  // Get victim's room
+  const victimRoom = mapping.rooms[victim.roomId];
+  if (!victimRoom) {
+    return facts;
+  }
+
+  // Get features in victim's room
+  const features = mapping.features[victimRoom.name] || [];
+  if (features.length === 0) {
+    return facts;
+  }
+
+  // Generate 1-2 blood facts for random features in the corpse's room
+  const numBloodFacts = Math.min(2, features.length);
+  const selectedFeatures = [...features]
+    .sort(() => Math.random() - 0.5)
+    .slice(0, numBloodFacts);
+
+  selectedFeatures.forEach((featureName) => {
+    facts.push({
+      type: FACT_TYPES.BLOOD_ON_FEATURE,
+      roomId: victim.roomId,
+      featureName: featureName,
     });
   });
 
@@ -697,6 +751,40 @@ function renderFact(fact, mapping, roles) {
       masks = [];
       break;
     }
+    case FACT_TYPES.BLOOD_ON_FEATURE: {
+      // "There was blood spilled on the X in Y"
+      const rText = fmtRoom(fact.roomId);
+      const feature = fact.featureName;
+
+      text = `There was blood spilled on the ${feature} in ${rText}.`;
+
+      // No masks - this is a relational constraint between weapon and victim's room
+      masks = [];
+
+      fn = (a) => {
+        // Find victim's room
+        const victimIdx = roles.findIndex((r) => r === "Victim");
+        if (victimIdx === -1) return false;
+
+        const victimRoom = getVal(a, victimIdx, "Room");
+        if (victimRoom === undefined) return true; // Not yet assigned
+
+        // Find killer's weapon
+        const killerIdx = roles.findIndex((r) => r === "Killer");
+        if (killerIdx === -1) return false;
+
+        const weaponId = getVal(a, killerIdx, "Item");
+        if (weaponId === undefined) return true; // Not yet assigned
+
+        // Check if weapon is bloody
+        const weapon = mapping.items[weaponId];
+        const isWeaponBloody = weapon?.bloody || false;
+
+        // True if: weapon IS bloody AND victim IS in this room
+        return isWeaponBloody && victimRoom === fact.roomId;
+      };
+      break;
+    }
   }
 
   return { text, fn, masks, id: generateStableId(fact) };
@@ -709,6 +797,7 @@ export function generateClues(truth, roles, numSuspects, mapping) {
     ...generateItemFacts(truth, numSuspects),
     ...generateProximityFacts(truth, roles, mapping),
     ...generateRelationshipFacts(truth, roles, mapping),
+    ...generateBloodFacts(truth, roles, mapping),
   ];
 }
 

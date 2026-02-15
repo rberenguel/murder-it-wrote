@@ -116,7 +116,7 @@ describe("UI Relationship Display", function () {
 
     const siblingRel = sherlockRels.find((r) => r.type === "siblings");
     expect(siblingRel).to.exist;
-    expect(siblingRel.term).to.equal("brother");
+    expect(siblingRel.term).to.equal("younger brother");
     expect(siblingRel.relatedTo).to.equal("Mycroft Holmes");
   });
 
