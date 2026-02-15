@@ -131,8 +131,12 @@ describe("LogicEngine", function () {
 
       solutions.forEach((sol) => {
         // Verify constraints
-        const killerIdx = [0, 1, 2, 3].find((i) => sol[`${i}_Role`] === "Killer");
-        const victimIdx = [0, 1, 2, 3].find((i) => sol[`${i}_Role`] === "Victim");
+        const killerIdx = [0, 1, 2, 3].find(
+          (i) => sol[`${i}_Role`] === "Killer",
+        );
+        const victimIdx = [0, 1, 2, 3].find(
+          (i) => sol[`${i}_Role`] === "Victim",
+        );
 
         expect(sol[`${killerIdx}_Item`]).to.equal(0);
         expect(sol[`${victimIdx}_Room`]).to.equal(2);

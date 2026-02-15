@@ -19,6 +19,7 @@ Simply open `tests/index.html` in a browser. The tests will run automatically.
 4. Use Chai's `expect` for assertions
 
 Example:
+
 ```javascript
 const { expect } = chai;
 

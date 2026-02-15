@@ -16,6 +16,7 @@ import {
   getCaseSize,
 } from "./ui.js";
 import { loadGame, clearGame } from "./persistence.js";
+import { haptic } from "./haptic.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   const uiCallbacks = { addLog, renderUI };
@@ -74,16 +75,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     introButtons.appendChild(newCaseBtn);
 
     // Continue button
-    startBtn.addEventListener("click", () => beginInvestigation(true));
+    startBtn.addEventListener("click", () => {
+      haptic();
+      beginInvestigation(true);
+    });
 
     // New Case button
     newCaseBtn.addEventListener("click", async () => {
+      haptic();
       await clearGame();
       beginInvestigation(false);
     });
   } else {
     // Show only Begin button (default)
-    startBtn.addEventListener("click", () => beginInvestigation(false));
+    startBtn.addEventListener("click", () => {
+      haptic();
+      beginInvestigation(false);
+    });
   }
 
   // --- Global Test Hook ---
@@ -109,6 +117,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (nt && nd) {
     nt.addEventListener("click", () => {
       if (window.innerWidth >= 1200) return;
+      haptic();
       no = !no;
       nd.style.transform = `translate3d(${no ? 0 : 100}%,0,0)`;
       addLog(`Notebook drawer: ${no ? "opened" : "closed"}`, "system");
@@ -121,6 +130,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (lt && ld) {
     lt.addEventListener("click", () => {
       if (window.innerWidth >= 1200) return;
+      haptic();
       lo = !lo;
       ld.style.transform = `translate3d(${lo ? 0 : -100}%,0,0)`;
       addLog(`Locations drawer: ${lo ? "opened" : "closed"}`, "system");
@@ -138,6 +148,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const newCaseBtn = document.getElementById("btn-new-case");
   if (newCaseBtn) {
     newCaseBtn.addEventListener("click", () => {
+      haptic();
       // Check if user has made progress
       if (hasUserProgress()) {
         showNewCaseModal();
@@ -147,31 +158,44 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  document
-    .getElementById("btn-verify")
-    ?.addEventListener("click", verifySolution);
-  document
-    .getElementById("btn-reveal")
-    ?.addEventListener("click", revealSolution);
+  document.getElementById("btn-verify")?.addEventListener("click", () => {
+    haptic();
+    verifySolution();
+  });
+  document.getElementById("btn-reveal")?.addEventListener("click", () => {
+    haptic();
+    revealSolution();
+  });
   document
     .getElementById("btn-reveal-confirm")
-    ?.addEventListener("click", performReveal);
+    ?.addEventListener("click", () => {
+      haptic();
+      performReveal();
+    });
   document
     .getElementById("btn-reveal-cancel")
-    ?.addEventListener("click", closeRevealModal);
+    ?.addEventListener("click", () => {
+      haptic();
+      closeRevealModal();
+    });
   document
     .getElementById("btn-new-case-confirm")
     ?.addEventListener("click", () => {
+      haptic();
       closeNewCaseModal();
       performNewCase();
     });
   document
     .getElementById("btn-new-case-cancel")
-    ?.addEventListener("click", closeNewCaseModal);
+    ?.addEventListener("click", () => {
+      haptic();
+      closeNewCaseModal();
+    });
   document
     .getElementById("btn-debug-pi")
     ?.addEventListener("click", toggleDebug);
   document.getElementById("btn-exit")?.addEventListener("click", () => {
+    haptic();
     // Return to intro screen
     document.getElementById("app-container").classList.add("hidden");
     document.getElementById("intro-screen").classList.remove("hidden");

@@ -258,6 +258,12 @@
   font-size: 0.9em;
 }
 
+[data-theme="gatsby"] .connection-badge {
+  color: #2d2d2d;
+  background-color: #e8d8b8;
+  border-color: #d4af37;
+}
+
 /* ============================================
    THE MALTESE FALCON THEME - 1940s Film Noir
    ============================================ */
@@ -678,6 +684,7 @@ body {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  font-size: 1rem; /* Mobile: ~80% of desktop size */
 }
 
 .card-title i {
@@ -1756,89 +1763,221 @@ body {
    ============================================ */
 
 /* === STELLAR VOYAGE === */
-[data-theme="stellar_voyage"] #btn-new-case * { color: #000; }
-[data-theme="stellar_voyage"] #btn-verify * { color: #ffffff; }
-[data-theme="stellar_voyage"] #btn-reveal * { color: #ffffff; }
-[data-theme="stellar_voyage"] #btn-exit * { color: #ffffff; }
-[data-theme="stellar_voyage"] #locations-tab * { color: #000; }
-[data-theme="stellar_voyage"] #notebook-tab * { color: #000; }
+[data-theme="stellar_voyage"] #btn-new-case * {
+  color: #000;
+}
+[data-theme="stellar_voyage"] #btn-verify * {
+  color: #ffffff;
+}
+[data-theme="stellar_voyage"] #btn-reveal * {
+  color: #ffffff;
+}
+[data-theme="stellar_voyage"] #btn-exit * {
+  color: #ffffff;
+}
+[data-theme="stellar_voyage"] #locations-tab * {
+  color: #000;
+}
+[data-theme="stellar_voyage"] #notebook-tab * {
+  color: #000;
+}
 
 /* === CLASSIC MANOR === */
-[data-theme="classic_manor"] #btn-new-case * { color: #fff; }
-[data-theme="classic_manor"] #btn-verify * { color: #fff; }
-[data-theme="classic_manor"] #btn-reveal * { color: #000; }
-[data-theme="classic_manor"] #btn-exit * { color: #000; }
-[data-theme="classic_manor"] #locations-tab * { color: #000; }
-[data-theme="classic_manor"] #notebook-tab * { color: #fff; }
+[data-theme="classic_manor"] #btn-new-case * {
+  color: #fff;
+}
+[data-theme="classic_manor"] #btn-verify * {
+  color: #fff;
+}
+[data-theme="classic_manor"] #btn-reveal * {
+  color: #000;
+}
+[data-theme="classic_manor"] #btn-exit * {
+  color: #000;
+}
+[data-theme="classic_manor"] #locations-tab * {
+  color: #000;
+}
+[data-theme="classic_manor"] #notebook-tab * {
+  color: #fff;
+}
 
 /* === MEDIEVAL === */
-[data-theme="medieval"] #btn-new-case * { color: #000000; }
-[data-theme="medieval"] #btn-verify * { color: #ffffff; }
-[data-theme="medieval"] #btn-reveal * { color: #000000; }
-[data-theme="medieval"] #btn-exit * { color: #000000; }
-[data-theme="medieval"] #locations-tab * { color: #ffffff; }
-[data-theme="medieval"] #notebook-tab * { color: #000000; }
+[data-theme="medieval"] #btn-new-case * {
+  color: #000000;
+}
+[data-theme="medieval"] #btn-verify * {
+  color: #ffffff;
+}
+[data-theme="medieval"] #btn-reveal * {
+  color: #000000;
+}
+[data-theme="medieval"] #btn-exit * {
+  color: #000000;
+}
+[data-theme="medieval"] #locations-tab * {
+  color: #ffffff;
+}
+[data-theme="medieval"] #notebook-tab * {
+  color: #000000;
+}
 
 /* === SHERLOCK === */
-[data-theme="sherlock"] #btn-new-case * { color: #ffffff; }
-[data-theme="sherlock"] #btn-verify * { color: #ffffff; }
-[data-theme="sherlock"] #btn-reveal * { color: #000; }
-[data-theme="sherlock"] #btn-exit * { color: #000; }
-[data-theme="sherlock"] #locations-tab * { color: #000; }
-[data-theme="sherlock"] #notebook-tab * { color: #fff; }
+[data-theme="sherlock"] #btn-new-case * {
+  color: #ffffff;
+}
+[data-theme="sherlock"] #btn-verify * {
+  color: #ffffff;
+}
+[data-theme="sherlock"] #btn-reveal * {
+  color: #000;
+}
+[data-theme="sherlock"] #btn-exit * {
+  color: #000;
+}
+[data-theme="sherlock"] #locations-tab * {
+  color: #000;
+}
+[data-theme="sherlock"] #notebook-tab * {
+  color: #fff;
+}
 
 /* === GATSBY === */
-[data-theme="gatsby"] #btn-new-case * { color: #000; }
-[data-theme="gatsby"] #btn-verify * { color: #ffffff; }
-[data-theme="gatsby"] #btn-reveal * { color: #000; }
-[data-theme="gatsby"] #btn-exit * { color: #000; }
-[data-theme="gatsby"] #locations-tab * { color: #000; }
-[data-theme="gatsby"] #notebook-tab * { color: #000; }
+[data-theme="gatsby"] #btn-new-case * {
+  color: #000;
+}
+[data-theme="gatsby"] #btn-verify * {
+  color: #ffffff;
+}
+[data-theme="gatsby"] #btn-reveal * {
+  color: #000;
+}
+[data-theme="gatsby"] #btn-exit * {
+  color: #000;
+}
+[data-theme="gatsby"] #locations-tab * {
+  color: #000;
+}
+[data-theme="gatsby"] #notebook-tab * {
+  color: #000;
+}
 
 /* === FALCON === */
-[data-theme="falcon"] #btn-new-case * { color: #000; }
-[data-theme="falcon"] #btn-verify * { color: #ffffff; }
-[data-theme="falcon"] #btn-reveal * { color: #000; }
-[data-theme="falcon"] #btn-exit * { color: #000; }
-[data-theme="falcon"] #locations-tab * { color: #000; }
-[data-theme="falcon"] #notebook-tab * { color: #000; }
+[data-theme="falcon"] #btn-new-case * {
+  color: #000;
+}
+[data-theme="falcon"] #btn-verify * {
+  color: #ffffff;
+}
+[data-theme="falcon"] #btn-reveal * {
+  color: #000;
+}
+[data-theme="falcon"] #btn-exit * {
+  color: #000;
+}
+[data-theme="falcon"] #locations-tab * {
+  color: #000;
+}
+[data-theme="falcon"] #notebook-tab * {
+  color: #000;
+}
 
 /* === CONTINENTAL EXPRESS === */
-[data-theme="continental_express"] #btn-new-case * { color: #fff; }
-[data-theme="continental_express"] #btn-verify * { color: #ffffff; }
-[data-theme="continental_express"] #btn-reveal * { color: #000; }
-[data-theme="continental_express"] #btn-exit * { color: #000; }
-[data-theme="continental_express"] #locations-tab * { color: #000; }
-[data-theme="continental_express"] #notebook-tab * { color: #fff; }
+[data-theme="continental_express"] #btn-new-case * {
+  color: #fff;
+}
+[data-theme="continental_express"] #btn-verify * {
+  color: #ffffff;
+}
+[data-theme="continental_express"] #btn-reveal * {
+  color: #000;
+}
+[data-theme="continental_express"] #btn-exit * {
+  color: #000;
+}
+[data-theme="continental_express"] #locations-tab * {
+  color: #000;
+}
+[data-theme="continental_express"] #notebook-tab * {
+  color: #fff;
+}
 
 /* === EDGE WALKER === */
-[data-theme="edge_walker"] #btn-new-case * { color: #000; }
-[data-theme="edge_walker"] #btn-verify * { color: #ffffff; }
-[data-theme="edge_walker"] #btn-reveal * { color: #fff; }
-[data-theme="edge_walker"] #btn-exit * { color: #fff; }
-[data-theme="edge_walker"] #locations-tab * { color: #000; }
-[data-theme="edge_walker"] #notebook-tab * { color: #000; }
+[data-theme="edge_walker"] #btn-new-case * {
+  color: #000;
+}
+[data-theme="edge_walker"] #btn-verify * {
+  color: #ffffff;
+}
+[data-theme="edge_walker"] #btn-reveal * {
+  color: #fff;
+}
+[data-theme="edge_walker"] #btn-exit * {
+  color: #fff;
+}
+[data-theme="edge_walker"] #locations-tab * {
+  color: #000;
+}
+[data-theme="edge_walker"] #notebook-tab * {
+  color: #000;
+}
 
 /* === RADIO SHRINK === */
-[data-theme="radio_shrink"] #btn-new-case * { color: #000; }
-[data-theme="radio_shrink"] #btn-verify * { color: #ffffff; }
-[data-theme="radio_shrink"] #btn-reveal * { color: #000; }
-[data-theme="radio_shrink"] #btn-exit * { color: #000; }
-[data-theme="radio_shrink"] #locations-tab * { color: #000; }
-[data-theme="radio_shrink"] #notebook-tab * { color: #000; }
+[data-theme="radio_shrink"] #btn-new-case * {
+  color: #000;
+}
+[data-theme="radio_shrink"] #btn-verify * {
+  color: #ffffff;
+}
+[data-theme="radio_shrink"] #btn-reveal * {
+  color: #000;
+}
+[data-theme="radio_shrink"] #btn-exit * {
+  color: #000;
+}
+[data-theme="radio_shrink"] #locations-tab * {
+  color: #000;
+}
+[data-theme="radio_shrink"] #notebook-tab * {
+  color: #000;
+}
 
 /* === INDIGO HEIR === */
-[data-theme="indigo_heir"] #btn-new-case * { color: #000; }
-[data-theme="indigo_heir"] #btn-verify * { color: #ffffff; }
-[data-theme="indigo_heir"] #btn-reveal * { color: #000; }
-[data-theme="indigo_heir"] #btn-exit * { color: #000; }
-[data-theme="indigo_heir"] #locations-tab * { color: #000; }
-[data-theme="indigo_heir"] #notebook-tab * { color: #000; }
+[data-theme="indigo_heir"] #btn-new-case * {
+  color: #000;
+}
+[data-theme="indigo_heir"] #btn-verify * {
+  color: #ffffff;
+}
+[data-theme="indigo_heir"] #btn-reveal * {
+  color: #000;
+}
+[data-theme="indigo_heir"] #btn-exit * {
+  color: #000;
+}
+[data-theme="indigo_heir"] #locations-tab * {
+  color: #000;
+}
+[data-theme="indigo_heir"] #notebook-tab * {
+  color: #000;
+}
 
 /* === SHADOW PROTOCOL === */
-[data-theme="shadow_protocol"] #btn-new-case * { color: #fff; }
-[data-theme="shadow_protocol"] #btn-verify * { color: #ffffff; }
-[data-theme="shadow_protocol"] #btn-reveal * { color: #000; }
-[data-theme="shadow_protocol"] #btn-exit * { color: #000; }
-[data-theme="shadow_protocol"] #locations-tab * { color: #fff; }
-[data-theme="shadow_protocol"] #notebook-tab * { color: #fff; }
+[data-theme="shadow_protocol"] #btn-new-case * {
+  color: #fff;
+}
+[data-theme="shadow_protocol"] #btn-verify * {
+  color: #ffffff;
+}
+[data-theme="shadow_protocol"] #btn-reveal * {
+  color: #000;
+}
+[data-theme="shadow_protocol"] #btn-exit * {
+  color: #000;
+}
+[data-theme="shadow_protocol"] #locations-tab * {
+  color: #fff;
+}
+[data-theme="shadow_protocol"] #notebook-tab * {
+  color: #fff;
+}

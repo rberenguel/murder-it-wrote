@@ -23,7 +23,13 @@ function generateTruthWithRetry(numSuspects, maxRetries = 10) {
   throw new Error("Failed to generate valid truth after retries");
 }
 
-function generateCluesWithRetry(truth, roles, numSuspects, mapping, maxRetries = 3) {
+function generateCluesWithRetry(
+  truth,
+  roles,
+  numSuspects,
+  mapping,
+  maxRetries = 3,
+) {
   for (let i = 0; i < maxRetries; i++) {
     try {
       return generateClues(truth, roles, numSuspects, mapping);
@@ -169,9 +175,13 @@ describe("Relationship Clues", function () {
       let { truth, roles } = generateTruthWithRetry(4);
       const clues = generateCluesWithRetry(truth, roles, 4, mapping);
 
-      const locationFacts = clues.filter((c) => c.type === "RELATIONSHIP_LOCATION");
+      const locationFacts = clues.filter(
+        (c) => c.type === "RELATIONSHIP_LOCATION",
+      );
       const itemFacts = clues.filter((c) => c.type === "RELATIONSHIP_ITEM");
-      const traitFacts = clues.filter((c) => c.type === "RELATIONSHIP_HAS_TRAIT");
+      const traitFacts = clues.filter(
+        (c) => c.type === "RELATIONSHIP_HAS_TRAIT",
+      );
 
       expect(locationFacts.length).to.be.greaterThan(0);
       expect(itemFacts.length).to.be.greaterThan(0);

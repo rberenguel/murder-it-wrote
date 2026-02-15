@@ -1,6 +1,12 @@
-import { IDS, MYSTERY_WORDS, DIFFICULTY_ICONS, SIZING_WORDS } from "./constants.js";
+import {
+  IDS,
+  MYSTERY_WORDS,
+  DIFFICULTY_ICONS,
+  SIZING_WORDS,
+} from "./constants.js";
 import { LogicEngine } from "./logic-engine.js";
 import { state, updateState } from "./game-state.js";
+import { haptic } from "./haptic.js";
 
 const FACT_TYPES = {
   SUSPECT_LOCATION: "SUSPECT_LOCATION",
@@ -192,13 +198,11 @@ function generateProximityFacts(truth, roles, mapping) {
   // Find victim's room (where the scream came from)
   const victim = truth.find((p) => p.role === "Victim");
   const victimRoom = mapping.rooms[victim.roomId];
-  console.log("Victim room (murder scene):", victimRoom?.name);
 
   if (!victimRoom) return facts;
 
   // Get adjacent room names
   const adjacentRoomNames = getAdjacentRooms(victimRoom.name, mapping.scenario);
-  console.log("Adjacent rooms to murder scene:", adjacentRoomNames);
 
   if (adjacentRoomNames.length === 0) return facts;
 
@@ -208,8 +212,6 @@ function generateProximityFacts(truth, roles, mapping) {
     const personRoom = mapping.rooms[p.roomId];
     return personRoom && adjacentRoomNames.includes(personRoom.name);
   });
-
-  console.log("Potential listeners:", listeners.length);
 
   // Generate scream fact if there are listeners (100% chance for testing)
   if (listeners.length > 0) {
@@ -349,7 +351,7 @@ function generateBloodFacts(truth, roles, mapping) {
   const allFeatures = mapping.features[victimRoom.name] || [];
 
   // Filter to only spillable features (physical objects, not abstract concepts)
-  const spillableFeatures = allFeatures.filter(f => f.spillable !== false);
+  const spillableFeatures = allFeatures.filter((f) => f.spillable !== false);
 
   if (spillableFeatures.length === 0) {
     return facts;
@@ -925,6 +927,7 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
           "This is taking quite a while. You can wait or try generating a new case.";
         regenerateBtn.classList.remove("hidden");
         regenerateBtn.onclick = () => {
+          haptic();
           shouldAbort = true;
           if (messageTimer) clearTimeout(messageTimer);
           if (buttonTimer) clearTimeout(buttonTimer);

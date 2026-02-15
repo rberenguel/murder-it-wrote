@@ -1044,7 +1044,12 @@ export const SCENARIOS = [
   {
     id: "edge_walker",
     name: "Edge Walker",
-    alternateNames: ["Neon City", "Electric Sheep", "Future Noir", "Street Level"],
+    alternateNames: [
+      "Neon City",
+      "Electric Sheep",
+      "Future Noir",
+      "Street Level",
+    ],
     suspects: [
       "Jack Marlowe",
       "Reina",
@@ -1327,7 +1332,13 @@ export const SCENARIOS = [
   {
     id: "indigo_heir",
     name: "Indigo Heir",
-    alternateNames: ["Shifting Rooms", "Royal Estate", "Mansion", "Hidden Rooms", "Grand Estate"],
+    alternateNames: [
+      "Shifting Rooms",
+      "Royal Estate",
+      "Mansion",
+      "Hidden Rooms",
+      "Grand Estate",
+    ],
     suspects: [
       "Simon B. Evans",
       "Cecily M. Evans",

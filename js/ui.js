@@ -1,6 +1,7 @@
 import { state, updateState } from "./game-state.js";
 import { ROLES_DEF } from "./constants.js";
 import { saveGame } from "./persistence.js";
+import { haptic } from "./haptic.js";
 
 export function getCaseSize() {
   // Return the stored sizing word for this case
@@ -32,6 +33,7 @@ export function addLog(m) {
 }
 
 export function toggleDebug() {
+  haptic();
   document.getElementById("debug-overlay").classList.toggle("hidden");
 }
 
@@ -79,7 +81,9 @@ export function getSuspectRelationships(suspectName) {
 
   state.gameMapping.scenario.relationships.forEach((rel) => {
     // Check if all suspects in this relationship are in the game
-    const allActive = rel.suspects.every((s) => activeSuspects.includes(s.name));
+    const allActive = rel.suspects.every((s) =>
+      activeSuspects.includes(s.name),
+    );
     if (!allActive) return;
 
     // Find this suspect in the relationship
@@ -180,6 +184,9 @@ export function renderUI() {
         ghostClass: "sortable-ghost",
         delay: 100,
         delayOnTouchOnly: true,
+        onStart: () => {
+          haptic();
+        },
         onEnd: async () => {
           // Update state.puzzle to match the new DOM order
           const clueList = document.querySelector(".clue-list");
@@ -217,12 +224,11 @@ export function renderUI() {
   grid.innerHTML = `
         <div class="notebook-grid">
             ${state.gameMapping.suspects
-              .map(
-                (name) => {
-                  const relationships = getSuspectRelationships(name);
-                  const relationshipHTML =
-                    relationships.length > 0
-                      ? `<div class="suspect-relationships">
+              .map((name) => {
+                const relationships = getSuspectRelationships(name);
+                const relationshipHTML =
+                  relationships.length > 0
+                    ? `<div class="suspect-relationships">
                             ${relationships
                               .map(
                                 (rel) =>
@@ -233,9 +239,9 @@ export function renderUI() {
                               )
                               .join("")}
                         </div>`
-                      : "";
+                    : "";
 
-                  return `
+                return `
                 <div class="suspect-card">
                     <h3 class="suspect-name">
                         <span class="suspect-icon"><i class="ph-light ph-user"></i></span>
@@ -249,8 +255,7 @@ export function renderUI() {
                     </div>
                 </div>
             `;
-                },
-              )
+              })
               .join("")}
         </div>`;
 
@@ -263,6 +268,7 @@ export function renderUI() {
 
 async function handleGuessChange(e) {
   if (e.target.matches("select.select-input")) {
+    haptic();
     const suspect = e.target.dataset.suspect;
     const field = e.target.dataset.field;
     const value = e.target.value;
@@ -277,6 +283,8 @@ async function handleClueDim(e) {
 
   const clueId = clueItem.dataset.clueId;
   if (!clueId) return;
+
+  haptic();
 
   // Toggle dimmed state
   if (state.dimmedClues.has(clueId)) {

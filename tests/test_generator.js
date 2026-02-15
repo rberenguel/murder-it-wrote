@@ -26,7 +26,13 @@ function generateTruthWithRetry(numSuspects, maxRetries = 10) {
 }
 
 // Helper function to generate clues with retry on corruption
-function generateCluesWithRetry(truth, roles, numSuspects, mapping, maxRetries = 3) {
+function generateCluesWithRetry(
+  truth,
+  roles,
+  numSuspects,
+  mapping,
+  maxRetries = 3,
+) {
   for (let i = 0; i < maxRetries; i++) {
     try {
       return generateClues(truth, roles, numSuspects, mapping);
@@ -165,7 +171,8 @@ describe("Generator", function () {
       const clues = generateCluesWithRetry(truth, roles, 3, mapping);
 
       const locationFacts = clues.filter(
-        (c) => c.type === "SUSPECT_LOCATION" || c.type === "SUSPECT_LOCATION_ITEM",
+        (c) =>
+          c.type === "SUSPECT_LOCATION" || c.type === "SUSPECT_LOCATION_ITEM",
       );
 
       // Should have location info for each suspect (though some might be merged)
