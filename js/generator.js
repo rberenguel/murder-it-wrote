@@ -14,6 +14,9 @@ const FACT_TYPES = {
   ROOM_NOT_CORPSE: "ROOM_NOT_CORPSE",
   ROLE_EXCLUSION: "ROLE_EXCLUSION",
   SCREAM_HEARD: "SCREAM_HEARD",
+  RELATIONSHIP_LOCATION: "RELATIONSHIP_LOCATION",
+  RELATIONSHIP_ITEM: "RELATIONSHIP_ITEM",
+  RELATIONSHIP_HAS_TRAIT: "RELATIONSHIP_HAS_TRAIT",
 };
 
 // Probabilistic protection for special fact types during pruning
@@ -29,6 +32,26 @@ const checkVal = (a, subId, type, val) => getVal(a, subId, type) === val;
 function getAdjacentRooms(roomName, scenario) {
   if (!scenario.roomAdjacency) return [];
   return scenario.roomAdjacency[roomName] || [];
+}
+
+// Helper: Find suspect ID by relationship term
+function findSuspectByRelationshipTerm(mapping, term) {
+  if (!mapping.scenario.relationships) return -1;
+
+  // Search through all relationships to find the suspect with this term
+  for (const relationship of mapping.scenario.relationships) {
+    for (const relSuspect of relationship.suspects) {
+      if (relSuspect.term === term) {
+        // Check if this suspect is in the game
+        const suspectIdx = mapping.suspects.indexOf(relSuspect.name);
+        if (suspectIdx !== -1) {
+          return suspectIdx;
+        }
+      }
+    }
+  }
+
+  return -1; // Not found
 }
 
 export function generateTruth(numSuspects) {
@@ -197,6 +220,96 @@ function generateProximityFacts(truth, roles, mapping) {
       suspectId: listener.id,
     });
   }
+
+  return facts;
+}
+
+function generateRelationshipFacts(truth, roles, mapping) {
+  const facts = [];
+
+  // Only generate if scenario has relationships
+  if (!mapping.scenario.relationships) {
+    return facts;
+  }
+
+  // FIRST PASS: Build a complete map of relationship terms to suspects
+  // This must be done before checking uniqueness
+  const termToSuspects = {}; // { "husband": [0, 2], "wife": [1, 3] }
+  const activeRelationships = []; // Store relationships with all suspects active
+
+  mapping.scenario.relationships.forEach((relationship) => {
+    // Check if this is an optional relationship
+    if (relationship.optional) {
+      const probability = relationship.probability || 0.5;
+      // Roll the dice - skip this relationship if we don't meet the probability
+      if (Math.random() > probability) {
+        return; // Skip this optional relationship
+      }
+    }
+
+    const activeSuspects = [];
+
+    // Find which suspects from this relationship are in the game
+    relationship.suspects.forEach((relSuspect) => {
+      const suspectIdx = mapping.suspects.indexOf(relSuspect.name);
+      if (suspectIdx !== -1) {
+        activeSuspects.push({
+          id: suspectIdx,
+          name: relSuspect.name,
+          term: relSuspect.term,
+        });
+
+        // Track all suspects with each term across ALL relationships
+        if (!termToSuspects[relSuspect.term]) {
+          termToSuspects[relSuspect.term] = [];
+        }
+        termToSuspects[relSuspect.term].push(suspectIdx);
+      }
+    });
+
+    // Only consider complete relationships (all members in game)
+    if (activeSuspects.length === relationship.suspects.length) {
+      activeRelationships.push({
+        relationship: relationship,
+        activeSuspects: activeSuspects,
+      });
+    }
+  });
+
+  // SECOND PASS: Generate facts only for unique terms
+  activeRelationships.forEach(({ relationship, activeSuspects }) => {
+    activeSuspects.forEach((suspect) => {
+      const truthEntry = truth[suspect.id];
+
+      // Only generate if the term is UNIQUE across ALL relationships
+      const isUniqueTerm = termToSuspects[suspect.term].length === 1;
+
+      if (isUniqueTerm) {
+        // RELATIONSHIP_LOCATION: "The husband was in X"
+        facts.push({
+          type: FACT_TYPES.RELATIONSHIP_LOCATION,
+          relationshipTerm: suspect.term,
+          roomId: truthEntry.roomId,
+          relationshipType: relationship.type,
+        });
+
+        // RELATIONSHIP_ITEM: "The wife had Y"
+        facts.push({
+          type: FACT_TYPES.RELATIONSHIP_ITEM,
+          relationshipTerm: suspect.term,
+          itemId: truthEntry.itemId,
+          relationshipType: relationship.type,
+        });
+
+        // RELATIONSHIP_HAS_TRAIT: "Someone is the husband"
+        facts.push({
+          type: FACT_TYPES.RELATIONSHIP_HAS_TRAIT,
+          relationshipTerm: suspect.term,
+          relationshipType: relationship.type,
+        });
+      }
+    });
+  });
 
   return facts;
 }
@@ -517,6 +630,73 @@ function renderFact(fact, mapping, roles) {
       };
       break;
     }
+    case FACT_TYPES.RELATIONSHIP_LOCATION: {
+      // "The husband was in X"
+      const rText = fmtRoom(fact.roomId);
+      const term = `<span class="entity-person">${fact.relationshipTerm}</span>`;
+
+      if (Math.random() > 0.5) {
+        text = `The ${term} was in ${rText}.`;
+      } else {
+        text = `The ${fact.relationshipType} person was in ${rText}.`;
+      }
+
+      // CSP constraint: Find which suspect has this term, check their room
+      fn = (a) => {
+        // Find the suspect ID with this relationship term
+        const suspectId = findSuspectByRelationshipTerm(
+          mapping,
+          fact.relationshipTerm,
+        );
+        if (suspectId === -1) return false;
+        return checkVal(a, suspectId, "Room", fact.roomId);
+      };
+
+      // No masks - can't use bitmask optimization for relationship constraints
+      masks = [];
+      break;
+    }
+    case FACT_TYPES.RELATIONSHIP_ITEM: {
+      // "The wife had X"
+      const item = fmtItem(fact.itemId);
+      const term = `<span class="entity-person">${fact.relationshipTerm}</span>`;
+
+      if (Math.random() > 0.5) {
+        text = `The ${term} had ${item}.`;
+      } else {
+        text = `The ${fact.relationshipType} person had ${item}.`;
+      }
+
+      // CSP constraint: Find which suspect has this term, check their item
+      fn = (a) => {
+        const suspectId = findSuspectByRelationshipTerm(
+          mapping,
+          fact.relationshipTerm,
+        );
+        if (suspectId === -1) return false;
+        return checkVal(a, suspectId, "Item", fact.itemId);
+      };
+
+      masks = [];
+      break;
+    }
+    case FACT_TYPES.RELATIONSHIP_HAS_TRAIT: {
+      // "Someone is the husband"
+      const term = `<span class="entity-person">${fact.relationshipTerm}</span>`;
+
+      // We can't reveal the name - that would defeat the purpose
+      // Instead, use this as an identifier constraint
+      if (Math.random() > 0.5) {
+        text = `Someone in the investigation is the ${term}.`;
+      } else {
+        text = `One suspect is ${fact.relationshipType}.`;
+      }
+
+      // This is an existence claim - always true if we generated it
+      fn = () => true;
+      masks = [];
+      break;
+    }
   }
 
   return { text, fn, masks, id: generateStableId(fact) };
@@ -528,6 +708,7 @@ export function generateClues(truth, roles, numSuspects, mapping) {
     ...generateRoomFacts(truth, numSuspects),
     ...generateItemFacts(truth, numSuspects),
     ...generateProximityFacts(truth, roles, mapping),
+    ...generateRelationshipFacts(truth, roles, mapping),
   ];
 }
 

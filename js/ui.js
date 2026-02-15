@@ -73,6 +73,38 @@ export function renderLocations() {
         </div>`;
 }
 
+// Helper: Get relationship information for a suspect
+export function getSuspectRelationships(suspectName) {
+  if (!state.gameMapping?.scenario?.relationships) return [];
+
+  const relationships = [];
+  const activeSuspects = state.gameMapping.suspects;
+
+  state.gameMapping.scenario.relationships.forEach((rel) => {
+    // Check if all suspects in this relationship are in the game
+    const allActive = rel.suspects.every((s) => activeSuspects.includes(s.name));
+    if (!allActive) return;
+
+    // Find this suspect in the relationship
+    const thisSuspect = rel.suspects.find((s) => s.name === suspectName);
+    if (!thisSuspect) return;
+
+    // Find the other suspects in the relationship
+    const others = rel.suspects.filter((s) => s.name !== suspectName);
+
+    others.forEach((other) => {
+      relationships.push({
+        term: thisSuspect.term,
+        relatedTo: other.name,
+        relatedTerm: other.term,
+        type: rel.type,
+      });
+    });
+  });
+
+  return relationships;
+}
+
 export function renderSelect(s, f, l, opts, usedMap) {
   const v = state.userGuesses[s]?.[f] || "";
   // Only Items must be unique. Rooms and Roles can be shared.
@@ -189,19 +221,38 @@ export function renderUI() {
         <div class="notebook-grid">
             ${state.gameMapping.suspects
               .map(
-                (name) => `
+                (name) => {
+                  const relationships = getSuspectRelationships(name);
+                  const relationshipHTML =
+                    relationships.length > 0
+                      ? `<div class="suspect-relationships">
+                            ${relationships
+                              .map(
+                                (rel) =>
+                                  `<span class="relationship-badge" title="${rel.term} of ${rel.relatedTo}">
+                                    <i class="ph-light ph-users-three"></i>
+                                    ${rel.term.charAt(0).toUpperCase() + rel.term.slice(1)} of ${rel.relatedTo}
+                                </span>`,
+                              )
+                              .join("")}
+                        </div>`
+                      : "";
+
+                  return `
                 <div class="suspect-card">
                     <h3 class="suspect-name">
                         <span class="suspect-icon"><i class="ph-light ph-user"></i></span>
                         ${name}
                     </h3>
+                    ${relationshipHTML}
                     <div class="guess-grid">
                         ${renderSelect(name, "room", "Loc", state.gameMapping.rooms, usedMap)}
                         ${renderSelect(name, "item", "Item", state.gameMapping.items, usedMap)}
                         ${renderSelect(name, "role", "Role", availableRoles, usedMap)}
                     </div>
                 </div>
-            `,
+            `;
+                },
               )
               .join("")}
         </div>`;

@@ -559,6 +559,33 @@ export const SCENARIOS = [
       { name: "Chloroform Cloth", isProper: false },
       { name: "Dagger", isProper: false },
     ],
+    relationships: [
+      {
+        type: "siblings",
+        suspects: [
+          { name: "Sherlock Holmes", term: "brother" },
+          { name: "Mycroft Holmes", term: "brother" },
+        ],
+      },
+      {
+        type: "married",
+        suspects: [
+          { name: "Dr. Watson", term: "husband" },
+          { name: "Mary Morstan", term: "wife" },
+        ],
+        optional: true,
+        probability: 0.7,
+      },
+      {
+        type: "landlord-tenant",
+        suspects: [
+          { name: "Mrs. Hudson", term: "landlady" },
+          { name: "Sherlock Holmes", term: "tenant" },
+        ],
+        optional: true,
+        probability: 0.5,
+      },
+    ],
   },
   {
     id: "gatsby",
@@ -690,6 +717,22 @@ export const SCENARIOS = [
       { name: "Fireplace Poker", isProper: false },
       { name: "Pearl Necklace", isProper: false },
       { name: "Golf Club", isProper: false },
+    ],
+    relationships: [
+      {
+        type: "married",
+        suspects: [
+          { name: "Tom Buchanan", term: "husband" },
+          { name: "Daisy Buchanan", term: "wife" },
+        ],
+      },
+      {
+        type: "married",
+        suspects: [
+          { name: "George Wilson", term: "husband" },
+          { name: "Myrtle Wilson", term: "wife" },
+        ],
+      },
     ],
   },
   {
@@ -953,6 +996,33 @@ export const SCENARIOS = [
       { name: "Heavy Pocket Watch", isProper: false },
       { name: "Champagne Bottle", isProper: false },
     ],
+    relationships: [
+      {
+        type: "married",
+        suspects: [
+          { name: "Archduke Viktor", term: "husband" },
+          { name: "Archduchess Elara", term: "wife" },
+        ],
+      },
+      {
+        type: "servant-employer",
+        suspects: [
+          { name: "Jean-Pierre", term: "servant" },
+          { name: "Baroness Von Zied", term: "employer" },
+        ],
+        optional: true,
+        probability: 0.6,
+      },
+      {
+        type: "rivals",
+        suspects: [
+          { name: "M. Renaud", term: "rival" },
+          { name: "Auguste Lupa", term: "rival" },
+        ],
+        optional: true,
+        probability: 0.4,
+      },
+    ],
   },
   {
     id: "edge_walker",
@@ -1196,6 +1266,38 @@ export const SCENARIOS = [
       { name: "Encyclopedic Tome", isProper: false },
       { name: "Ceremonial Dagger", isProper: false },
     ],
+    relationships: [
+      {
+        type: "siblings",
+        suspects: [
+          { name: "Dr. Alistair Heron", term: "brother" },
+          { name: "Dr. Malcolm Heron", term: "brother" },
+        ],
+      },
+      {
+        type: "parent-child",
+        suspects: [
+          { name: "Arthur Heron", term: "father" },
+          { name: "Dr. Alistair Heron", term: "son" },
+        ],
+      },
+      {
+        type: "parent-child",
+        suspects: [
+          { name: "Arthur Heron", term: "father" },
+          { name: "Dr. Malcolm Heron", term: "son" },
+        ],
+      },
+      {
+        type: "colleagues",
+        suspects: [
+          { name: "Dr. Alistair Heron", term: "colleague" },
+          { name: "Clara Skye", term: "colleague" },
+        ],
+        optional: true,
+        probability: 0.6,
+      },
+    ],
   },
   {
     id: "indigo_heir",
@@ -1331,6 +1433,40 @@ export const SCENARIOS = [
       { name: "Crown", isProper: false },
       { name: "Lunch Box", isProper: false },
       { name: "Telescope", isProper: false },
+    ],
+    relationships: [
+      {
+        type: "married",
+        suspects: [
+          { name: "Julian Vance", term: "husband" },
+          { name: "Martha Vance", term: "wife" },
+        ],
+      },
+      {
+        type: "siblings",
+        suspects: [
+          { name: "Julian Vance", term: "brother" },
+          { name: "David Vance", term: "brother" },
+        ],
+      },
+      {
+        type: "parent-child",
+        suspects: [
+          { name: "Horace Ashford", term: "father" },
+          { name: "Julian Ashford", term: "son" },
+        ],
+        optional: true,
+        probability: 0.7,
+      },
+      {
+        type: "cousins",
+        suspects: [
+          { name: "Julian Vance", term: "cousin" },
+          { name: "Cecily Elkins", term: "cousin" },
+        ],
+        optional: true,
+        probability: 0.5,
+      },
     ],
   },
   {
