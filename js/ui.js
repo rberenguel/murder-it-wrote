@@ -208,9 +208,14 @@ export function renderUI() {
   // Add double-tap/double-click handling for dimming clues
   cc.removeEventListener("dblclick", handleClueDim);
   cc.addEventListener("dblclick", handleClueDim);
-  // Mobile double-tap support
-  cc.removeEventListener("touchend", handleTouchTap);
-  cc.addEventListener("touchend", handleTouchTap);
+
+  // Mobile double-tap support - attach to each clue item directly
+  // Use capturing phase (true) to run before Sortable's handlers
+  const clueItems = cc.querySelectorAll(".clue-item");
+  clueItems.forEach((item) => {
+    item.removeEventListener("touchend", handleTouchTap, true);
+    item.addEventListener("touchend", handleTouchTap, true);
+  });
 
   const usedMap = { item: {} };
   Object.values(state.userGuesses).forEach((g) => {
@@ -277,8 +282,20 @@ async function handleGuessChange(e) {
   }
 }
 
-async function handleClueDim(e) {
-  const clueItem = e.target.closest(".clue-item");
+async function handleClueDim(clueItemOrEvent) {
+  // Debounce to prevent dblclick and touchend both firing
+  const now = Date.now();
+  if (now - lastDimTime < DIM_DEBOUNCE) {
+    return;
+  }
+  lastDimTime = now;
+
+  // Support both direct clueItem element or event object
+  const clueItem =
+    clueItemOrEvent instanceof Element
+      ? clueItemOrEvent
+      : clueItemOrEvent.target?.closest(".clue-item");
+
   if (!clueItem) return;
 
   const clueId = clueItem.dataset.clueId;
@@ -286,23 +303,24 @@ async function handleClueDim(e) {
 
   haptic();
 
-  // Toggle dimmed state
+  // Toggle dimmed state in state only, then re-render
   if (state.dimmedClues.has(clueId)) {
     state.dimmedClues.delete(clueId);
-    clueItem.classList.remove("dimmed");
   } else {
     state.dimmedClues.add(clueId);
-    clueItem.classList.add("dimmed");
   }
 
   updateState({ hasInteracted: true });
   await saveGame();
+  renderUI(); // Re-render to apply dimmed class from state
 }
 
 // Double-tap detection for mobile
 let lastTapTime = 0;
 let lastTapTarget = null;
+let lastDimTime = 0; // Prevent duplicate dims from dblclick + touchend
 const DOUBLE_TAP_DELAY = 300; // ms
+const DIM_DEBOUNCE = 100; // ms - prevent duplicate dim calls
 
 async function handleTouchTap(e) {
   // Don't handle double-tap on the drag handle
@@ -317,7 +335,8 @@ async function handleTouchTap(e) {
   if (timeDiff < DOUBLE_TAP_DELAY && lastTapTarget === clueItem) {
     // Double tap detected
     e.preventDefault();
-    await handleClueDim(e);
+    e.stopPropagation(); // Prevent dblclick event from firing
+    await handleClueDim(clueItem);
     lastTapTime = 0;
     lastTapTarget = null;
   } else {

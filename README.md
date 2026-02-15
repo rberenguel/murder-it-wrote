@@ -50,6 +50,8 @@ This process—called **Essentiality Pruning**—ensures that every single clue 
 - **Several Themes**: Play to see them all. I may add more.
 - **Dynamic Case Sizing**: Cases are labeled by complexity (Cozy, Intimate, Tense, Complex, Massive) based on the number of suspects.
 - **Whimsical Case Titles**: Each case gets a randomly selected mystery descriptor (Mystery, Conundrum, Enigma, etc.) that persists with your save.
+- **Relationship Clues**: Suspects can have relationships (married couples, siblings, employer-servant, etc.) that create additional deductive challenges. Clues like "The husband was in the Library" don't reveal which suspect is the husband—you must figure that out.
+- **Atmospheric Details**: Bloody crime scenes may leave traces on room features, adding flavor to your investigation.
 - **Auto-Save**: Your progress is automatically saved. Close the game and resume exactly where you left off.
 - **Clue Reordering**: Drag clues to reorder them by their handle numbers. Your custom order is preserved across sessions.
 - **Logic Grid**: A built-in notebook to track your deductions.
