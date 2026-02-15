@@ -172,6 +172,9 @@ export function renderUI() {
   // Add double-tap/double-click handling for dimming clues
   cc.removeEventListener("dblclick", handleClueDim);
   cc.addEventListener("dblclick", handleClueDim);
+  // Mobile double-tap support
+  cc.removeEventListener("touchend", handleTouchTap);
+  cc.addEventListener("touchend", handleTouchTap);
 
   const usedMap = { item: {} };
   Object.values(state.userGuesses).forEach((g) => {
@@ -238,6 +241,34 @@ async function handleClueDim(e) {
 
   updateState({ hasInteracted: true });
   await saveGame();
+}
+
+// Double-tap detection for mobile
+let lastTapTime = 0;
+let lastTapTarget = null;
+const DOUBLE_TAP_DELAY = 300; // ms
+
+async function handleTouchTap(e) {
+  // Don't handle double-tap on the drag handle
+  if (e.target.closest(".clue-handle")) return;
+
+  const clueItem = e.target.closest(".clue-item");
+  if (!clueItem) return;
+
+  const currentTime = Date.now();
+  const timeDiff = currentTime - lastTapTime;
+
+  if (timeDiff < DOUBLE_TAP_DELAY && lastTapTarget === clueItem) {
+    // Double tap detected
+    e.preventDefault();
+    await handleClueDim(e);
+    lastTapTime = 0;
+    lastTapTarget = null;
+  } else {
+    // First tap
+    lastTapTime = currentTime;
+    lastTapTarget = clueItem;
+  }
 }
 
 export function verifySolution() {

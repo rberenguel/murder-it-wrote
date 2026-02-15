@@ -216,7 +216,8 @@ function mergeFacts(facts) {
       if (!suspectFacts[f.suspectId]) suspectFacts[f.suspectId] = {};
       if (f.role === "Killer") suspectFacts[f.suspectId].notKiller = f;
       else if (f.role === "Victim") suspectFacts[f.suspectId].notVictim = f;
-      else if (f.role === "Accomplice") suspectFacts[f.suspectId].notAccomplice = f;
+      else if (f.role === "Accomplice")
+        suspectFacts[f.suspectId].notAccomplice = f;
       else merged.push(f);
     } else {
       merged.push(f);
@@ -225,7 +226,8 @@ function mergeFacts(facts) {
 
   Object.keys(suspectFacts).forEach((sidStr) => {
     const sid = parseInt(sidStr);
-    const { location, item, notKiller, notVictim, notAccomplice } = suspectFacts[sid];
+    const { location, item, notKiller, notVictim, notAccomplice } =
+      suspectFacts[sid];
 
     // 1. Triple Exclusion Merge (not Killer, not Victim, not Accomplice)
     if (notKiller && notVictim && notAccomplice) {
