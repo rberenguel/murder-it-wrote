@@ -44,6 +44,7 @@ export async function saveGame() {
     mysteryWord: state.mysteryWord,
     difficultyIcon: state.difficultyIcon,
     userGuesses: state.userGuesses,
+    dimmedClues: Array.from(state.dimmedClues), // Convert Set to Array for storage
   };
 
   await set(STORAGE_KEY, saveData);

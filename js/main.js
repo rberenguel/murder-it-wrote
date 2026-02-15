@@ -172,6 +172,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   document
     .getElementById("btn-debug-pi")
     ?.addEventListener("click", toggleDebug);
+  document.getElementById("btn-exit")?.addEventListener("click", () => {
+    // Return to intro screen
+    document.getElementById("app-container").classList.add("hidden");
+    document.getElementById("intro-screen").classList.remove("hidden");
+    addLog("Returned to menu", "system");
+  });
 
   // Initial render
   renderLocations();

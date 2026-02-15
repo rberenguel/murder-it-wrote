@@ -794,6 +794,16 @@ body {
   padding-bottom: 2rem;
 }
 
+.drawer-footer .btn {
+  flex: 1;
+  padding: 0.75rem;
+  min-width: 2.5rem;
+}
+
+.drawer-footer .btn i {
+  font-size: 1.25rem;
+}
+
 @media (min-width: 768px) {
   .drawer-footer {
     padding-bottom: 1rem;
@@ -834,6 +844,15 @@ body {
 
 .clue-item:hover {
   border-color: var(--border-focus);
+}
+
+.clue-item.dimmed {
+  opacity: 0.25;
+  transition: opacity 0.3s ease;
+}
+
+.clue-item.dimmed:hover {
+  opacity: 0.35;
 }
 
 .clue-handle {

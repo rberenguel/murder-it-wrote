@@ -14,6 +14,7 @@ export let state = {
   sortable: null,
   difficultyIcon: null,
   hasInteracted: false, // Track if user has dragged clues or made guesses
+  dimmedClues: new Set(), // Track which clues are dimmed (marked as used)
 };
 
 export function setState(newState) {

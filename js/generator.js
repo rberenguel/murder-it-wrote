@@ -551,6 +551,7 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
       userGuesses: restoredState.userGuesses,
       isGenerating: false,
       hasInteracted: hadInteraction,
+      dimmedClues: new Set(restoredState.dimmedClues || []),
     });
 
     // Restore clues from saved data in the correct order
@@ -872,6 +873,7 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
     userGuesses: {},
     isGenerating: false,
     hasInteracted: false,
+    dimmedClues: new Set(),
   });
 
   renderUI();

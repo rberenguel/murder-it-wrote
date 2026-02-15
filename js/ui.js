@@ -135,7 +135,7 @@ export function renderUI() {
   cc.innerHTML = `<ul class="clue-list">${state.puzzle
     .map(
       (c) => `
-        <li class="clue-item" data-clue-id="${c.id}">
+        <li class="clue-item ${state.dimmedClues.has(c.id) ? "dimmed" : ""}" data-clue-id="${c.id}">
             <span class="clue-handle">${c.number}.</span>
             <span class="clue-text">${c.text}</span>
         </li>`,
@@ -168,6 +168,10 @@ export function renderUI() {
       }),
     });
   }
+
+  // Add double-tap/double-click handling for dimming clues
+  cc.removeEventListener("dblclick", handleClueDim);
+  cc.addEventListener("dblclick", handleClueDim);
 
   const usedMap = { item: {} };
   Object.values(state.userGuesses).forEach((g) => {
@@ -214,6 +218,26 @@ async function handleGuessChange(e) {
     await window.updateGuess(suspect, field, value);
     renderUI();
   }
+}
+
+async function handleClueDim(e) {
+  const clueItem = e.target.closest(".clue-item");
+  if (!clueItem) return;
+
+  const clueId = clueItem.dataset.clueId;
+  if (!clueId) return;
+
+  // Toggle dimmed state
+  if (state.dimmedClues.has(clueId)) {
+    state.dimmedClues.delete(clueId);
+    clueItem.classList.remove("dimmed");
+  } else {
+    state.dimmedClues.add(clueId);
+    clueItem.classList.add("dimmed");
+  }
+
+  updateState({ hasInteracted: true });
+  await saveGame();
 }
 
 export function verifySolution() {
