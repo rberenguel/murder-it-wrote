@@ -43,6 +43,8 @@ export async function saveGame() {
     solution: state.solution,
     mysteryWord: state.mysteryWord,
     difficultyIcon: state.difficultyIcon,
+    sizingWord: state.sizingWord,
+    scenarioName: state.scenarioName,
     userGuesses: state.userGuesses,
     dimmedClues: Array.from(state.dimmedClues), // Convert Set to Array for storage
   };

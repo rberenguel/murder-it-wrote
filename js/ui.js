@@ -2,12 +2,9 @@ import { state, updateState } from "./game-state.js";
 import { ROLES_DEF } from "./constants.js";
 import { saveGame } from "./persistence.js";
 
-export function getCaseSize(numSuspects) {
-  if (numSuspects <= 3) return "Cozy";
-  if (numSuspects === 4) return "Intimate";
-  if (numSuspects === 5) return "Tense";
-  if (numSuspects === 6) return "Complex";
-  return "Massive";
+export function getCaseSize() {
+  // Return the stored sizing word for this case
+  return state.sizingWord || "Mysterious";
 }
 
 export function getDifficultyStars(numSuspects, iconName = "star") {
@@ -148,7 +145,7 @@ export function renderUI() {
       .map(([r, c]) => `${c} ${wrapRole(r)}${c > 1 ? "s" : ""}`)
       .join(", ");
     const numSuspects = state.gameMapping.suspects.length;
-    const sizeWord = getCaseSize(numSuspects);
+    const sizeWord = getCaseSize();
     const mysteryWord = state.mysteryWord || "Mystery";
     const difficultyStars = getDifficultyStars(
       numSuspects,
@@ -157,7 +154,7 @@ export function renderUI() {
     evidenceHeader.innerHTML = `
             <div style="display: flex; flex-direction: column;">
                 <h2 class="card-title" style="font-family: var(--font-sans);">
-                    <i class="ph-light ph-magnifying-glass"></i>The ${sizeWord} ${state.activeScenario.name} ${mysteryWord}
+                    <i class="ph-light ph-magnifying-glass"></i>The ${sizeWord} ${state.scenarioName || state.activeScenario.name} ${mysteryWord}
                     <span style="margin-left: 0.5rem; font-size: 0.875rem;">${difficultyStars}</span>
                 </h2>
                 <span style="font-size: 0.625rem; color: var(--text-slate-400); font-weight: 400; margin-left: 1.75rem;">Manifest: 1 ${wrapRole("Killer")}, 1 ${wrapRole("Victim")}, ${roleStr}</span>

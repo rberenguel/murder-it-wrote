@@ -35,10 +35,21 @@ export const DIFFICULTY_ICONS = [
   "bomb",
   "detective",
 ];
+
+// Sizing word pools for case size descriptors
+export const SIZING_WORDS = {
+  3: ["Cozy", "Compact", "Snug", "Minimal", "Brief"],
+  4: ["Intimate", "Personal", "Select", "Tight", "Close-knit"],
+  5: ["Tense", "Gripping", "Fraught", "Charged", "Edgy"],
+  6: ["Complex", "Intricate", "Elaborate", "Tangled", "Knotty"],
+  7: ["Massive", "Grand", "Epic", "Sprawling", "Labyrinthine"],
+};
+
 export const SCENARIOS = [
   {
     id: "stellar_voyage",
     name: "Stellar Voyage",
+    alternateNames: ["Deep Space", "Starship", "Final Frontier", "Warp Speed"],
     suspects: [
       "Capt. Beaumont",
       "Cmdr. Hayes",
@@ -177,6 +188,7 @@ export const SCENARIOS = [
   {
     id: "classic_manor",
     name: "Estate of Mystery",
+    alternateNames: ["Manor House", "Estate", "Country House"],
     suspects: [
       "Commander Hawthorne",
       "Lady Valentine",
@@ -312,6 +324,7 @@ export const SCENARIOS = [
   {
     id: "medieval",
     name: "Medieval Castle",
+    alternateNames: ["Castle Keep", "Fortress", "Stronghold", "Keep"],
     suspects: [
       "Sir Alistair",
       "Lady Eleanor",
@@ -441,6 +454,7 @@ export const SCENARIOS = [
   {
     id: "sherlock",
     name: "Sherlock Holmes",
+    alternateNames: ["Baker Street", "Victorian Crime", "Holmes"],
     suspects: [
       "Sherlock Holmes",
       "Dr. Watson",
@@ -590,6 +604,7 @@ export const SCENARIOS = [
   {
     id: "gatsby",
     name: "Great Gatsby",
+    alternateNames: ["Roaring Twenties", "Jazz Age"],
     suspects: [
       "Jay Gatsby",
       "Nick Carraway",
@@ -738,6 +753,7 @@ export const SCENARIOS = [
   {
     id: "falcon",
     name: "Maltese Falcon",
+    alternateNames: [], // No alternates - fixed by characters
     suspects: [
       "Sam Spade",
       "Brigid O'Shaughnessy",
@@ -860,6 +876,7 @@ export const SCENARIOS = [
   {
     id: "continental_express",
     name: "Continental Express",
+    alternateNames: ["Express", "Luxury Train", "Night Train", "Railway"],
     suspects: [
       "Auguste Lupa",
       "M. Renaud",
@@ -1027,6 +1044,7 @@ export const SCENARIOS = [
   {
     id: "edge_walker",
     name: "Edge Walker",
+    alternateNames: ["Neon City", "Electric Sheep", "Future Noir", "Street Level"],
     suspects: [
       "Jack Marlowe",
       "Reina",
@@ -1154,6 +1172,7 @@ export const SCENARIOS = [
   {
     id: "radio_shrink",
     name: "Pompous Psychiatrist",
+    alternateNames: ["Radio Hour", "Psychiatrist"],
     suspects: [
       "Dr. Alistair Heron",
       "Dr. Malcolm Heron",
@@ -1308,6 +1327,7 @@ export const SCENARIOS = [
   {
     id: "indigo_heir",
     name: "Indigo Heir",
+    alternateNames: ["Shifting Rooms", "Royal Estate", "Mansion", "Hidden Rooms", "Grand Estate"],
     suspects: [
       "Simon B. Evans",
       "Cecily M. Evans",
@@ -1501,6 +1521,7 @@ export const SCENARIOS = [
   {
     id: "shadow_protocol",
     name: "Shadow Protocol",
+    alternateNames: ["Covert Ops", "Black Ops", "Classified"],
     suspects: [
       "Agent Cipher",
       "Agent Sparrow",

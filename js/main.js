@@ -52,9 +52,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Apply saved theme to intro screen for font styling
     document.body.dataset.theme = savedGame.activeScenario.id;
 
-    // Get case size based on number of suspects
-    const numSuspects = savedGame.gameMapping.suspects.length;
-    const sizeWord = getCaseSize(numSuspects);
+    // Get saved sizing word and mystery word
+    const sizeWord = savedGame.sizingWord || "Mysterious";
     const mysteryWord = savedGame.mysteryWord || "Mystery";
 
     // Show Continue and New Case buttons
@@ -62,7 +61,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     startBtn.innerHTML = `
       <i class="ph-light ph-sign-in"></i>
       <span>CONTINUE</span>
-      <span class="scenario-subtitle">${sizeWord} ${savedGame.activeScenario.name} ${mysteryWord}</span>
+      <span class="scenario-subtitle">${sizeWord} ${savedGame.scenarioName || savedGame.activeScenario.name} ${mysteryWord}</span>
     `;
 
     const newCaseBtn = document.createElement("button");

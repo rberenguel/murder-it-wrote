@@ -1,4 +1,4 @@
-import { IDS, MYSTERY_WORDS, DIFFICULTY_ICONS } from "./constants.js";
+import { IDS, MYSTERY_WORDS, DIFFICULTY_ICONS, SIZING_WORDS } from "./constants.js";
 import { LogicEngine } from "./logic-engine.js";
 import { state, updateState } from "./game-state.js";
 
@@ -826,6 +826,8 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
       solution: restoredState.solution,
       mysteryWord: restoredState.mysteryWord,
       difficultyIcon: restoredState.difficultyIcon,
+      sizingWord: restoredState.sizingWord,
+      scenarioName: restoredState.scenarioName,
       userGuesses: restoredState.userGuesses,
       isGenerating: false,
       hasInteracted: hadInteraction,
@@ -1142,12 +1144,24 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
   const difficultyIcon =
     DIFFICULTY_ICONS[Math.floor(Math.random() * DIFFICULTY_ICONS.length)];
 
+  // Pick a random sizing word based on number of suspects
+  const sizingKey = numSuspects <= 3 ? 3 : numSuspects >= 7 ? 7 : numSuspects;
+  const sizingPool = SIZING_WORDS[sizingKey];
+  const sizingWord = sizingPool[Math.floor(Math.random() * sizingPool.length)];
+
+  // Pick a random scenario name (or use original if no alternates)
+  const alternates = s.alternateNames || [];
+  const namePool = alternates.length > 0 ? [s.name, ...alternates] : [s.name];
+  const scenarioName = namePool[Math.floor(Math.random() * namePool.length)];
+
   updateState({
     gameMapping,
     puzzle: shuffledClues,
     solution: { truth, roles },
     mysteryWord,
     difficultyIcon,
+    sizingWord,
+    scenarioName,
     userGuesses: {},
     isGenerating: false,
     hasInteracted: false,
