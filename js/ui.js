@@ -467,9 +467,11 @@ export function hasUserProgress() {
 // Generate printable logic puzzle grids
 export function generatePrintablePage(qrNormalDataURL, qrCompactDataURL) {
   const suspects = state.gameMapping.suspects;
-  const items = state.gameMapping.items.map(i => typeof i === 'string' ? i : i.name);
+  const items = state.gameMapping.items.map((i) =>
+    typeof i === "string" ? i : i.name,
+  );
   const rooms = state.gameMapping.rooms;
-  const roomNames = rooms.map(r => typeof r === 'string' ? r : r.name);
+  const roomNames = rooms.map((r) => (typeof r === "string" ? r : r.name));
   const roles = [...new Set(state.solution.roles)];
   const clues = state.puzzle;
 
@@ -481,22 +483,23 @@ export function generatePrintablePage(qrNormalDataURL, qrCompactDataURL) {
 
   // Build role manifest string
   const roleManifest = Object.entries(roleCounts)
-    .map(([role, count]) => `${count} ${role}${count > 1 ? 's' : ''}`)
-    .join(', ');
+    .map(([role, count]) => `${count} ${role}${count > 1 ? "s" : ""}`)
+    .join(", ");
 
   // Get locations with features and connections
-  const features = state.gameMapping.features || state.activeScenario.roomFeatures;
+  const features =
+    state.gameMapping.features || state.activeScenario.roomFeatures;
   const adjacency = state.activeScenario?.roomAdjacency || {};
 
   // Get all relationships
   const allRelationships = [];
   const processedPairs = new Set();
 
-  state.gameMapping.suspects.forEach(suspectName => {
+  state.gameMapping.suspects.forEach((suspectName) => {
     const relationships = getSuspectRelationships(suspectName);
-    relationships.forEach(rel => {
+    relationships.forEach((rel) => {
       // Create a unique key for this relationship pair (order-independent)
-      const pairKey = [suspectName, rel.relatedTo].sort().join('|');
+      const pairKey = [suspectName, rel.relatedTo].sort().join("|");
       if (!processedPairs.has(pairKey)) {
         processedPairs.add(pairKey);
         allRelationships.push({
@@ -504,7 +507,7 @@ export function generatePrintablePage(qrNormalDataURL, qrCompactDataURL) {
           term1: rel.term,
           person2: rel.relatedTo,
           term2: rel.relatedTerm,
-          type: rel.type
+          type: rel.type,
         });
       }
     });
@@ -519,8 +522,8 @@ export function generatePrintablePage(qrNormalDataURL, qrCompactDataURL) {
 
   // Helper to get shortened name (skip articles, keep meaningful words)
   const getShortName = (name, maxWords = 2) => {
-    const words = name.split(' ');
-    const articles = ['The', 'A', 'An'];
+    const words = name.split(" ");
+    const articles = ["The", "A", "An"];
     let startIdx = 0;
 
     // Skip leading articles
@@ -528,15 +531,15 @@ export function generatePrintablePage(qrNormalDataURL, qrCompactDataURL) {
       startIdx = 1;
     }
 
-    return words.slice(startIdx, startIdx + maxWords).join(' ');
+    return words.slice(startIdx, startIdx + maxWords).join(" ");
   };
 
   // Helper to get unique short names (expand words if duplicates exist)
   const getUniqueShortNames = (names, initialWords = 1) => {
-    const result = names.map(name => ({
+    const result = names.map((name) => ({
       original: name,
       short: getShortName(name, initialWords),
-      wordCount: initialWords
+      wordCount: initialWords,
     }));
 
     // Find duplicates and expand until unique
@@ -546,16 +549,17 @@ export function generatePrintablePage(qrNormalDataURL, qrCompactDataURL) {
       const counts = {};
 
       // Count occurrences
-      result.forEach(item => {
+      result.forEach((item) => {
         counts[item.short] = (counts[item.short] || 0) + 1;
       });
 
       // Expand conflicting names
-      result.forEach(item => {
+      result.forEach((item) => {
         if (counts[item.short] > 1) {
-          const words = item.original.split(' ');
-          const articles = ['The', 'A', 'An'];
-          const startIdx = words.length > 1 && articles.includes(words[0]) ? 1 : 0;
+          const words = item.original.split(" ");
+          const articles = ["The", "A", "An"];
+          const startIdx =
+            words.length > 1 && articles.includes(words[0]) ? 1 : 0;
           const maxAvailable = words.length - startIdx;
 
           if (item.wordCount < maxAvailable) {
@@ -567,12 +571,20 @@ export function generatePrintablePage(qrNormalDataURL, qrCompactDataURL) {
       });
     }
 
-    return result.map(item => item.short);
+    return result.map((item) => item.short);
   };
 
   // Generate a grid table
-  const generateGrid = (title, rowLabel, rows, colLabel, cols, category, compact = false) => {
-    const displayCols = compact ? cols.map(c => getShortName(c, 2)) : cols;
+  const generateGrid = (
+    title,
+    rowLabel,
+    rows,
+    colLabel,
+    cols,
+    category,
+    compact = false,
+  ) => {
+    const displayCols = compact ? cols.map((c) => getShortName(c, 2)) : cols;
     const displayRows = compact ? getUniqueShortNames(rows, 1) : rows;
 
     return `
@@ -581,20 +593,26 @@ export function generatePrintablePage(qrNormalDataURL, qrCompactDataURL) {
         <table class="logic-grid">
           <thead>
             <tr>
-              <th class="corner-cell">${compact ? '' : `${rowLabel} / ${colLabel}`}</th>
-              ${displayCols.map((col, i) => `<th class="col-header">${compact ? `<span>${col}</span>` : col}</th>`).join('')}
+              <th class="corner-cell">${compact ? "" : `${rowLabel} / ${colLabel}`}</th>
+              ${displayCols.map((col, i) => `<th class="col-header">${compact ? `<span>${col}</span>` : col}</th>`).join("")}
             </tr>
           </thead>
           <tbody>
-            ${displayRows.map((row, rowIdx) => `
+            ${displayRows
+              .map(
+                (row, rowIdx) => `
               <tr>
                 <th class="row-header">${row}</th>
-                ${cols.map((col, colIdx) => {
-                  const isGuessed = hasGuess(rows[rowIdx], category, col);
-                  return `<td class="grid-cell ${isGuessed ? 'pre-filled' : ''}"></td>`;
-                }).join('')}
+                ${cols
+                  .map((col, colIdx) => {
+                    const isGuessed = hasGuess(rows[rowIdx], category, col);
+                    return `<td class="grid-cell ${isGuessed ? "pre-filled" : ""}"></td>`;
+                  })
+                  .join("")}
               </tr>
-            `).join('')}
+            `,
+              )
+              .join("")}
           </tbody>
         </table>
       </div>
@@ -606,52 +624,68 @@ export function generatePrintablePage(qrNormalDataURL, qrCompactDataURL) {
     // Create solution string: for each suspect, encode item+room+role indices
     const solution = [];
     suspects.forEach((suspectName, suspectIdx) => {
-      const truth = state.solution.truth.find(t => t.id === suspectIdx);
+      const truth = state.solution.truth.find((t) => t.id === suspectIdx);
       if (truth) {
-        solution.push(`${truth.itemId}${truth.roomId}${roles.indexOf(truth.role)}`);
+        solution.push(
+          `${truth.itemId}${truth.roomId}${roles.indexOf(truth.role)}`,
+        );
       }
     });
-    return solution.join('');
+    return solution.join("");
   };
 
   // Generate extra info section (locations + relationships)
   const generateExtra = () => {
-    const locationsHTML = rooms.length > 0 ? `
+    const locationsHTML =
+      rooms.length > 0
+        ? `
       <div class="compact-list">
         <strong>Locations:</strong>
         <ul>
-          ${rooms.map(r => {
-            const roomName = typeof r === 'string' ? r : r.name;
-            const connectedRooms = adjacency[roomName] || [];
-            const activeConnections = connectedRooms.filter(name =>
-              rooms.some(room => (typeof room === 'string' ? room : room.name) === name)
-            );
-            const roomFeatures = features[roomName] || [];
+          ${rooms
+            .map((r) => {
+              const roomName = typeof r === "string" ? r : r.name;
+              const connectedRooms = adjacency[roomName] || [];
+              const activeConnections = connectedRooms.filter((name) =>
+                rooms.some(
+                  (room) =>
+                    (typeof room === "string" ? room : room.name) === name,
+                ),
+              );
+              const roomFeatures = features[roomName] || [];
 
-            const doors = activeConnections.length > 0
-              ? `(${activeConnections.map(dest => `<i class="ph-light ph-door-open"></i> ${dest}`).join(', ')})`
-              : '';
-            const feats = roomFeatures.map(f => f.name).join(', ');
-            const parts = [doors, feats].filter(Boolean).join(', ');
+              const doors =
+                activeConnections.length > 0
+                  ? `(${activeConnections.map((dest) => `<i class="ph-light ph-door-open"></i> ${dest}`).join(", ")})`
+                  : "";
+              const feats = roomFeatures.map((f) => f.name).join(", ");
+              const parts = [doors, feats].filter(Boolean).join(", ");
 
-            return `<li><strong>${roomName}</strong>${parts ? ` ${parts}` : ''}</li>`;
-          }).join('')}
+              return `<li><strong>${roomName}</strong>${parts ? ` ${parts}` : ""}</li>`;
+            })
+            .join("")}
         </ul>
       </div>
-    ` : '';
+    `
+        : "";
 
-    const relationshipsHTML = allRelationships.length > 0 ? `
+    const relationshipsHTML =
+      allRelationships.length > 0
+        ? `
       <div class="compact-list">
         <strong>Relationships:</strong>
         <ul>
-          ${allRelationships.map(rel =>
-            `<li>${rel.person1}/${rel.person2} (${rel.term1})</li>`
-          ).join('')}
+          ${allRelationships
+            .map(
+              (rel) => `<li>${rel.person1}/${rel.person2} (${rel.term1})</li>`,
+            )
+            .join("")}
         </ul>
       </div>
-    ` : '';
+    `
+        : "";
 
-    if (!locationsHTML && !relationshipsHTML) return '';
+    if (!locationsHTML && !relationshipsHTML) return "";
 
     return `
       <div class="info-section">
@@ -665,7 +699,10 @@ export function generatePrintablePage(qrNormalDataURL, qrCompactDataURL) {
   // Get case info
   const caseTitle = getCaseTitle();
   const numSuspects = state.gameMapping.suspects.length;
-  const difficultyStars = getDifficultyStars(numSuspects, state.difficultyIcon || "star");
+  const difficultyStars = getDifficultyStars(
+    numSuspects,
+    state.difficultyIcon || "star",
+  );
 
   const html = `
 <!DOCTYPE html>
@@ -1122,21 +1159,21 @@ export function generatePrintablePage(qrNormalDataURL, qrCompactDataURL) {
   <div class="pagelet pagelet-2 flipped">
     <div class="pagelet-content">
       <!-- Page 6: Grid 3 -->
-      ${generateGrid('Suspects × Roles', 'Suspects', suspects, 'Roles', roles, 'role', true)}
+      ${generateGrid("Suspects × Roles", "Suspects", suspects, "Roles", roles, "role", true)}
       <div class="page-number">6</div>
     </div>
   </div>
   <div class="pagelet pagelet-3 flipped">
     <div class="pagelet-content">
       <!-- Page 5: Grid 2 -->
-      ${generateGrid('Suspects × Locations', 'Suspects', suspects, 'Locations', roomNames, 'room', true)}
+      ${generateGrid("Suspects × Locations", "Suspects", suspects, "Locations", roomNames, "room", true)}
       <div class="page-number">5</div>
     </div>
   </div>
   <div class="pagelet pagelet-4 flipped">
     <div class="pagelet-content">
       <!-- Page 4: Grid 1 -->
-      ${generateGrid('Suspects × Items', 'Suspects', suspects, 'Items', items, 'item', true)}
+      ${generateGrid("Suspects × Items", "Suspects", suspects, "Items", items, "item", true)}
       <div class="page-number">4</div>
     </div>
   </div>
@@ -1146,9 +1183,7 @@ export function generatePrintablePage(qrNormalDataURL, qrCompactDataURL) {
       <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 0.25rem;">
         <h3 style="font-size: 9pt; font-weight: bold; margin: 0;">Solution</h3>
         <img src="${qrCompactDataURL}" style="border: 2px solid #ccc; padding: 0.25rem; background: white; max-width: 120px; height: auto;" alt="Solution QR Code" />
-        <p style="font-size: 5.5pt; color: #666; text-align: center; line-height: 1.2; max-width: 140px;">
-          3 lines: items | rooms | roles<br>(indices per suspect)
-        </p>
+        <p style="font-size: 6pt; color: #666; text-align: center; line-height: 1.2;">Scan to verify</p>
       </div>
     </div>
   </div>
@@ -1175,12 +1210,16 @@ export function generatePrintablePage(qrNormalDataURL, qrCompactDataURL) {
       <!-- Page 3: Clues -->
       <h3 style="font-size: 10pt; margin-bottom: 0.5rem;">Evidence</h3>
       <ul class="clues-list">
-        ${clues.map(clue => `
+        ${clues
+          .map(
+            (clue) => `
           <li class="clue-item">
             <span class="clue-number">${clue.number}.</span>
             <span class="clue-text">${clue.text}</span>
           </li>
-        `).join('')}
+        `,
+          )
+          .join("")}
       </ul>
       <div class="page-number">3</div>
     </div>
@@ -1197,26 +1236,27 @@ export function generatePrintablePage(qrNormalDataURL, qrCompactDataURL) {
   <div class="clues-section">
     <div class="clues-title">Evidence</div>
     <ul class="clues-list">
-      ${clues.map(clue => `
+      ${clues
+        .map(
+          (clue) => `
         <li class="clue-item">
           <span class="clue-number">${clue.number}.</span>
           <span class="clue-text">${clue.text}</span>
         </li>
-      `).join('')}
+      `,
+        )
+        .join("")}
     </ul>
   </div>
 
-  ${generateGrid('Suspects × Items', 'Suspects', suspects, 'Items', items, 'item', false)}
-  ${generateGrid('Suspects × Locations', 'Suspects', suspects, 'Locations', roomNames, 'room', false)}
-  ${generateGrid('Suspects × Roles', 'Suspects', suspects, 'Roles', roles, 'role', false)}
+  ${generateGrid("Suspects × Items", "Suspects", suspects, "Items", items, "item", false)}
+  ${generateGrid("Suspects × Locations", "Suspects", suspects, "Locations", roomNames, "room", false)}
+  ${generateGrid("Suspects × Roles", "Suspects", suspects, "Roles", roles, "role", false)}
 
   <div style="text-align: center; margin: 2rem 0 1rem 0; page-break-inside: avoid;">
     <h3 style="font-size: 11pt; font-weight: bold; margin-bottom: 0.5rem;">Solution</h3>
     <img src="${qrNormalDataURL}" style="border: 2px solid #ccc; padding: 0.5rem; background: white; max-width: 150px; height: auto;" alt="Solution QR Code" />
-    <p style="font-size: 8pt; color: #666; margin-top: 0.5rem; line-height: 1.3;">
-      QR format: 3 lines (items | rooms | roles)<br>
-      Each digit = index per suspect, in order
-    </p>
+    <p style="font-size: 8pt; color: #666; margin-top: 0.5rem;">Scan to verify solution</p>
   </div>
 
   <script>
@@ -1247,14 +1287,14 @@ export function openPrintMode() {
   const suspects = state.gameMapping.suspects;
   const roles = [...new Set(state.solution.roles)];
 
-  // Encode solution as 3 separate number strings for QR code
+  // Encode solution as URL (iOS requires actionable data)
   const encodeSolution = () => {
     const items = [];
     const rooms = [];
     const roleIndices = [];
 
     suspects.forEach((suspectName, suspectIdx) => {
-      const truth = state.solution.truth.find(t => t.id === suspectIdx);
+      const truth = state.solution.truth.find((t) => t.id === suspectIdx);
       if (truth) {
         items.push(truth.itemId);
         rooms.push(truth.roomId);
@@ -1262,26 +1302,26 @@ export function openPrintMode() {
       }
     });
 
-    // Return 3 lines: items, rooms, roles
-    return `${items.join('')}\n${rooms.join('')}\n${roleIndices.join('')}`;
+    // Return as URL with solution in hash (iOS recognizes URLs as actionable)
+    return `https://mostlymaths.net/murder-it-wrote/#solution:${items.join("")}-${rooms.join("")}-${roleIndices.join("")}`;
   };
 
   const solutionCode = encodeSolution();
 
   // Create temporary containers for QR code generation
-  const tempContainerNormal = document.createElement('div');
-  tempContainerNormal.style.position = 'absolute';
-  tempContainerNormal.style.left = '-9999px';
+  const tempContainerNormal = document.createElement("div");
+  tempContainerNormal.style.position = "absolute";
+  tempContainerNormal.style.left = "-9999px";
   document.body.appendChild(tempContainerNormal);
 
-  const tempContainerCompact = document.createElement('div');
-  tempContainerCompact.style.position = 'absolute';
-  tempContainerCompact.style.left = '-9999px';
+  const tempContainerCompact = document.createElement("div");
+  tempContainerCompact.style.position = "absolute";
+  tempContainerCompact.style.left = "-9999px";
   document.body.appendChild(tempContainerCompact);
 
   // Generate QR codes
-  if (typeof QRCode === 'undefined') {
-    alert('QR Code library not loaded. Please refresh the page.');
+  if (typeof QRCode === "undefined") {
+    alert("QR Code library not loaded. Please refresh the page.");
     document.body.removeChild(tempContainerNormal);
     document.body.removeChild(tempContainerCompact);
     return;
@@ -1291,43 +1331,43 @@ export function openPrintMode() {
     text: solutionCode,
     width: 150,
     height: 150,
-    colorDark: '#000000',
-    colorLight: '#ffffff',
-    correctLevel: QRCode.CorrectLevel.H
+    colorDark: "#000000",
+    colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.H,
   });
 
   const qrCompact = new QRCode(tempContainerCompact, {
     text: solutionCode,
     width: 120,
     height: 120,
-    colorDark: '#000000',
-    colorLight: '#ffffff',
-    correctLevel: QRCode.CorrectLevel.H
+    colorDark: "#000000",
+    colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.H,
   });
 
   // Wait a moment for QR codes to render, then extract as data URLs
   setTimeout(() => {
-    const canvasNormal = tempContainerNormal.querySelector('canvas');
-    const canvasCompact = tempContainerCompact.querySelector('canvas');
+    const canvasNormal = tempContainerNormal.querySelector("canvas");
+    const canvasCompact = tempContainerCompact.querySelector("canvas");
 
     if (!canvasNormal || !canvasCompact) {
-      alert('Failed to generate QR codes. Please try again.');
+      alert("Failed to generate QR codes. Please try again.");
       document.body.removeChild(tempContainerNormal);
       document.body.removeChild(tempContainerCompact);
       return;
     }
 
-    const qrNormalDataURL = canvasNormal.toDataURL('image/png');
-    const qrCompactDataURL = canvasCompact.toDataURL('image/png');
+    const qrNormalDataURL = canvasNormal.toDataURL("image/png");
+    const qrCompactDataURL = canvasCompact.toDataURL("image/png");
 
     // Clean up temporary containers
     document.body.removeChild(tempContainerNormal);
     document.body.removeChild(tempContainerCompact);
 
     // Open print window with QR data URLs
-    const printWindow = window.open('', '_blank', 'width=800,height=600');
+    const printWindow = window.open("", "_blank", "width=800,height=600");
     if (!printWindow) {
-      alert('Please allow popups to open the print view');
+      alert("Please allow popups to open the print view");
       return;
     }
 

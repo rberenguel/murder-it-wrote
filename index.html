@@ -7,21 +7,42 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
     <meta name="theme-color" content="#000000" />
-    <meta name="description" content="A detective logic puzzle game with procedurally generated murder mysteries" />
+    <meta
+      name="description"
+      content="A detective logic puzzle game with procedurally generated murder mysteries"
+    />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://mostlymaths.net/murder-it-wrote/" />
+    <meta
+      property="og:url"
+      content="https://mostlymaths.net/murder-it-wrote/"
+    />
     <meta property="og:title" content="Murder, it wrote" />
-    <meta property="og:description" content="A detective logic puzzle game with procedurally generated murder mysteries" />
-    <meta property="og:image" content="https://mostlymaths.net/murder-it-wrote/media/murder-it-wrote.png" />
+    <meta
+      property="og:description"
+      content="A detective logic puzzle game with procedurally generated murder mysteries"
+    />
+    <meta
+      property="og:image"
+      content="https://mostlymaths.net/murder-it-wrote/media/murder-it-wrote.png"
+    />
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://mostlymaths.net/murder-it-wrote/" />
+    <meta
+      property="twitter:url"
+      content="https://mostlymaths.net/murder-it-wrote/"
+    />
     <meta property="twitter:title" content="Murder, it wrote" />
-    <meta property="twitter:description" content="A detective logic puzzle game with procedurally generated murder mysteries" />
-    <meta property="twitter:image" content="https://mostlymaths.net/murder-it-wrote/media/murder-it-wrote.png" />
+    <meta
+      property="twitter:description"
+      content="A detective logic puzzle game with procedurally generated murder mysteries"
+    />
+    <meta
+      property="twitter:image"
+      content="https://mostlymaths.net/murder-it-wrote/media/murder-it-wrote.png"
+    />
 
     <title>Murder, it wrote</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
@@ -199,6 +220,41 @@
             </button>
           </div>
           <div id="log-container" class="log-container custom-scrollbar"></div>
+        </div>
+      </div>
+
+      <div id="solution-modal" class="modal-overlay hidden">
+        <div class="modal-panel">
+          <div class="modal-header">
+            <h2 class="modal-title">Solution Code Scanned</h2>
+          </div>
+          <div class="modal-body">
+            <div
+              id="solution-display"
+              style="
+                font-family: &quot;Monoid&quot;, monospace;
+                font-size: 14pt;
+                line-height: 1.8;
+                text-align: center;
+              "
+            ></div>
+            <p
+              style="
+                margin-top: 1rem;
+                font-size: 10pt;
+                color: var(--text-slate-400);
+                text-align: center;
+              "
+            >
+              Each digit represents an index per suspect, in order, starting
+              from index 0
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button id="btn-solution-close" class="btn btn-dark">
+              <span>Close</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -222,4 +222,52 @@ document.addEventListener("DOMContentLoaded", async () => {
     .catch((err) => {
       console.warn("Could not load version from manifest:", err);
     });
+
+  // Solution modal handler
+  const solutionModal = document.getElementById("solution-modal");
+  const solutionDisplay = document.getElementById("solution-display");
+  const closeSolutionBtn = document.getElementById("btn-solution-close");
+
+  // Check for solution in hash
+  const checkSolutionHash = () => {
+    const hash = window.location.hash;
+    if (hash.startsWith("#solution:")) {
+      const solutionData = hash.substring(10); // Remove "#solution:"
+      const parts = solutionData.split("-");
+
+      if (parts.length === 3) {
+        const [items, locations, roles] = parts;
+
+        // Display solution nicely formatted
+        solutionDisplay.innerHTML = `
+          <div style="margin-bottom: 0.75rem;">
+            <strong style="color: var(--accent);">Items:</strong> ${items.split("").join(" ")}
+          </div>
+          <div style="margin-bottom: 0.75rem;">
+            <strong style="color: var(--accent);">Locations:</strong> ${locations.split("").join(" ")}
+          </div>
+          <div>
+            <strong style="color: var(--accent);">Roles:</strong> ${roles.split("").join(" ")}
+          </div>
+        `;
+
+        solutionModal.classList.remove("hidden");
+
+        // Clear hash after showing
+        history.replaceState(null, null, window.location.pathname);
+      }
+    }
+  };
+
+  // Close solution modal
+  closeSolutionBtn?.addEventListener("click", () => {
+    haptic();
+    solutionModal.classList.add("hidden");
+  });
+
+  // Check on load
+  checkSolutionHash();
+
+  // Check when hash changes
+  window.addEventListener("hashchange", checkSolutionHash);
 });

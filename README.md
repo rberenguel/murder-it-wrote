@@ -62,6 +62,7 @@ This process—called **Essentiality Pruning**—ensures that every single clue 
 ### Solution Encoding
 
 The printable version includes a QR code containing the solution. The solution is encoded as a compact number string where each suspect (in order) is represented by three digits:
+
 - **First digit**: Item index (which item they have)
 - **Second digit**: Room index (which room they're in)
 - **Third digit**: Role index (their role in the case)
