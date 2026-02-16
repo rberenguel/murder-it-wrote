@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Viking Map Fold Template</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+      background: white;
+      font-family: 'Arial', sans-serif;
+    }
+
+    .print-controls {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 1000;
+    }
+
+    .print-btn {
+      padding: 0.5rem 1rem;
+      border: 1px solid #333;
+      background: white;
+      cursor: pointer;
+      font-size: 10pt;
+      border-radius: 4px;
+      font-family: 'Arial', sans-serif;
+    }
+
+    .print-btn:hover {
+      background: #f0f0f0;
+    }
+
+    .print-btn:active {
+      background: #e0e0e0;
+    }
+
+    .pagelet {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px dashed #999;
+      font-size: 48pt;
+      font-weight: bold;
+      color: #ccc;
+    }
+
+    .pagelet.flipped {
+      transform: rotate(180deg);
+    }
+
+    .cut-line {
+      display: block;
+      position: absolute;
+      top: 50%;
+      left: 25%;
+      width: 50%;
+      height: 2px;
+      background: repeating-linear-gradient(
+        90deg,
+        #000 0px,
+        #000 10px,
+        transparent 10px,
+        transparent 20px
+      );
+      transform: translateY(-1px);
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    .cut-line::before {
+      content: '✂';
+      position: absolute;
+      left: 40%;
+      top: -17px;
+      transform: translateX(-50%);
+      font-size: 24pt;
+      color: #999;
+    }
+
+    @media print {
+      .print-controls {
+        display: none;
+      }
+
+      @page {
+        size: landscape;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="print-controls">
+    <button class="print-btn" onclick="window.print()">Print</button>
+  </div>
+
+  <div class="cut-line"></div>
+
+  <div class="pagelet pagelet-1 flipped">7</div>
+  <div class="pagelet pagelet-2 flipped">6</div>
+  <div class="pagelet pagelet-3 flipped">5</div>
+  <div class="pagelet pagelet-4 flipped">4</div>
+  <div class="pagelet pagelet-5">8</div>
+  <div class="pagelet pagelet-6">1</div>
+  <div class="pagelet pagelet-7">2</div>
+  <div class="pagelet pagelet-8">3</div>
+</body>
+</html>

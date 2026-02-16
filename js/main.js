@@ -14,6 +14,7 @@ import {
   closeNewCaseModal,
   hasUserProgress,
   getCaseSize,
+  openPrintMode,
 } from "./ui.js";
 import { loadGame, clearGame } from "./persistence.js";
 import { haptic } from "./haptic.js";
@@ -161,6 +162,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("btn-verify")?.addEventListener("click", () => {
     haptic();
     verifySolution();
+  });
+  document.getElementById("btn-print")?.addEventListener("click", () => {
+    haptic();
+    openPrintMode();
   });
   document.getElementById("btn-reveal")?.addEventListener("click", () => {
     haptic();

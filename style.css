@@ -1769,6 +1769,9 @@ body {
 [data-theme="stellar_voyage"] #btn-verify * {
   color: #ffffff;
 }
+[data-theme="stellar_voyage"] #btn-print * {
+  color: #ffffff;
+}
 [data-theme="stellar_voyage"] #btn-reveal * {
   color: #ffffff;
 }
@@ -1788,6 +1791,9 @@ body {
 }
 [data-theme="classic_manor"] #btn-verify * {
   color: #fff;
+}
+[data-theme="classic_manor"] #btn-print * {
+  color: #000;
 }
 [data-theme="classic_manor"] #btn-reveal * {
   color: #000;
@@ -1809,6 +1815,9 @@ body {
 [data-theme="medieval"] #btn-verify * {
   color: #ffffff;
 }
+[data-theme="medieval"] #btn-print * {
+  color: #000000;
+}
 [data-theme="medieval"] #btn-reveal * {
   color: #000000;
 }
@@ -1828,6 +1837,9 @@ body {
 }
 [data-theme="sherlock"] #btn-verify * {
   color: #ffffff;
+}
+[data-theme="sherlock"] #btn-print * {
+  color: #000;
 }
 [data-theme="sherlock"] #btn-reveal * {
   color: #000;
@@ -1849,6 +1861,9 @@ body {
 [data-theme="gatsby"] #btn-verify * {
   color: #ffffff;
 }
+[data-theme="gatsby"] #btn-print * {
+  color: #000;
+}
 [data-theme="gatsby"] #btn-reveal * {
   color: #000;
 }
@@ -1868,6 +1883,9 @@ body {
 }
 [data-theme="falcon"] #btn-verify * {
   color: #ffffff;
+}
+[data-theme="falcon"] #btn-print * {
+  color: #000;
 }
 [data-theme="falcon"] #btn-reveal * {
   color: #000;
@@ -1889,6 +1907,9 @@ body {
 [data-theme="continental_express"] #btn-verify * {
   color: #ffffff;
 }
+[data-theme="continental_express"] #btn-print * {
+  color: #000;
+}
 [data-theme="continental_express"] #btn-reveal * {
   color: #000;
 }
@@ -1908,6 +1929,9 @@ body {
 }
 [data-theme="edge_walker"] #btn-verify * {
   color: #ffffff;
+}
+[data-theme="edge_walker"] #btn-print * {
+  color: #fff;
 }
 [data-theme="edge_walker"] #btn-reveal * {
   color: #fff;
@@ -1929,6 +1953,9 @@ body {
 [data-theme="radio_shrink"] #btn-verify * {
   color: #ffffff;
 }
+[data-theme="radio_shrink"] #btn-print * {
+  color: #000;
+}
 [data-theme="radio_shrink"] #btn-reveal * {
   color: #000;
 }
@@ -1949,6 +1976,9 @@ body {
 [data-theme="indigo_heir"] #btn-verify * {
   color: #ffffff;
 }
+[data-theme="indigo_heir"] #btn-print * {
+  color: #000;
+}
 [data-theme="indigo_heir"] #btn-reveal * {
   color: #000;
 }
@@ -1968,6 +1998,9 @@ body {
 }
 [data-theme="shadow_protocol"] #btn-verify * {
   color: #ffffff;
+}
+[data-theme="shadow_protocol"] #btn-print * {
+  color: #000;
 }
 [data-theme="shadow_protocol"] #btn-reveal * {
   color: #000;

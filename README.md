@@ -57,6 +57,16 @@ This process—called **Essentiality Pruning**—ensures that every single clue 
 - **Logic Grid**: A built-in notebook to track your deductions.
 - **Smart Validation**: The notebook highlights impossible combinations (e.g., assigning the same item to two people).
 - **Polished UI**: Hopefully. Theme-aware styling, scrollbars, and typography. It might need more work on mobile or to keep the style consistent though.
+- **Printable Mode**: Generate a printable logic puzzle with a viking map fold layout, perfect for solving on paper. Includes a QR code with the encoded solution for verification.
+
+### Solution Encoding
+
+The printable version includes a QR code containing the solution. The solution is encoded as a compact number string where each suspect (in order) is represented by three digits:
+- **First digit**: Item index (which item they have)
+- **Second digit**: Room index (which room they're in)
+- **Third digit**: Role index (their role in the case)
+
+For example, if there are 5 suspects, the solution might be encoded as: `321142534201430` (5 suspects × 3 digits each = 15 digits). This makes the solution verifiable but not immediately obvious when glancing at the QR code.
 
 ## Credits / references
 
@@ -89,3 +99,4 @@ Additional fonts in the fonts folder (not currently used):
 ### Libraries
 
 - **[idb-keyval](https://github.com/jakearchibald/idb-keyval)** - A super-simple promise-based keyval store by [Jake Archibald](https://github.com/jakearchibald) (Apache 2.0)
+- **[qrcodejs](https://github.com/davidshimjs/qrcodejs)** - QR code generator by [Sangmin, Shim](https://github.com/davidshimjs) (MIT)
