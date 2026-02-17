@@ -1,4 +1,5 @@
 import { state, updateState, pickRandomScenario } from "./game-state.js";
+import { initRng, getSeed, codeToSeed, seedToCode } from "./rng.js";
 import { SCENARIOS } from "./constants.js";
 import { handleNewCase } from "./generator.js";
 import {
@@ -26,7 +27,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const savedGame = await loadGame();
 
   // --- Intro Flow ---
-  const beginInvestigation = async (restore = false) => {
+  const beginInvestigation = async (restore = false, presetSeed = null) => {
     const overlay = document.getElementById("transition-overlay");
     if (overlay) {
       overlay.classList.remove("hidden");
@@ -38,10 +39,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (restore && savedGame) {
       addLog("Restoring investigation...", "system");
+      initRng(savedGame.seed);
+      updateState({ seed: getSeed() });
       await handleNewCase(uiCallbacks, savedGame);
     } else {
       addLog("Beginning investigation...", "system");
-      updateState({ activeScenario: pickRandomScenario() });
+      initRng(presetSeed); // null → random seed
+      updateState({ seed: getSeed(), activeScenario: pickRandomScenario() });
       await handleNewCase(uiCallbacks);
     }
   };
@@ -97,6 +101,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // --- Global Test Hook ---
   window.miw = {
+    getSeed: () => getSeed(),
+    playWithSeed: (seed) => performNewCaseWithSeed(seed),
     select: async (id) => {
       const s = SCENARIOS.find((x) => x.id === id);
       if (s) {
@@ -142,9 +148,41 @@ document.addEventListener("DOMContentLoaded", async () => {
   const performNewCase = async () => {
     await clearGame(); // Clear save before new case
     addLog("Generating new case...", "system");
-    updateState({ activeScenario: pickRandomScenario() });
+    initRng();
+    updateState({ seed: getSeed(), activeScenario: pickRandomScenario() });
     handleNewCase(uiCallbacks);
   };
+
+  const performNewCaseWithSeed = async (seed) => {
+    await clearGame();
+    initRng(seed);
+    addLog(`Generating case ${seedToCode(getSeed())}...`, "system");
+    updateState({ seed: getSeed(), activeScenario: pickRandomScenario() });
+    handleNewCase(uiCallbacks);
+  };
+
+  // --- Seed input in debug panel ---
+  const seedEl = document.getElementById("debug-seed");
+  if (seedEl) {
+    seedEl.addEventListener("focus", () => {
+      const range = document.createRange();
+      range.selectNodeContents(seedEl);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    });
+    seedEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const seed = codeToSeed(seedEl.textContent.trim());
+        if (seed != null) {
+          seedEl.blur();
+          document.getElementById("debug-overlay").classList.add("hidden");
+          performNewCaseWithSeed(seed);
+        }
+      }
+    });
+  }
 
   const newCaseBtn = document.getElementById("btn-new-case");
   if (newCaseBtn) {
@@ -210,6 +248,20 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Initial render
   renderLocations();
 
+  // Intro scroll-hint fade
+  const introScreen = document.getElementById("intro-screen");
+  const syncIntroScroll = () => {
+    const overflows = introScreen.scrollHeight > introScreen.clientHeight + 2;
+    const atBottom =
+      introScreen.scrollTop + introScreen.clientHeight >=
+      introScreen.scrollHeight - 4;
+    introScreen.classList.toggle("has-overflow", overflows);
+    introScreen.classList.toggle("at-bottom", atBottom && overflows);
+  };
+  introScreen.addEventListener("scroll", syncIntroScroll, { passive: true });
+  window.addEventListener("resize", syncIntroScroll);
+  syncIntroScroll();
+
   // Fetch and display version from manifest.json
   fetch("manifest.json")
     .then((res) => res.json())
@@ -228,17 +280,51 @@ document.addEventListener("DOMContentLoaded", async () => {
   const solutionDisplay = document.getElementById("solution-display");
   const closeSolutionBtn = document.getElementById("btn-solution-close");
 
-  // Check for solution in hash
-  const checkSolutionHash = () => {
+  // Check for solution / play hash
+  const checkSolutionHash = async () => {
     const hash = window.location.hash;
-    if (hash.startsWith("#solution:")) {
-      const solutionData = hash.substring(10); // Remove "#solution:"
+
+    if (hash.startsWith("#play:")) {
+      // Format: #play:CODE-items-rooms-roles
+      const data = hash.substring(6);
+      const parts = data.split("-");
+      history.replaceState(null, null, window.location.pathname);
+
+      if (parts.length === 4) {
+        const [seedCode, items, locations, roles] = parts;
+        const seed = codeToSeed(seedCode);
+
+        solutionDisplay.innerHTML = `
+          <div style="margin-bottom: 0.75rem; font-family: var(--font-mono); font-size: 0.875rem; color: var(--text-muted);">
+            Game code: <strong style="color: var(--accent); letter-spacing: 0.05em;">${seedCode}</strong>
+          </div>
+          <div style="margin-bottom: 0.75rem;">
+            <strong style="color: var(--accent);">Items:</strong> ${items.split("").join(" ")}
+          </div>
+          <div style="margin-bottom: 0.75rem;">
+            <strong style="color: var(--accent);">Locations:</strong> ${locations.split("").join(" ")}
+          </div>
+          <div>
+            <strong style="color: var(--accent);">Roles:</strong> ${roles.split("").join(" ")}
+          </div>
+        `;
+        solutionModal.classList.remove("hidden");
+
+        // Auto-start the game with this seed so the player can continue digitally
+        if (seed != null) {
+          await clearGame();
+          await beginInvestigation(false, seed);
+        }
+      }
+    } else if (hash.startsWith("#solution:")) {
+      // Legacy format: #solution:items-rooms-roles
+      const solutionData = hash.substring(10);
       const parts = solutionData.split("-");
+      history.replaceState(null, null, window.location.pathname);
 
       if (parts.length === 3) {
         const [items, locations, roles] = parts;
 
-        // Display solution nicely formatted
         solutionDisplay.innerHTML = `
           <div style="margin-bottom: 0.75rem;">
             <strong style="color: var(--accent);">Items:</strong> ${items.split("").join(" ")}
@@ -250,11 +336,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             <strong style="color: var(--accent);">Roles:</strong> ${roles.split("").join(" ")}
           </div>
         `;
-
         solutionModal.classList.remove("hidden");
-
-        // Clear hash after showing
-        history.replaceState(null, null, window.location.pathname);
       }
     }
   };
@@ -266,7 +348,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   // Check on load
-  checkSolutionHash();
+  await checkSolutionHash();
 
   // Check when hash changes
   window.addEventListener("hashchange", checkSolutionHash);

@@ -87,6 +87,7 @@
           </button>
         </div>
       </div>
+      <div class="intro-scroll-fade" aria-hidden="true"></div>
     </div>
 
     <!-- Main App UI -->
@@ -215,6 +216,14 @@
         <div class="debug-panel">
           <div class="debug-header">
             <div class="debug-title">System Log</div>
+            <div
+              id="debug-seed"
+              class="debug-seed"
+              contenteditable="true"
+              spellcheck="false"
+              inputmode="numeric"
+              title="Edit seed and press Enter to replay"
+            ></div>
             <button onclick="toggleDebug()" class="debug-close">
               <i class="ph-light ph-x"></i>
             </button>

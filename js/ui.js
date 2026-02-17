@@ -2,6 +2,7 @@ import { state, updateState } from "./game-state.js";
 import { ROLES_DEF } from "./constants.js";
 import { saveGame } from "./persistence.js";
 import { haptic } from "./haptic.js";
+import { seedToCode } from "./rng.js";
 
 export function getCaseSize() {
   // Return the stored sizing word for this case
@@ -41,7 +42,13 @@ export function addLog(m) {
 
 export function toggleDebug() {
   haptic();
-  document.getElementById("debug-overlay").classList.toggle("hidden");
+  const overlay = document.getElementById("debug-overlay");
+  overlay.classList.toggle("hidden");
+  if (!overlay.classList.contains("hidden")) {
+    const seedEl = document.getElementById("debug-seed");
+    if (seedEl)
+      seedEl.textContent = state.seed != null ? seedToCode(state.seed) : "—";
+  }
 }
 
 export function renderLocations() {
@@ -466,6 +473,7 @@ export function hasUserProgress() {
 
 // Generate printable logic puzzle grids
 export function generatePrintablePage(qrNormalDataURL, qrCompactDataURL) {
+  const gameCode = state.seed != null ? seedToCode(state.seed) : "";
   const suspects = state.gameMapping.suspects;
   const items = state.gameMapping.items.map((i) =>
     typeof i === "string" ? i : i.name,
@@ -1183,7 +1191,8 @@ export function generatePrintablePage(qrNormalDataURL, qrCompactDataURL) {
       <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 0.25rem;">
         <h3 style="font-size: 9pt; font-weight: bold; margin: 0;">Solution</h3>
         <img src="${qrCompactDataURL}" style="border: 2px solid #ccc; padding: 0.25rem; background: white; max-width: 120px; height: auto;" alt="Solution QR Code" />
-        <p style="font-size: 6pt; color: #666; text-align: center; line-height: 1.2;">Scan to verify</p>
+        <p style="font-size: 6pt; color: #666; text-align: center; line-height: 1.2;">Scan to play &amp; verify</p>
+        ${gameCode ? `<p style="font-size: 7pt; font-family: monospace; letter-spacing: 0.05em;">${gameCode}</p>` : ""}
       </div>
     </div>
   </div>
@@ -1256,7 +1265,8 @@ export function generatePrintablePage(qrNormalDataURL, qrCompactDataURL) {
   <div style="text-align: center; margin: 2rem 0 1rem 0; page-break-inside: avoid;">
     <h3 style="font-size: 11pt; font-weight: bold; margin-bottom: 0.5rem;">Solution</h3>
     <img src="${qrNormalDataURL}" style="border: 2px solid #ccc; padding: 0.5rem; background: white; max-width: 150px; height: auto;" alt="Solution QR Code" />
-    <p style="font-size: 8pt; color: #666; margin-top: 0.5rem;">Scan to verify solution</p>
+    <p style="font-size: 8pt; color: #666; margin-top: 0.5rem;">Scan to play &amp; verify solution</p>
+    ${gameCode ? `<p style="font-size: 9pt; font-family: monospace; letter-spacing: 0.1em; margin-top: 0.25rem;">Game code: <strong>${gameCode}</strong></p>` : ""}
   </div>
 
   <script>
@@ -1302,8 +1312,9 @@ export function openPrintMode() {
       }
     });
 
-    // Return as URL with solution in hash (iOS recognizes URLs as actionable)
-    return `https://mostlymaths.net/murder-it-wrote/#solution:${items.join("")}-${rooms.join("")}-${roleIndices.join("")}`;
+    // Return as URL with seed + solution in hash (iOS recognizes URLs as actionable)
+    const code = state.seed != null ? seedToCode(state.seed) : "aaaaaa";
+    return `https://mostlymaths.net/murder-it-wrote/#play:${code}-${items.join("")}-${rooms.join("")}-${roleIndices.join("")}`;
   };
 
   const solutionCode = encodeSolution();

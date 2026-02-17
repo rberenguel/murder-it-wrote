@@ -1,11 +1,13 @@
 import { SCENARIOS } from "./constants.js";
+import { random } from "./rng.js";
 
 export function pickRandomScenario() {
-  return SCENARIOS[Math.floor(Math.random() * SCENARIOS.length)];
+  return SCENARIOS[Math.floor(random() * SCENARIOS.length)];
 }
 
 export let state = {
-  activeScenario: pickRandomScenario(),
+  activeScenario: null,
+  seed: null,
   gameMapping: null,
   puzzle: [],
   solution: null,

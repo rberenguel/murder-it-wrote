@@ -47,6 +47,7 @@ export async function saveGame() {
     scenarioName: state.scenarioName,
     userGuesses: state.userGuesses,
     dimmedClues: Array.from(state.dimmedClues), // Convert Set to Array for storage
+    seed: state.seed,
   };
 
   await set(STORAGE_KEY, saveData);

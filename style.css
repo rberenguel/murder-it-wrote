@@ -1082,6 +1082,21 @@ body {
   color: #5d4037;
   border-bottom: 1px solid rgba(93, 64, 55, 0.3);
 }
+
+[data-theme="classic_manor"] .entity-person {
+  font-variant: small-caps;
+  color: #8b0000;
+  letter-spacing: 0.04em;
+}
+[data-theme="classic_manor"] .entity-item {
+  font-style: italic;
+  color: #daa520;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.4);
+}
+[data-theme="classic_manor"] .entity-room {
+  font-weight: 600;
+  border-bottom: 1px solid rgba(139, 0, 0, 0.25);
+}
 [data-theme="medieval"] .entity-item {
   color: #5d4037;
   font-style: italic;
@@ -1246,6 +1261,23 @@ body {
   font-family: var(--font-mono);
   font-size: 0.875rem;
 }
+.debug-seed {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  cursor: text;
+  outline: none;
+  border-bottom: 1px dashed transparent;
+  transition: border-color 0.15s;
+}
+.debug-seed::before {
+  content: "seed: ";
+  user-select: none;
+}
+.debug-seed:hover,
+.debug-seed:focus {
+  border-bottom-color: var(--text-muted);
+}
 .debug-close {
   color: var(--text-muted);
   background: none;
@@ -1408,10 +1440,13 @@ body {
   background-color: #000000;
   z-index: 1000;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  /* no justify-content: center — margin: auto on child handles it */
+  overflow-y: auto;
   color: #ffffff;
-  padding: 2rem;
+  /* no padding-bottom: the fade element provides bottom clearance */
+  padding: 2rem 2rem 0;
 }
 
 .intro-content {
@@ -1421,6 +1456,31 @@ body {
   flex-direction: column;
   align-items: center;
   text-align: center;
+  /* centers vertically when content fits; pushes to top when it overflows */
+  margin: auto 0;
+  padding-bottom: 2rem;
+}
+
+/* Scroll-hint gradient — shown only when .has-overflow and not .at-bottom */
+.intro-scroll-fade {
+  position: sticky;
+  bottom: 0;
+  align-self: stretch;
+  flex-shrink: 0;
+  height: 5rem;
+  margin-top: -5rem; /* overlap the content above */
+  background: linear-gradient(to bottom, transparent, #000000);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.intro-screen.has-overflow .intro-scroll-fade {
+  opacity: 1;
+}
+
+.intro-screen.at-bottom .intro-scroll-fade {
+  opacity: 0;
 }
 
 .intro-title {

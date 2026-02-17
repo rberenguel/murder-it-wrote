@@ -59,15 +59,21 @@ This process—called **Essentiality Pruning**—ensures that every single clue 
 - **Polished UI**: Hopefully. Theme-aware styling, scrollbars, and typography. It might need more work on mobile or to keep the style consistent though.
 - **Printable Mode**: Generate a printable logic puzzle with a viking map fold layout, perfect for solving on paper. Includes a QR code with the encoded solution for verification.
 
+### Seeded Generation & Game Codes
+
+Every case is generated from a 32-bit seed, encoded as a 6-character alphanumeric **game code** (e.g. `aBcDeF`). The code is shown in the debug panel (π button) and can be edited: type any valid code and press Enter to replay that exact case.
+
+The printable version includes a QR code that encodes both the seed and the solution in a `#play:CODE-…` URL. Scanning it on a phone opens the same case digitally — the solution modal appears on top so you can verify your paper answers, and dismissing it drops you straight into the live game.
+
 ### Solution Encoding
 
-The printable version includes a QR code containing the solution. The solution is encoded as a compact number string where each suspect (in order) is represented by three digits:
+The solution embedded in the QR / URL is a compact digit string where each suspect (in order) contributes three digits:
 
 - **First digit**: Item index (which item they have)
 - **Second digit**: Room index (which room they're in)
 - **Third digit**: Role index (their role in the case)
 
-For example, if there are 5 suspects, the solution might be encoded as: `321142534201430` (5 suspects × 3 digits each = 15 digits). This makes the solution verifiable but not immediately obvious when glancing at the QR code.
+For example, 5 suspects → `321142534201430` (15 digits). Not immediately readable at a glance, which is intentional.
 
 ## Credits / references
 

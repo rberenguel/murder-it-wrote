@@ -7,6 +7,7 @@ import {
 import { LogicEngine } from "./logic-engine.js";
 import { state, updateState } from "./game-state.js";
 import { haptic } from "./haptic.js";
+import { random, shuffle } from "./rng.js";
 
 const FACT_TYPES = {
   SUSPECT_LOCATION: "SUSPECT_LOCATION",
@@ -64,23 +65,16 @@ function findSuspectByRelationshipTerm(mapping, term) {
 
 export function generateTruth(numSuspects) {
   const activeRoles = ["Killer", "Victim"];
-  if (activeRoles.length < numSuspects && Math.random() > 0.6)
+  if (activeRoles.length < numSuspects && random() > 0.6)
     activeRoles.push("Witness");
-  if (activeRoles.length < numSuspects && Math.random() > 0.7)
+  if (activeRoles.length < numSuspects && random() > 0.7)
     activeRoles.push("Accomplice");
   while (activeRoles.length < numSuspects) activeRoles.push("Innocent");
 
-  const shuffle = (a) => {
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-  };
   const sRoles = shuffle([...activeRoles]);
   const sItems = shuffle([...Array(numSuspects).keys()]);
   const sRooms = Array.from({ length: numSuspects }, () =>
-    Math.floor(Math.random() * numSuspects),
+    Math.floor(random() * numSuspects),
   );
 
   // Force Witness and Accomplice to be in the same room as the Victim (murder room)
@@ -217,7 +211,7 @@ function generateProximityFacts(truth, roles, mapping) {
 
   // Generate scream fact if there are listeners (100% chance for testing)
   if (listeners.length > 0) {
-    const listener = listeners[Math.floor(Math.random() * listeners.length)];
+    const listener = listeners[Math.floor(random() * listeners.length)];
     console.log(
       `✓ SCREAM FACT GENERATED: ${mapping.suspects[listener.id]} in ${mapping.rooms[truth[listener.id].roomId]?.name} heard scream from ${victimRoom.name}`,
     );
@@ -248,7 +242,7 @@ function generateRelationshipFacts(truth, roles, mapping) {
     if (relationship.optional) {
       const probability = relationship.probability || 0.5;
       // Roll the dice - skip this relationship if we don't meet the probability
-      if (Math.random() > probability) {
+      if (random() > probability) {
         return; // Skip this optional relationship
       }
     }
@@ -361,9 +355,10 @@ function generateBloodFacts(truth, roles, mapping) {
 
   // Generate 1-2 blood facts for random spillable features in the corpse's room
   const numBloodFacts = Math.min(2, spillableFeatures.length);
-  const selectedFeatures = [...spillableFeatures]
-    .sort(() => Math.random() - 0.5)
-    .slice(0, numBloodFacts);
+  const selectedFeatures = shuffle([...spillableFeatures]).slice(
+    0,
+    numBloodFacts,
+  );
 
   selectedFeatures.forEach((feature) => {
     facts.push({
@@ -486,19 +481,19 @@ function renderFact(fact, mapping, roles) {
 
       if (!rObj) {
         console.error(`Invalid roomId ${fact.roomId} in fact:`, fact);
-        text = `${name} was found in an unknown location.`;
+        text = `${name} was found in an unknown location`;
         fn = () => true;
         break;
       }
 
       const feats = mapping.features[rObj.name] || [];
 
-      if (feats.length > 0 && Math.random() > 0.5) {
-        const feat = feats[Math.floor(Math.random() * feats.length)];
-        text = `${name} was close to the ${feat.name}.`;
+      if (feats.length > 0 && random() > 0.5) {
+        const feat = feats[Math.floor(random() * feats.length)];
+        text = `${name} was close to the ${feat.name}`;
       } else {
         const rText = fmtRoom(fact.roomId);
-        text = `${name} was in ${rText}.`;
+        text = `${name} was in ${rText}`;
       }
 
       fn = (a) => checkVal(a, fact.suspectId, "Room", fact.roomId);
@@ -510,7 +505,7 @@ function renderFact(fact, mapping, roles) {
     case FACT_TYPES.SUSPECT_ITEM: {
       const name = fmt("suspects", fact.suspectId);
       const item = fmtItem(fact.itemId);
-      text = `${name} had ${item}.`;
+      text = `${name} had ${item}`;
       fn = (a) => checkVal(a, fact.suspectId, "Item", fact.itemId);
       masks = [
         { varIdx: numSuspects + fact.suspectId, mask: 1 << fact.itemId },
@@ -521,7 +516,7 @@ function renderFact(fact, mapping, roles) {
       const name = fmt("suspects", fact.suspectId);
       const rText = fmtRoom(fact.roomId);
       const item = fmtItem(fact.itemId);
-      text = `${name} was in ${rText} with ${item}.`;
+      text = `${name} was in ${rText} with ${item}`;
       fn = (a) =>
         checkVal(a, fact.suspectId, "Room", fact.roomId) &&
         checkVal(a, fact.suspectId, "Item", fact.itemId);
@@ -542,7 +537,7 @@ function renderFact(fact, mapping, roles) {
         fact.role === "Innocent"
           ? "innocent"
           : `the ${wrapRole(fact.role.toLowerCase())}`;
-      text = `${name} is ${rText}.`;
+      text = `${name} is ${rText}`;
       fn = (a) => checkVal(a, fact.suspectId, "Role", fact.role);
       masks = [{ varIdx: fact.suspectId, mask: roleMask }];
       break;
@@ -554,7 +549,7 @@ function renderFact(fact, mapping, roles) {
         .filter((i) => i !== -1);
       let badMask = 0;
       badIndices.forEach((i) => (badMask |= 1 << i));
-      text = `${name} is not the ${wrapRole(fact.role.toLowerCase())}.`;
+      text = `${name} is not the ${wrapRole(fact.role.toLowerCase())}`;
       fn = (a) => getVal(a, fact.suspectId, "Role") !== fact.role;
       masks = [{ varIdx: fact.suspectId, mask: ~badMask }];
       break;
@@ -562,7 +557,7 @@ function renderFact(fact, mapping, roles) {
     case FACT_TYPES.ROOM_ITEM: {
       const rText = fmtRoom(fact.roomId);
       const item = fmtItem(fact.itemId);
-      text = `The person in ${rText} had ${item}.`;
+      text = `The person in ${rText} had ${item}`;
       fn = (a) => {
         const occupants = Array.from({ length: numSuspects }, (_, i) => i);
         const r = occupants.filter((i) => getVal(a, i, "Room") === fact.roomId);
@@ -581,20 +576,20 @@ function renderFact(fact, mapping, roles) {
           `Invalid roomId ${fact.roomId} in ROOM_EMPTY fact:`,
           fact,
         );
-        text = `An unknown location was empty.`;
+        text = `An unknown location was empty`;
         fn = () => true;
         break;
       }
 
-      if (Math.random() > 0.5) {
+      if (random() > 0.5) {
         // "The Kitchen was empty."
-        text = `${rText.charAt(0).toUpperCase() + rText.slice(1)} was empty.`;
+        text = `${rText.charAt(0).toUpperCase() + rText.slice(1)} was empty`;
       } else {
         // "There was nobody at the Kitchen" or "There was nobody at Kitchen"
         const name = rObj.isProper ? rObj.name : rObj.name.toLowerCase();
         const rName = `<span class="entity-room">${name}</span>`;
         const atLocation = rObj.noArticle ? rName : `the ${rName}`;
-        text = `There was nobody at ${atLocation}.`;
+        text = `There was nobody at ${atLocation}`;
       }
 
       fn = (a) => {
@@ -611,7 +606,7 @@ function renderFact(fact, mapping, roles) {
     case FACT_TYPES.ITEM_NOT_MURDER_WEAPON: {
       const item = fmtItem(fact.itemId);
       const capItem = item.charAt(0).toUpperCase() + item.slice(1);
-      text = `${capItem} was not the murder weapon.`;
+      text = `${capItem} was not the murder weapon`;
       fn = (a) => {
         const owner = Array.from({ length: numSuspects }, (_, i) => i).find(
           (pid) => checkVal(a, pid, "Item", fact.itemId),
@@ -622,7 +617,7 @@ function renderFact(fact, mapping, roles) {
     }
     case FACT_TYPES.ROOM_NOT_CORPSE: {
       const rText = fmtRoom(fact.roomId);
-      text = `There is no corpse in ${rText}.`;
+      text = `There is no corpse in ${rText}`;
       fn = (a) => {
         const occupants = Array.from({ length: numSuspects }, (_, i) => i);
         const suspectsInRoom = occupants.filter((pid) =>
@@ -636,7 +631,7 @@ function renderFact(fact, mapping, roles) {
     }
     case FACT_TYPES.ROLE_EXCLUSION: {
       const name = fmt("suspects", fact.suspectId);
-      text = `${name} is neither the ${wrapRole("killer")} nor the ${wrapRole("victim")} nor the ${wrapRole("accomplice")}.`;
+      text = `${name} is neither the ${wrapRole("killer")} nor the ${wrapRole("victim")} nor the ${wrapRole("accomplice")}`;
       fn = (a) =>
         getVal(a, fact.suspectId, "Role") !== "Killer" &&
         getVal(a, fact.suspectId, "Role") !== "Victim" &&
@@ -659,7 +654,7 @@ function renderFact(fact, mapping, roles) {
     }
     case FACT_TYPES.SCREAM_HEARD: {
       const name = fmt("suspects", fact.suspectId);
-      text = `${name} heard a scream coming from somewhere nearby.`;
+      text = `${name} heard a scream coming from somewhere nearby`;
 
       // No masks - this is a relational constraint between listener and victim
       masks = [];
@@ -699,10 +694,10 @@ function renderFact(fact, mapping, roles) {
       const rText = fmtRoom(fact.roomId);
       const term = `<span class="entity-person">${fact.relationshipTerm}</span>`;
 
-      if (Math.random() > 0.5) {
-        text = `The ${term} was in ${rText}.`;
+      if (random() > 0.5) {
+        text = `The ${term} was in ${rText}`;
       } else {
-        text = `The ${fact.relationshipType} person was in ${rText}.`;
+        text = `The ${fact.relationshipType} person was in ${rText}`;
       }
 
       // CSP constraint: Find which suspect has this term, check their room
@@ -725,10 +720,10 @@ function renderFact(fact, mapping, roles) {
       const item = fmtItem(fact.itemId);
       const term = `<span class="entity-person">${fact.relationshipTerm}</span>`;
 
-      if (Math.random() > 0.5) {
-        text = `The ${term} had ${item}.`;
+      if (random() > 0.5) {
+        text = `The ${term} had ${item}`;
       } else {
-        text = `The ${fact.relationshipType} person had ${item}.`;
+        text = `The ${fact.relationshipType} person had ${item}`;
       }
 
       // CSP constraint: Find which suspect has this term, check their item
@@ -750,10 +745,10 @@ function renderFact(fact, mapping, roles) {
 
       // We can't reveal the name - that would defeat the purpose
       // Instead, use this as an identifier constraint
-      if (Math.random() > 0.5) {
-        text = `Someone in the investigation is the ${term}.`;
+      if (random() > 0.5) {
+        text = `Someone in the investigation is the ${term}`;
       } else {
-        text = `One suspect is ${fact.relationshipType}.`;
+        text = `One suspect is ${fact.relationshipType}`;
       }
 
       // This is an existence claim - always true if we generated it
@@ -766,7 +761,7 @@ function renderFact(fact, mapping, roles) {
       const rText = fmtRoom(fact.roomId);
       const feature = fact.featureName;
 
-      text = `There was blood spilled on the ${feature} in ${rText}.`;
+      text = `There was blood spilled on the ${feature} in ${rText}`;
 
       // No masks - this is a relational constraint between weapon and victim's room
       masks = [];
@@ -953,17 +948,10 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
     s.items.length,
   );
   const numSuspects =
-    Math.floor(Math.random() * (Math.min(maxAvailable, 7) - 3 + 1)) + 3;
+    Math.floor(random() * (Math.min(maxAvailable, 7) - 3 + 1)) + 3;
 
   addLog(`Generating Universe (${numSuspects} suspects)...`);
 
-  const shuffle = (a) => {
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-  };
   const getSubset = (arr, count) => shuffle([...arr]).slice(0, count);
 
   const gameMapping = {
@@ -977,7 +965,7 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
   gameMapping.features = {};
   gameMapping.rooms.forEach((room) => {
     const allFeats = s.roomFeatures[room.name] || [];
-    const count = Math.floor(Math.random() * 2) + 2; // Pick 2 or 3 features
+    const count = Math.floor(random() * 2) + 2; // Pick 2 or 3 features
     gameMapping.features[room.name] = shuffle([...allFeats]).slice(0, count);
   });
 
@@ -1122,7 +1110,7 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
       // Probabilistic protection for special fact types
       if (!essential) {
         const protectionChance = PROTECTED_FACT_TYPES[fact.type];
-        if (protectionChance && Math.random() < protectionChance) {
+        if (protectionChance && random() < protectionChance) {
           essential = true; // Protected! Keep this fact
         }
       }
@@ -1143,21 +1131,21 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
 
   // Pick a random mystery word for this case
   const mysteryWord =
-    MYSTERY_WORDS[Math.floor(Math.random() * MYSTERY_WORDS.length)];
+    MYSTERY_WORDS[Math.floor(random() * MYSTERY_WORDS.length)];
 
   // Pick a random difficulty icon for this case
   const difficultyIcon =
-    DIFFICULTY_ICONS[Math.floor(Math.random() * DIFFICULTY_ICONS.length)];
+    DIFFICULTY_ICONS[Math.floor(random() * DIFFICULTY_ICONS.length)];
 
   // Pick a random sizing word based on number of suspects
   const sizingKey = numSuspects <= 3 ? 3 : numSuspects >= 7 ? 7 : numSuspects;
   const sizingPool = SIZING_WORDS[sizingKey];
-  const sizingWord = sizingPool[Math.floor(Math.random() * sizingPool.length)];
+  const sizingWord = sizingPool[Math.floor(random() * sizingPool.length)];
 
   // Pick a random scenario name (or use original if no alternates)
   const alternates = s.alternateNames || [];
   const namePool = alternates.length > 0 ? [s.name, ...alternates] : [s.name];
-  const scenarioName = namePool[Math.floor(Math.random() * namePool.length)];
+  const scenarioName = namePool[Math.floor(random() * namePool.length)];
 
   updateState({
     gameMapping,
