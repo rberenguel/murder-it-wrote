@@ -145,7 +145,7 @@ export function renderUI() {
   }
   const cc = document.getElementById("clues-container");
   const roleCounts = state.solution.roles.reduce((a, r) => {
-    if (!["Killer", "Victim", "Accomplice"].includes(r)) a[r] = (a[r] || 0) + 1;
+    if (!["Killer", "Victim"].includes(r)) a[r] = (a[r] || 0) + 1;
     return a;
   }, {});
 

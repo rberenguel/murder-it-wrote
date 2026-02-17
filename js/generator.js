@@ -64,8 +64,10 @@ function findSuspectByRelationshipTerm(mapping, term) {
 
 export function generateTruth(numSuspects) {
   const activeRoles = ["Killer", "Victim"];
-  if (Math.random() > 0.6) activeRoles.push("Witness");
-  if (Math.random() > 0.7) activeRoles.push("Accomplice");
+  if (activeRoles.length < numSuspects && Math.random() > 0.6)
+    activeRoles.push("Witness");
+  if (activeRoles.length < numSuspects && Math.random() > 0.7)
+    activeRoles.push("Accomplice");
   while (activeRoles.length < numSuspects) activeRoles.push("Innocent");
 
   const shuffle = (a) => {
