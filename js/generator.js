@@ -425,7 +425,7 @@ function mergeFacts(facts) {
   return merged;
 }
 
-function renderFact(fact, mapping, roles) {
+export function renderFact(fact, mapping, roles) {
   const numSuspects = mapping.suspects.length;
 
   // Generate stable ID based on fact properties
@@ -694,11 +694,7 @@ function renderFact(fact, mapping, roles) {
       const rText = fmtRoom(fact.roomId);
       const term = `<span class="entity-person">${fact.relationshipTerm}</span>`;
 
-      if (random() > 0.5) {
-        text = `The ${term} was in ${rText}`;
-      } else {
-        text = `The ${fact.relationshipType} person was in ${rText}`;
-      }
+      text = `The ${term} was in ${rText}`;
 
       // CSP constraint: Find which suspect has this term, check their room
       fn = (a) => {
@@ -720,11 +716,7 @@ function renderFact(fact, mapping, roles) {
       const item = fmtItem(fact.itemId);
       const term = `<span class="entity-person">${fact.relationshipTerm}</span>`;
 
-      if (random() > 0.5) {
-        text = `The ${term} had ${item}`;
-      } else {
-        text = `The ${fact.relationshipType} person had ${item}`;
-      }
+      text = `The ${term} had ${item}`;
 
       // CSP constraint: Find which suspect has this term, check their item
       fn = (a) => {
@@ -745,11 +737,7 @@ function renderFact(fact, mapping, roles) {
 
       // We can't reveal the name - that would defeat the purpose
       // Instead, use this as an identifier constraint
-      if (random() > 0.5) {
-        text = `Someone in the investigation is the ${term}`;
-      } else {
-        text = `One suspect is ${fact.relationshipType}`;
-      }
+      text = `Someone in the investigation is the ${term}`;
 
       // This is an existence claim - always true if we generated it
       fn = () => true;
