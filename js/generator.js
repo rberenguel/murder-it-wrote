@@ -1061,6 +1061,8 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
     return;
   }
 
+  await new Promise((r) => setTimeout(r, 0));
+
   let keptFacts = [...allFacts];
   for (let i = keptFacts.length - 1; i >= 0; i--) {
     // Check if user requested abort
@@ -1079,7 +1081,7 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
       if (masks) masks.forEach((m) => engine.restrict(m.varIdx, m.mask));
     });
 
-    if (i % 10 === 0) await new Promise((r) => setTimeout(r, 0));
+    if (i % 3 === 0) await new Promise((r) => setTimeout(r, 0));
 
     if (engine.solve(2).length === 1) {
       // Check if essential (covers a term not covered by others)
@@ -1120,6 +1122,7 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
   }
 
   // Post-Pruning Merge and Render
+  await new Promise((r) => setTimeout(r, 0));
   const finalFacts = mergeFacts(keptFacts);
   const finalClues = finalFacts.map((f) => renderFact(f, gameMapping, roles));
 

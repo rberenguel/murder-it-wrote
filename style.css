@@ -1210,7 +1210,7 @@ body {
 #debug-overlay {
   position: fixed;
   inset: 0;
-  z-index: 50;
+  z-index: 20001;
   display: flex;
   flex-direction: column;
   background-color: rgba(0, 0, 0, 0.5);
@@ -1338,6 +1338,28 @@ body {
 /* Utilities */
 .hidden {
   display: none !important;
+}
+
+/* Sound toggle — always-visible, upper right, contrast via mix-blend-mode */
+.sound-toggle {
+  mix-blend-mode: difference;
+  position: fixed;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 20000;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  border: none;
+  background-color: transparent;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  transition: opacity 0.2s;
+  padding: 0;
 }
 
 /* Intro Screen */
@@ -1844,6 +1866,14 @@ body {
 [data-theme="stellar_voyage"] #notebook-tab * {
   color: #000;
 }
+[data-theme="stellar_voyage"] #btn-reveal-cancel *,
+[data-theme="stellar_voyage"] #btn-new-case-cancel * {
+  color: #ffffff;
+}
+[data-theme="stellar_voyage"] #btn-reveal-confirm *,
+[data-theme="stellar_voyage"] #btn-new-case-confirm * {
+  color: #000;
+}
 
 /* === CLASSIC MANOR === */
 [data-theme="classic_manor"] #btn-new-case * {
@@ -1865,6 +1895,14 @@ body {
   color: #000;
 }
 [data-theme="classic_manor"] #notebook-tab * {
+  color: #fff;
+}
+[data-theme="classic_manor"] #btn-reveal-cancel *,
+[data-theme="classic_manor"] #btn-new-case-cancel * {
+  color: #000;
+}
+[data-theme="classic_manor"] #btn-reveal-confirm *,
+[data-theme="classic_manor"] #btn-new-case-confirm * {
   color: #fff;
 }
 
@@ -1890,6 +1928,14 @@ body {
 [data-theme="medieval"] #notebook-tab * {
   color: #000000;
 }
+[data-theme="medieval"] #btn-reveal-cancel *,
+[data-theme="medieval"] #btn-new-case-cancel * {
+  color: #000000;
+}
+[data-theme="medieval"] #btn-reveal-confirm *,
+[data-theme="medieval"] #btn-new-case-confirm * {
+  color: #000000;
+}
 
 /* === SHERLOCK === */
 [data-theme="sherlock"] #btn-new-case * {
@@ -1913,6 +1959,14 @@ body {
 [data-theme="sherlock"] #notebook-tab * {
   color: #fff;
 }
+[data-theme="sherlock"] #btn-reveal-cancel *,
+[data-theme="sherlock"] #btn-new-case-cancel * {
+  color: #000;
+}
+[data-theme="sherlock"] #btn-reveal-confirm *,
+[data-theme="sherlock"] #btn-new-case-confirm * {
+  color: #ffffff;
+}
 
 /* === GATSBY === */
 [data-theme="gatsby"] #btn-new-case * {
@@ -1934,6 +1988,14 @@ body {
   color: #000;
 }
 [data-theme="gatsby"] #notebook-tab * {
+  color: #000;
+}
+[data-theme="gatsby"] #btn-reveal-cancel *,
+[data-theme="gatsby"] #btn-new-case-cancel * {
+  color: #000;
+}
+[data-theme="gatsby"] #btn-reveal-confirm *,
+[data-theme="gatsby"] #btn-new-case-confirm * {
   color: #000;
 }
 
@@ -1959,6 +2021,14 @@ body {
 [data-theme="falcon"] #notebook-tab * {
   color: #000;
 }
+[data-theme="falcon"] #btn-reveal-cancel *,
+[data-theme="falcon"] #btn-new-case-cancel * {
+  color: #000;
+}
+[data-theme="falcon"] #btn-reveal-confirm *,
+[data-theme="falcon"] #btn-new-case-confirm * {
+  color: #000;
+}
 
 /* === CONTINENTAL EXPRESS === */
 [data-theme="continental_express"] #btn-new-case * {
@@ -1980,6 +2050,14 @@ body {
   color: #000;
 }
 [data-theme="continental_express"] #notebook-tab * {
+  color: #fff;
+}
+[data-theme="continental_express"] #btn-reveal-cancel *,
+[data-theme="continental_express"] #btn-new-case-cancel * {
+  color: #000;
+}
+[data-theme="continental_express"] #btn-reveal-confirm *,
+[data-theme="continental_express"] #btn-new-case-confirm * {
   color: #fff;
 }
 
@@ -2005,6 +2083,14 @@ body {
 [data-theme="edge_walker"] #notebook-tab * {
   color: #000;
 }
+[data-theme="edge_walker"] #btn-reveal-cancel *,
+[data-theme="edge_walker"] #btn-new-case-cancel * {
+  color: #fff;
+}
+[data-theme="edge_walker"] #btn-reveal-confirm *,
+[data-theme="edge_walker"] #btn-new-case-confirm * {
+  color: #000;
+}
 
 /* === RADIO SHRINK === */
 [data-theme="radio_shrink"] #btn-new-case * {
@@ -2026,6 +2112,14 @@ body {
   color: #000;
 }
 [data-theme="radio_shrink"] #notebook-tab * {
+  color: #000;
+}
+[data-theme="radio_shrink"] #btn-reveal-cancel *,
+[data-theme="radio_shrink"] #btn-new-case-cancel * {
+  color: #000;
+}
+[data-theme="radio_shrink"] #btn-reveal-confirm *,
+[data-theme="radio_shrink"] #btn-new-case-confirm * {
   color: #000;
 }
 
@@ -2051,6 +2145,14 @@ body {
 [data-theme="indigo_heir"] #notebook-tab * {
   color: #000;
 }
+[data-theme="indigo_heir"] #btn-reveal-cancel *,
+[data-theme="indigo_heir"] #btn-new-case-cancel * {
+  color: #000;
+}
+[data-theme="indigo_heir"] #btn-reveal-confirm *,
+[data-theme="indigo_heir"] #btn-new-case-confirm * {
+  color: #000;
+}
 
 /* === SHADOW PROTOCOL === */
 [data-theme="shadow_protocol"] #btn-new-case * {
@@ -2072,5 +2174,13 @@ body {
   color: #fff;
 }
 [data-theme="shadow_protocol"] #notebook-tab * {
+  color: #fff;
+}
+[data-theme="shadow_protocol"] #btn-reveal-cancel *,
+[data-theme="shadow_protocol"] #btn-new-case-cancel * {
+  color: #000;
+}
+[data-theme="shadow_protocol"] #btn-reveal-confirm *,
+[data-theme="shadow_protocol"] #btn-new-case-confirm * {
   color: #fff;
 }

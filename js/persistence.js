@@ -2,6 +2,7 @@ import { get, set } from "../lib/idb-keyval.js";
 import { state } from "./game-state.js";
 
 const STORAGE_KEY = "miw-game-state";
+const SOUND_KEY = "miw-sound-enabled";
 
 // Extract current clue order from DOM (CRITICAL)
 function extractClueOrder() {
@@ -78,4 +79,17 @@ export async function loadGame() {
 
 export async function clearGame() {
   await set(STORAGE_KEY, null);
+}
+
+export async function loadSoundPref() {
+  try {
+    const val = await get(SOUND_KEY);
+    return val === false ? false : true; // default to enabled
+  } catch {
+    return true;
+  }
+}
+
+export async function saveSoundPref(enabled) {
+  await set(SOUND_KEY, enabled);
 }

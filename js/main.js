@@ -17,25 +17,78 @@ import {
   getCaseSize,
   openPrintMode,
 } from "./ui.js";
-import { loadGame, clearGame } from "./persistence.js";
+import {
+  loadGame,
+  clearGame,
+  loadSoundPref,
+  saveSoundPref,
+} from "./persistence.js";
 import { haptic } from "./haptic.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   const uiCallbacks = { addLog, renderUI };
+
+  // Load sound preference before any audio can play.
+  let soundEnabled = await loadSoundPref();
+  window.setSoundEnabled?.(soundEnabled);
+  addLog(
+    `Sound: ${soundEnabled ? "enabled" : "disabled"} (from storage)`,
+    "system",
+  );
+
+  // Wire the sound toggle button.
+  const soundBtn = document.getElementById("btn-sound-toggle");
+  const updateSoundBtn = (enabled) => {
+    if (!soundBtn) return;
+    soundBtn.querySelector("i").className =
+      `ph-light ${enabled ? "ph-speaker-simple-high" : "ph-speaker-simple-slash"}`;
+    soundBtn.title = enabled ? "Mute sound effects" : "Enable sound effects";
+  };
+  updateSoundBtn(soundEnabled);
+  soundBtn?.addEventListener("click", async () => {
+    soundEnabled = !soundEnabled;
+    window.setSoundEnabled?.(soundEnabled);
+    updateSoundBtn(soundEnabled);
+    await saveSoundPref(soundEnabled);
+    addLog(`Sound: ${soundEnabled ? "enabled" : "disabled"}`, "system");
+  });
 
   // Check for saved game
   const savedGame = await loadGame();
 
   // --- Intro Flow ---
   const beginInvestigation = async (restore = false, presetSeed = null) => {
+    await window.startAudio?.();
+    const doorMs = (window.playDoor?.() ?? 0) * 1000; // random door creak
+
+    // Fade the intro content out over the door duration.
+    // The intro-screen's black background stays solid, so there's no flash.
+    const introContent = document.querySelector(".intro-content");
+    if (introContent && doorMs > 0) {
+      introContent.style.transition = `opacity ${doorMs / 1000}s ease-out`;
+      introContent.style.opacity = "0";
+      introContent.style.pointerEvents = "none";
+    }
+
+    // Wait for the door to finish — intro is now fully black.
+    if (doorMs > 0) await new Promise((r) => setTimeout(r, doorMs));
+
+    // Clean up and switch screens.
+    document.getElementById("intro-screen").classList.add("hidden");
+    if (introContent) {
+      introContent.style.transition = "";
+      introContent.style.opacity = "";
+      introContent.style.pointerEvents = "";
+    }
+    document.getElementById("app-container").classList.remove("hidden");
+
+    // Now show the loading overlay and start the typewriter.
     const overlay = document.getElementById("transition-overlay");
     if (overlay) {
       overlay.classList.remove("hidden");
       overlay.classList.add("active");
     }
-
-    document.getElementById("intro-screen").classList.add("hidden");
-    document.getElementById("app-container").classList.remove("hidden");
+    window.playTypewriter?.();
 
     if (restore && savedGame) {
       addLog("Restoring investigation...", "system");
@@ -48,6 +101,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       updateState({ seed: getSeed(), activeScenario: pickRandomScenario() });
       await handleNewCase(uiCallbacks);
     }
+
+    window.stopTypewriter?.();
+    window.sampler?.("ding", 1.5); // case ready — overlay is fading out
   };
 
   // Update intro screen based on saved game
@@ -150,7 +206,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     addLog("Generating new case...", "system");
     initRng();
     updateState({ seed: getSeed(), activeScenario: pickRandomScenario() });
-    handleNewCase(uiCallbacks);
+    window.playTypewriter?.();
+    await handleNewCase(uiCallbacks);
+    window.stopTypewriter?.();
+    window.sampler?.("ding", 1.5);
   };
 
   const performNewCaseWithSeed = async (seed) => {
@@ -188,6 +247,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (newCaseBtn) {
     newCaseBtn.addEventListener("click", () => {
       haptic();
+      window.sampler?.("ding", 1.5);
       // Check if user has made progress
       if (hasUserProgress()) {
         showNewCaseModal();
@@ -199,6 +259,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   document.getElementById("btn-verify")?.addEventListener("click", () => {
     haptic();
+    window.sampler?.("ding", 1.5);
     verifySolution();
   });
   document.getElementById("btn-print")?.addEventListener("click", () => {
@@ -207,6 +268,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
   document.getElementById("btn-reveal")?.addEventListener("click", () => {
     haptic();
+    window.sampler?.("derase", 1.0);
     revealSolution();
   });
   document
@@ -234,11 +296,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       haptic();
       closeNewCaseModal();
     });
-  document
-    .getElementById("btn-debug-pi")
-    ?.addEventListener("click", toggleDebug);
+  document.getElementById("btn-debug-pi")?.addEventListener("click", () => {
+    window.sampler?.("quack2", 1.0);
+    toggleDebug();
+  });
   document.getElementById("btn-exit")?.addEventListener("click", () => {
     haptic();
+    window.playDoor?.();
     // Return to intro screen
     document.getElementById("app-container").classList.add("hidden");
     document.getElementById("intro-screen").classList.remove("hidden");

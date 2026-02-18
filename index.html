@@ -169,7 +169,7 @@
             <button id="btn-reveal-cancel" class="btn btn-outline">
               <span>Cancel</span>
             </button>
-            <button id="btn-reveal-confirm" class="btn btn-dark">
+            <button id="btn-reveal-confirm" class="btn btn-primary">
               <span>Reveal</span>
             </button>
           </div>
@@ -262,13 +262,23 @@
           </p>
         </div>
         <div class="modal-footer">
-          <button id="btn-solution-close" class="btn btn-dark">
+          <button id="btn-solution-close" class="btn btn-primary">
             <span>Close</span>
           </button>
         </div>
       </div>
     </div>
 
+    <button
+      id="btn-sound-toggle"
+      class="sound-toggle"
+      title="Mute sound effects"
+    >
+      <i class="ph-light ph-speaker-simple-high"></i>
+    </button>
+
+    <script src="audio/Tone.js"></script>
+    <script src="js/sampler.js"></script>
     <script type="module" src="js/main.js"></script>
   </body>
 </html>

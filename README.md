@@ -107,3 +107,9 @@ Additional fonts in the fonts folder (not currently used):
 
 - **[idb-keyval](https://github.com/jakearchibald/idb-keyval)** - A super-simple promise-based keyval store by [Jake Archibald](https://github.com/jakearchibald) (Apache 2.0)
 - **[qrcodejs](https://github.com/davidshimjs/qrcodejs)** - QR code generator by [Sangmin, Shim](https://github.com/davidshimjs) (MIT)
+- **[Tone.js](https://tonejs.github.io/)** - A Web Audio framework for interactive music and sound in the browser, used here for the sampler-based sound effects (MIT)
+
+### Sound effects
+
+- All door effects by <a href="https://pixabay.com/users/dragon-studio-38165424/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=454242">DRAGON-STUDIO</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=454242">Pixabay</a>.
+- Keys, ding and quack from [daktilo](https://github.com/orhun/daktilo)
