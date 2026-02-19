@@ -1,5 +1,6 @@
 import {
   IDS,
+  KILL_VERB_GROUPS,
   MYSTERY_WORDS,
   DIFFICULTY_ICONS,
   SIZING_WORDS,
@@ -502,6 +503,8 @@ export function renderFact(fact, mapping, roles) {
           `${name} was in ${rText}`,
           `${name} was found in ${rText}`,
           `${name} was spotted in ${rText}`,
+          `${name} was reported to be in ${rText}`,
+          `${name} was known to be in ${rText}`,
         );
       }
 
@@ -533,6 +536,8 @@ export function renderFact(fact, mapping, roles) {
         `${name} was in ${rText} with ${item}`,
         `${name} was found in ${rText}, carrying ${item}`,
         `In ${rText}, ${name} had ${item}`,
+        `${name} was reported to be in ${rText} with ${item}`,
+        `${name} was known to be in ${rText}, carrying ${item}`,
       );
       fn = (a) =>
         checkVal(a, fact.suspectId, "Room", fact.roomId) &&
@@ -631,12 +636,16 @@ export function renderFact(fact, mapping, roles) {
       break;
     }
     case FACT_TYPES.ITEM_NOT_MURDER_WEAPON: {
+      const itemObj = mapping.items[fact.itemId];
       const item = fmtItem(fact.itemId);
       const capItem = item.charAt(0).toUpperCase() + item.slice(1);
+      const kvGroup = itemObj.killVerb ? KILL_VERB_GROUPS[itemObj.killVerb] : null;
+      const kv = kvGroup ? pick(...kvGroup) : "kill";
       text = pick(
         `${capItem} was not the murder weapon`,
         `${capItem} was ruled out as the murder weapon`,
         `The murder was not committed with ${item}`,
+        `${capItem} was not used to ${kv} the victim`,
       );
       fn = (a) => {
         const owner = Array.from({ length: numSuspects }, (_, i) => i).find(
