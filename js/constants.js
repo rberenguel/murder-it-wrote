@@ -46,29 +46,29 @@ export const SIZING_WORDS = {
 };
 
 // Kill-verb family keys — each string lives here exactly once.
-const kSTAB        = "STAB";
-const kSHOOT       = "SHOOT";
-const kBLUDGEON    = "BLUDGEON";
-const kSTRANGLE    = "STRANGLE";
-const kPOISON      = "POISON";
-const kSLASH       = "SLASH";
-const kBURN        = "BURN";
+const kSTAB = "STAB";
+const kSHOOT = "SHOOT";
+const kBLUDGEON = "BLUDGEON";
+const kSTRANGLE = "STRANGLE";
+const kPOISON = "POISON";
+const kSLASH = "SLASH";
+const kBURN = "BURN";
 const kELECTROCUTE = "ELECTROCUTE";
-const kINCAPACITATE= "INCAPACITATE";
-const kELIMINATE   = "ELIMINATE";
+const kINCAPACITATE = "INCAPACITATE";
+const kELIMINATE = "ELIMINATE";
 
 // Kill-verb synonym families. Items reference a key; render time picks one synonym.
 export const KILL_VERB_GROUPS = {
-  [kSTAB]:        ["stab", "impale", "pierce", "run through"],
-  [kSHOOT]:       ["shoot", "fire at", "blast", "gun down"],
-  [kBLUDGEON]:    ["bludgeon", "beat", "bash", "strike", "club"],
-  [kSTRANGLE]:    ["strangle", "choke", "suffocate"],
-  [kPOISON]:      ["poison", "drug", "inject"],
-  [kSLASH]:       ["slash", "cut", "slice", "hack"],
-  [kBURN]:        ["burn", "incinerate", "scorch"],
+  [kSTAB]: ["stab", "impale", "pierce", "run through"],
+  [kSHOOT]: ["shoot", "fire at", "blast", "gun down"],
+  [kBLUDGEON]: ["bludgeon", "beat", "bash", "strike", "club"],
+  [kSTRANGLE]: ["strangle", "choke", "suffocate"],
+  [kPOISON]: ["poison", "drug", "inject"],
+  [kSLASH]: ["slash", "cut", "slice", "hack"],
+  [kBURN]: ["burn", "incinerate", "scorch"],
   [kELECTROCUTE]: ["electrocute", "shock", "fry"],
-  [kINCAPACITATE]:["incapacitate", "disable", "neutralize"],
-  [kELIMINATE]:   ["eliminate", "dispatch", "kill"],
+  [kINCAPACITATE]: ["incapacitate", "disable", "neutralize"],
+  [kELIMINATE]: ["eliminate", "dispatch", "kill"],
 };
 
 export const SCENARIOS = [
@@ -199,16 +199,61 @@ export const SCENARIOS = [
     },
     items: [
       { name: "Pulse Pistol", isProper: false, bloody: true, killVerb: kSHOOT },
-      { name: "Crescent Blade", isProper: false, bloody: true, killVerb: kSLASH },
-      { name: "Plasma Cutter", isProper: false, bloody: true, killVerb: kSLASH },
-      { name: "Pressure Injector", isProper: false, bloody: false, killVerb: kPOISON },
-      { name: "Particle Beam", isProper: false, bloody: false, killVerb: kSHOOT },
-      { name: "Stun Baton", isProper: false, bloody: false, killVerb: kBLUDGEON },
-      { name: "Carved Idol", isProper: false, bloody: true, killVerb: kBLUDGEON },
-      { name: "Ancient Flute", isProper: false, bloody: true, killVerb: kBLUDGEON },
-      { name: "Self-sealing stem bolts", isProper: false, bloody: true, killVerb: kBLUDGEON },
+      {
+        name: "Crescent Blade",
+        isProper: false,
+        bloody: true,
+        killVerb: kSLASH,
+      },
+      {
+        name: "Plasma Cutter",
+        isProper: false,
+        bloody: true,
+        killVerb: kSLASH,
+      },
+      {
+        name: "Pressure Injector",
+        isProper: false,
+        bloody: false,
+        killVerb: kPOISON,
+      },
+      {
+        name: "Particle Beam",
+        isProper: false,
+        bloody: false,
+        killVerb: kSHOOT,
+      },
+      {
+        name: "Stun Baton",
+        isProper: false,
+        bloody: false,
+        killVerb: kBLUDGEON,
+      },
+      {
+        name: "Carved Idol",
+        isProper: false,
+        bloody: true,
+        killVerb: kBLUDGEON,
+      },
+      {
+        name: "Ancient Flute",
+        isProper: false,
+        bloody: true,
+        killVerb: kBLUDGEON,
+      },
+      {
+        name: "Self-sealing stem bolts",
+        isProper: false,
+        bloody: true,
+        killVerb: kBLUDGEON,
+      },
       { name: "Plasma Torch", isProper: false, bloody: false, killVerb: kBURN },
-      { name: "English Teapot", isProper: false, bloody: true, killVerb: kBLUDGEON },
+      {
+        name: "English Teapot",
+        isProper: false,
+        bloody: true,
+        killVerb: kBLUDGEON,
+      },
     ],
   },
   {
@@ -334,13 +379,23 @@ export const SCENARIOS = [
       // Attic isolated (accessed by stairs)
     },
     items: [
-      { name: "Candlestick", isProper: false, bloody: true, killVerb: kBLUDGEON },
+      {
+        name: "Candlestick",
+        isProper: false,
+        bloody: true,
+        killVerb: kBLUDGEON,
+      },
       { name: "Dagger", isProper: false, bloody: true, killVerb: kSTAB },
       { name: "Lead Pipe", isProper: false, bloody: true, killVerb: kBLUDGEON },
       { name: "Revolver", isProper: false, bloody: true, killVerb: kSHOOT },
       { name: "Rope", isProper: false, bloody: false, killVerb: kSTRANGLE },
       { name: "Wrench", isProper: false, bloody: true, killVerb: kBLUDGEON },
-      { name: "Poison Bottle", isProper: false, bloody: false, killVerb: kPOISON },
+      {
+        name: "Poison Bottle",
+        isProper: false,
+        bloody: false,
+        killVerb: kPOISON,
+      },
       { name: "Horseshoe", isProper: false, bloody: true, killVerb: kBLUDGEON },
       { name: "Trophy", isProper: false, bloody: true, killVerb: kBLUDGEON },
       { name: "Poker", isProper: false, bloody: true, killVerb: kBLUDGEON },
@@ -467,14 +522,34 @@ export const SCENARIOS = [
       { name: "Broadsword", isProper: false, bloody: true, killVerb: kSLASH },
       { name: "Chalice", isProper: false, bloody: true, killVerb: kBLUDGEON },
       { name: "Crossbow", isProper: false, bloody: true, killVerb: kSHOOT },
-      { name: "Poison Ring", isProper: false, bloody: false, killVerb: kPOISON },
+      {
+        name: "Poison Ring",
+        isProper: false,
+        bloody: false,
+        killVerb: kPOISON,
+      },
       { name: "Mace", isProper: false, bloody: true, killVerb: kBLUDGEON },
       { name: "Flail", isProper: false, bloody: true, killVerb: kBLUDGEON },
-      { name: "Morning Star", isProper: false, bloody: true, killVerb: kBLUDGEON },
-      { name: "Vial of Hemlock", isProper: false, bloody: false, killVerb: kPOISON },
+      {
+        name: "Morning Star",
+        isProper: false,
+        bloody: true,
+        killVerb: kBLUDGEON,
+      },
+      {
+        name: "Vial of Hemlock",
+        isProper: false,
+        bloody: false,
+        killVerb: kPOISON,
+      },
       { name: "Gauntlet", isProper: false, bloody: true, killVerb: kBLUDGEON },
       { name: "Dagger", isProper: false, bloody: true, killVerb: kSTAB },
-      { name: "War Hammer", isProper: false, bloody: true, killVerb: kBLUDGEON },
+      {
+        name: "War Hammer",
+        isProper: false,
+        bloody: true,
+        killVerb: kBLUDGEON,
+      },
     ],
   },
   {
@@ -589,14 +664,44 @@ export const SCENARIOS = [
     items: [
       { name: "Revolver", isProper: false, bloody: true, killVerb: kSHOOT },
       { name: "Syringe", isProper: false, bloody: false, killVerb: kPOISON },
-      { name: "Poison Vial", isProper: false, bloody: false, killVerb: kPOISON },
-      { name: "Walking Stick", isProper: false, bloody: true, killVerb: kBLUDGEON },
+      {
+        name: "Poison Vial",
+        isProper: false,
+        bloody: false,
+        killVerb: kPOISON,
+      },
+      {
+        name: "Walking Stick",
+        isProper: false,
+        bloody: true,
+        killVerb: kBLUDGEON,
+      },
       { name: "Cane Sword", isProper: false, bloody: true, killVerb: kSTAB },
-      { name: "Riding Crop", isProper: false, bloody: true, killVerb: kBLUDGEON },
+      {
+        name: "Riding Crop",
+        isProper: false,
+        bloody: true,
+        killVerb: kBLUDGEON,
+      },
       { name: "Letter Opener", isProper: false, bloody: true, killVerb: kSTAB },
-      { name: "Fireplace Poker", isProper: false, bloody: true, killVerb: kBLUDGEON },
-      { name: "Brass Knuckles", isProper: false, bloody: true, killVerb: kBLUDGEON },
-      { name: "Chloroform Cloth", isProper: false, bloody: false, killVerb: kSTRANGLE },
+      {
+        name: "Fireplace Poker",
+        isProper: false,
+        bloody: true,
+        killVerb: kBLUDGEON,
+      },
+      {
+        name: "Brass Knuckles",
+        isProper: false,
+        bloody: true,
+        killVerb: kBLUDGEON,
+      },
+      {
+        name: "Chloroform Cloth",
+        isProper: false,
+        bloody: false,
+        killVerb: kSTRANGLE,
+      },
       { name: "Dagger", isProper: false, bloody: true, killVerb: kSTAB },
     ],
     relationships: [
@@ -748,15 +853,55 @@ export const SCENARIOS = [
     },
     items: [
       { name: "Revolver", isProper: false, bloody: true, killVerb: kSHOOT },
-      { name: "Broken Champagne Bottle", isProper: false, bloody: true, killVerb: kSLASH },
-      { name: "Crystal Decanter", isProper: false, bloody: true, killVerb: kBLUDGEON },
-      { name: "Whiskey Decanter", isProper: false, bloody: true, killVerb: kBLUDGEON },
-      { name: "Automobile", isProper: false, bloody: true, killVerb: kELIMINATE },
-      { name: "Silk Scarf", isProper: false, bloody: false, killVerb: kSTRANGLE },
-      { name: "Straight Razor", isProper: false, bloody: true, killVerb: kSLASH },
+      {
+        name: "Broken Champagne Bottle",
+        isProper: false,
+        bloody: true,
+        killVerb: kSLASH,
+      },
+      {
+        name: "Crystal Decanter",
+        isProper: false,
+        bloody: true,
+        killVerb: kBLUDGEON,
+      },
+      {
+        name: "Whiskey Decanter",
+        isProper: false,
+        bloody: true,
+        killVerb: kBLUDGEON,
+      },
+      {
+        name: "Automobile",
+        isProper: false,
+        bloody: true,
+        killVerb: kELIMINATE,
+      },
+      {
+        name: "Silk Scarf",
+        isProper: false,
+        bloody: false,
+        killVerb: kSTRANGLE,
+      },
+      {
+        name: "Straight Razor",
+        isProper: false,
+        bloody: true,
+        killVerb: kSLASH,
+      },
       { name: "Letter Opener", isProper: false, bloody: true, killVerb: kSTAB },
-      { name: "Fireplace Poker", isProper: false, bloody: true, killVerb: kBLUDGEON },
-      { name: "Pearl Necklace", isProper: false, bloody: false, killVerb: kSTRANGLE },
+      {
+        name: "Fireplace Poker",
+        isProper: false,
+        bloody: true,
+        killVerb: kBLUDGEON,
+      },
+      {
+        name: "Pearl Necklace",
+        isProper: false,
+        bloody: false,
+        killVerb: kSTRANGLE,
+      },
       { name: "Golf Club", isProper: false, bloody: true, killVerb: kBLUDGEON },
     ],
     relationships: [
@@ -886,17 +1031,42 @@ export const SCENARIOS = [
       ],
     },
     items: [
-      { name: "Maltese Falcon Statue", isProper: true, bloody: true, killVerb: kBLUDGEON },
+      {
+        name: "Maltese Falcon Statue",
+        isProper: true,
+        bloody: true,
+        killVerb: kBLUDGEON,
+      },
       { name: "Revolver", isProper: false, bloody: true, killVerb: kSHOOT },
       { name: "Knife", isProper: false, bloody: true, killVerb: kSTAB },
-      { name: "Whiskey Bottle", isProper: false, bloody: true, killVerb: kBLUDGEON },
+      {
+        name: "Whiskey Bottle",
+        isProper: false,
+        bloody: true,
+        killVerb: kBLUDGEON,
+      },
       { name: "Lead Pipe", isProper: false, bloody: true, killVerb: kBLUDGEON },
       { name: "Switchblade", isProper: false, bloody: true, killVerb: kSTAB },
-      { name: "Brass Knuckles", isProper: false, bloody: true, killVerb: kBLUDGEON },
+      {
+        name: "Brass Knuckles",
+        isProper: false,
+        bloody: true,
+        killVerb: kBLUDGEON,
+      },
       { name: "Ice Pick", isProper: false, bloody: true, killVerb: kSTAB },
-      { name: "Garrote Wire", isProper: false, bloody: false, killVerb: kSTRANGLE },
+      {
+        name: "Garrote Wire",
+        isProper: false,
+        bloody: false,
+        killVerb: kSTRANGLE,
+      },
       { name: "Sap", isProper: false, bloody: true, killVerb: kBLUDGEON },
-      { name: "Poisoned Ring", isProper: false, bloody: false, killVerb: kPOISON },
+      {
+        name: "Poisoned Ring",
+        isProper: false,
+        bloody: false,
+        killVerb: kPOISON,
+      },
     ],
   },
   {
@@ -1028,16 +1198,46 @@ export const SCENARIOS = [
     },
     items: [
       { name: "Dagger", isProper: false, bloody: true, killVerb: kSTAB },
-      { name: "Vial of Laudanum", isProper: false, bloody: false, killVerb: kPOISON },
-      { name: "Garrote Wire", isProper: false, bloody: false, killVerb: kSTRANGLE },
+      {
+        name: "Vial of Laudanum",
+        isProper: false,
+        bloody: false,
+        killVerb: kPOISON,
+      },
+      {
+        name: "Garrote Wire",
+        isProper: false,
+        bloody: false,
+        killVerb: kSTRANGLE,
+      },
       { name: "Letter Opener", isProper: false, bloody: true, killVerb: kSTAB },
       { name: "Hatpin", isProper: false, bloody: true, killVerb: kSTAB },
       { name: "Scissors", isProper: false, bloody: true, killVerb: kSTAB },
       { name: "Ice Pick", isProper: false, bloody: true, killVerb: kSTAB },
-      { name: "Walking Cane", isProper: false, bloody: true, killVerb: kBLUDGEON },
-      { name: "Poison Ring", isProper: false, bloody: false, killVerb: kPOISON },
-      { name: "Heavy Pocket Watch", isProper: false, bloody: true, killVerb: kBLUDGEON },
-      { name: "Champagne Bottle", isProper: false, bloody: true, killVerb: kBLUDGEON },
+      {
+        name: "Walking Cane",
+        isProper: false,
+        bloody: true,
+        killVerb: kBLUDGEON,
+      },
+      {
+        name: "Poison Ring",
+        isProper: false,
+        bloody: false,
+        killVerb: kPOISON,
+      },
+      {
+        name: "Heavy Pocket Watch",
+        isProper: false,
+        bloody: true,
+        killVerb: kBLUDGEON,
+      },
+      {
+        name: "Champagne Bottle",
+        isProper: false,
+        bloody: true,
+        killVerb: kBLUDGEON,
+      },
     ],
     relationships: [
       {
@@ -1190,14 +1390,49 @@ export const SCENARIOS = [
       { name: "Blaster", isProper: false, bloody: true, killVerb: kSHOOT },
       { name: "Glass Shard", isProper: false, bloody: true, killVerb: kSLASH },
       { name: "Razor", isProper: false, bloody: true, killVerb: kSLASH },
-      { name: "Venom Injector", isProper: false, bloody: false, killVerb: kPOISON },
-      { name: "Electric Probe", isProper: false, bloody: false, killVerb: kELECTROCUTE },
-      { name: "Garrote Wire", isProper: false, bloody: false, killVerb: kSTRANGLE },
-      { name: "Shock Baton", isProper: false, bloody: false, killVerb: kELECTROCUTE },
+      {
+        name: "Venom Injector",
+        isProper: false,
+        bloody: false,
+        killVerb: kPOISON,
+      },
+      {
+        name: "Electric Probe",
+        isProper: false,
+        bloody: false,
+        killVerb: kELECTROCUTE,
+      },
+      {
+        name: "Garrote Wire",
+        isProper: false,
+        bloody: false,
+        killVerb: kSTRANGLE,
+      },
+      {
+        name: "Shock Baton",
+        isProper: false,
+        bloody: false,
+        killVerb: kELECTROCUTE,
+      },
       { name: "Knife", isProper: false, bloody: true, killVerb: kSTAB },
-      { name: "Metal Pipe", isProper: false, bloody: true, killVerb: kBLUDGEON },
-      { name: "Sharpened Metal Rod", isProper: false, bloody: true, killVerb: kSTAB },
-      { name: "Neural Disruptor", isProper: false, bloody: false, killVerb: kINCAPACITATE },
+      {
+        name: "Metal Pipe",
+        isProper: false,
+        bloody: true,
+        killVerb: kBLUDGEON,
+      },
+      {
+        name: "Sharpened Metal Rod",
+        isProper: false,
+        bloody: true,
+        killVerb: kSTAB,
+      },
+      {
+        name: "Neural Disruptor",
+        isProper: false,
+        bloody: false,
+        killVerb: kINCAPACITATE,
+      },
     ],
   },
   {
@@ -1310,17 +1545,62 @@ export const SCENARIOS = [
       ],
     },
     items: [
-      { name: "Wine Bottle", isProper: false, bloody: true, killVerb: kBLUDGEON },
-      { name: "Broadcasting Award", isProper: false, bloody: true, killVerb: kBLUDGEON },
-      { name: "Brass Poker", isProper: false, bloody: true, killVerb: kBLUDGEON },
-      { name: "Silver Slitter", isProper: false, bloody: true, killVerb: kSLASH },
+      {
+        name: "Wine Bottle",
+        isProper: false,
+        bloody: true,
+        killVerb: kBLUDGEON,
+      },
+      {
+        name: "Broadcasting Award",
+        isProper: false,
+        bloody: true,
+        killVerb: kBLUDGEON,
+      },
+      {
+        name: "Brass Poker",
+        isProper: false,
+        bloody: true,
+        killVerb: kBLUDGEON,
+      },
+      {
+        name: "Silver Slitter",
+        isProper: false,
+        bloody: true,
+        killVerb: kSLASH,
+      },
       { name: "Tailor Shears", isProper: false, bloody: true, killVerb: kSTAB },
-      { name: "Lug Wrench", isProper: false, bloody: true, killVerb: kBLUDGEON },
-      { name: "Sommelier Tool", isProper: false, bloody: true, killVerb: kSTAB },
+      {
+        name: "Lug Wrench",
+        isProper: false,
+        bloody: true,
+        killVerb: kBLUDGEON,
+      },
+      {
+        name: "Sommelier Tool",
+        isProper: false,
+        bloody: true,
+        killVerb: kSTAB,
+      },
       { name: "Nine Iron", isProper: false, bloody: true, killVerb: kBLUDGEON },
-      { name: "Shard of Crystal", isProper: false, bloody: true, killVerb: kSLASH },
-      { name: "Encyclopedic Tome", isProper: false, bloody: true, killVerb: kBLUDGEON },
-      { name: "Ceremonial Dagger", isProper: false, bloody: true, killVerb: kSTAB },
+      {
+        name: "Shard of Crystal",
+        isProper: false,
+        bloody: true,
+        killVerb: kSLASH,
+      },
+      {
+        name: "Encyclopedic Tome",
+        isProper: false,
+        bloody: true,
+        killVerb: kBLUDGEON,
+      },
+      {
+        name: "Ceremonial Dagger",
+        isProper: false,
+        bloody: true,
+        killVerb: kSTAB,
+      },
     ],
     relationships: [
       {
@@ -1484,14 +1764,39 @@ export const SCENARIOS = [
       "Room 99": ["Secret Passage"],
     },
     items: [
-      { name: "Metal Detector", isProper: false, bloody: true, killVerb: kBLUDGEON },
-      { name: "Broken Lever", isProper: false, bloody: true, killVerb: kBLUDGEON },
-      { name: "Magnifying Glass", isProper: false, bloody: true, killVerb: kBLUDGEON },
+      {
+        name: "Metal Detector",
+        isProper: false,
+        bloody: true,
+        killVerb: kBLUDGEON,
+      },
+      {
+        name: "Broken Lever",
+        isProper: false,
+        bloody: true,
+        killVerb: kBLUDGEON,
+      },
+      {
+        name: "Magnifying Glass",
+        isProper: false,
+        bloody: true,
+        killVerb: kBLUDGEON,
+      },
       { name: "Wrench", isProper: false, bloody: true, killVerb: kBLUDGEON },
       { name: "Shovel", isProper: false, bloody: true, killVerb: kBLUDGEON },
-      { name: "Watering Can", isProper: false, bloody: true, killVerb: kBLUDGEON },
+      {
+        name: "Watering Can",
+        isProper: false,
+        bloody: true,
+        killVerb: kBLUDGEON,
+      },
       { name: "Hammer", isProper: false, bloody: true, killVerb: kBLUDGEON },
-      { name: "Silver Spoon", isProper: false, bloody: true, killVerb: kBLUDGEON },
+      {
+        name: "Silver Spoon",
+        isProper: false,
+        bloody: true,
+        killVerb: kBLUDGEON,
+      },
       { name: "Crown", isProper: false, bloody: true, killVerb: kBLUDGEON },
       { name: "Lunch Box", isProper: false, bloody: true, killVerb: kBLUDGEON },
       { name: "Telescope", isProper: false, bloody: true, killVerb: kBLUDGEON },
@@ -1665,17 +1970,57 @@ export const SCENARIOS = [
       ],
     },
     items: [
-      { name: "Poisoned Umbrella", isProper: false, bloody: false, killVerb: kPOISON },
-      { name: "Silenced Pistol", isProper: false, bloody: true, killVerb: kSHOOT },
-      { name: "Poison Dart", isProper: false, bloody: false, killVerb: kPOISON },
-      { name: "Garrote Wire", isProper: false, bloody: false, killVerb: kSTRANGLE },
-      { name: "Lethal Syringe", isProper: false, bloody: false, killVerb: kPOISON },
-      { name: "Radioactive Pellet", isProper: false, bloody: false, killVerb: kPOISON },
+      {
+        name: "Poisoned Umbrella",
+        isProper: false,
+        bloody: false,
+        killVerb: kPOISON,
+      },
+      {
+        name: "Silenced Pistol",
+        isProper: false,
+        bloody: true,
+        killVerb: kSHOOT,
+      },
+      {
+        name: "Poison Dart",
+        isProper: false,
+        bloody: false,
+        killVerb: kPOISON,
+      },
+      {
+        name: "Garrote Wire",
+        isProper: false,
+        bloody: false,
+        killVerb: kSTRANGLE,
+      },
+      {
+        name: "Lethal Syringe",
+        isProper: false,
+        bloody: false,
+        killVerb: kPOISON,
+      },
+      {
+        name: "Radioactive Pellet",
+        isProper: false,
+        bloody: false,
+        killVerb: kPOISON,
+      },
       { name: "Poison Pen", isProper: false, bloody: false, killVerb: kPOISON },
-      { name: "Car Brake Cable", isProper: false, bloody: false, killVerb: kELIMINATE },
+      {
+        name: "Car Brake Cable",
+        isProper: false,
+        bloody: false,
+        killVerb: kELIMINATE,
+      },
       { name: "Combat Knife", isProper: false, bloody: true, killVerb: kSTAB },
       { name: "Hidden Blade", isProper: false, bloody: true, killVerb: kSTAB },
-      { name: "Toxin Applicator", isProper: false, bloody: false, killVerb: kPOISON },
+      {
+        name: "Toxin Applicator",
+        isProper: false,
+        bloody: false,
+        killVerb: kPOISON,
+      },
     ],
   },
 ];

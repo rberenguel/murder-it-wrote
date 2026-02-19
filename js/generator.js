@@ -426,7 +426,7 @@ function mergeFacts(facts) {
   return merged;
 }
 
-export function renderFact(fact, mapping, roles) {
+export function renderFact(fact, mapping, roles, deck = null) {
   const numSuspects = mapping.suspects.length;
 
   // Generate stable ID based on fact properties
@@ -471,7 +471,17 @@ export function renderFact(fact, mapping, roles) {
     return item.isProper ? iText : `the ${iText}`;
   };
   const wrapRole = (r) => `<span class="entity-role">${r}</span>`;
+  // pick: pure random, for non-variant choices (feature selection, kill verb)
   const pick = (...opts) => opts[Math.floor(random() * opts.length)];
+  // draw: shuffle-and-drain per key so variants cycle before repeating.
+  // Stores shuffled indices so each call's interpolated strings are independent.
+  const draw = deck
+    ? (key, ...opts) => {
+        if (!deck[key] || deck[key].length === 0)
+          deck[key] = shuffle([...Array(opts.length).keys()]);
+        return opts[deck[key].pop()];
+      }
+    : (_key, ...opts) => opts[Math.floor(random() * opts.length)];
   let text,
     fn,
     masks = [];
@@ -492,14 +502,16 @@ export function renderFact(fact, mapping, roles) {
 
       if (feats.length > 0 && random() > 0.5) {
         const feat = feats[Math.floor(random() * feats.length)];
-        text = pick(
+        text = draw(
+          fact.type + "_f",
           `${name} was close to the ${feat.name}`,
           `${name} was near the ${feat.name}`,
           `${name} was found by the ${feat.name}`,
         );
       } else {
         const rText = fmtRoom(fact.roomId);
-        text = pick(
+        text = draw(
+          fact.type,
           `${name} was in ${rText}`,
           `${name} was found in ${rText}`,
           `${name} was spotted in ${rText}`,
@@ -517,7 +529,8 @@ export function renderFact(fact, mapping, roles) {
     case FACT_TYPES.SUSPECT_ITEM: {
       const name = fmt("suspects", fact.suspectId);
       const item = fmtItem(fact.itemId);
-      text = pick(
+      text = draw(
+        fact.type,
         `${name} had ${item}`,
         `${name} was carrying ${item}`,
         `${name} was found with ${item}`,
@@ -532,7 +545,8 @@ export function renderFact(fact, mapping, roles) {
       const name = fmt("suspects", fact.suspectId);
       const rText = fmtRoom(fact.roomId);
       const item = fmtItem(fact.itemId);
-      text = pick(
+      text = draw(
+        fact.type,
         `${name} was in ${rText} with ${item}`,
         `${name} was found in ${rText}, carrying ${item}`,
         `In ${rText}, ${name} had ${item}`,
@@ -559,7 +573,8 @@ export function renderFact(fact, mapping, roles) {
         fact.role === "Innocent"
           ? "innocent"
           : `the ${wrapRole(fact.role.toLowerCase())}`;
-      text = pick(
+      text = draw(
+        fact.type,
         `${name} is ${rText}`,
         `${name} was found to be ${rText}`,
         `Records confirm ${name} is ${rText}`,
@@ -575,7 +590,8 @@ export function renderFact(fact, mapping, roles) {
         .filter((i) => i !== -1);
       let badMask = 0;
       badIndices.forEach((i) => (badMask |= 1 << i));
-      text = pick(
+      text = draw(
+        fact.type,
         `${name} is not the ${wrapRole(fact.role.toLowerCase())}`,
         `${name} was not the ${wrapRole(fact.role.toLowerCase())}`,
         `It is confirmed that ${name} is not the ${wrapRole(fact.role.toLowerCase())}`,
@@ -587,7 +603,8 @@ export function renderFact(fact, mapping, roles) {
     case FACT_TYPES.ROOM_ITEM: {
       const rText = fmtRoom(fact.roomId);
       const item = fmtItem(fact.itemId);
-      text = pick(
+      text = draw(
+        fact.type,
         `The person in ${rText} had ${item}`,
         `Whoever was in ${rText} had ${item}`,
         `The occupant of ${rText} was carrying ${item}`,
@@ -617,7 +634,8 @@ export function renderFact(fact, mapping, roles) {
 
       {
         const capRText = rText.charAt(0).toUpperCase() + rText.slice(1);
-        text = pick(
+        text = draw(
+          fact.type,
           `${capRText} was empty`,
           `There was nobody at ${rText}`,
           `No one was found in ${rText}`,
@@ -639,9 +657,12 @@ export function renderFact(fact, mapping, roles) {
       const itemObj = mapping.items[fact.itemId];
       const item = fmtItem(fact.itemId);
       const capItem = item.charAt(0).toUpperCase() + item.slice(1);
-      const kvGroup = itemObj.killVerb ? KILL_VERB_GROUPS[itemObj.killVerb] : null;
+      const kvGroup = itemObj.killVerb
+        ? KILL_VERB_GROUPS[itemObj.killVerb]
+        : null;
       const kv = kvGroup ? pick(...kvGroup) : "kill";
-      text = pick(
+      text = draw(
+        fact.type,
         `${capItem} was not the murder weapon`,
         `${capItem} was ruled out as the murder weapon`,
         `The murder was not committed with ${item}`,
@@ -657,7 +678,8 @@ export function renderFact(fact, mapping, roles) {
     }
     case FACT_TYPES.ROOM_NOT_CORPSE: {
       const rText = fmtRoom(fact.roomId);
-      text = pick(
+      text = draw(
+        fact.type,
         `There is no corpse in ${rText}`,
         `No body was found in ${rText}`,
         `The victim was not in ${rText}`,
@@ -675,7 +697,8 @@ export function renderFact(fact, mapping, roles) {
     }
     case FACT_TYPES.ROLE_EXCLUSION: {
       const name = fmt("suspects", fact.suspectId);
-      text = pick(
+      text = draw(
+        fact.type,
         `${name} is neither the ${wrapRole("killer")} nor the ${wrapRole("victim")} nor the ${wrapRole("accomplice")}`,
         `${name} is not the ${wrapRole("killer")}, not the ${wrapRole("victim")}, and not the ${wrapRole("accomplice")}`,
         `${name} was cleared of being the ${wrapRole("killer")}, the ${wrapRole("victim")}, and the ${wrapRole("accomplice")}`,
@@ -702,7 +725,8 @@ export function renderFact(fact, mapping, roles) {
     }
     case FACT_TYPES.SCREAM_HEARD: {
       const name = fmt("suspects", fact.suspectId);
-      text = pick(
+      text = draw(
+        fact.type,
         `${name} heard a scream coming from somewhere nearby`,
         `${name} reported hearing a scream nearby`,
         `${name} heard a scream from somewhere close by`,
@@ -746,7 +770,8 @@ export function renderFact(fact, mapping, roles) {
       const rText = fmtRoom(fact.roomId);
       const term = `<span class="entity-person">${fact.relationshipTerm}</span>`;
 
-      text = pick(
+      text = draw(
+        fact.type,
         `The ${term} was in ${rText}`,
         `The ${term} was found in ${rText}`,
         `The ${term} was spotted in ${rText}`,
@@ -772,7 +797,8 @@ export function renderFact(fact, mapping, roles) {
       const item = fmtItem(fact.itemId);
       const term = `<span class="entity-person">${fact.relationshipTerm}</span>`;
 
-      text = pick(
+      text = draw(
+        fact.type,
         `The ${term} had ${item}`,
         `The ${term} was carrying ${item}`,
         `The ${term} was found with ${item}`,
@@ -809,7 +835,8 @@ export function renderFact(fact, mapping, roles) {
       const rText = fmtRoom(fact.roomId);
       const feature = fact.featureName;
 
-      text = pick(
+      text = draw(
+        fact.type,
         `There was blood spilled on the ${feature} in ${rText}`,
         `Blood was found on the ${feature} in ${rText}`,
         `The ${feature} in ${rText} was stained with blood`,
@@ -1179,7 +1206,10 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
   // pruning changes or new clue types added in the future.
   resetRng();
   const finalFacts = mergeFacts(keptFacts);
-  const finalClues = finalFacts.map((f) => renderFact(f, gameMapping, roles));
+  const deck = {};
+  const finalClues = finalFacts.map((f) =>
+    renderFact(f, gameMapping, roles, deck),
+  );
 
   // Shuffle and assign original numbers to each clue
   const shuffledClues = shuffle(finalClues).map((clue, index) => ({
