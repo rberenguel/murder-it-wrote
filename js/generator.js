@@ -7,7 +7,7 @@ import {
 import { LogicEngine } from "./logic-engine.js";
 import { state, updateState } from "./game-state.js";
 import { haptic } from "./haptic.js";
-import { random, shuffle } from "./rng.js";
+import { random, resetRng, shuffle } from "./rng.js";
 
 const FACT_TYPES = {
   SUSPECT_LOCATION: "SUSPECT_LOCATION",
@@ -470,6 +470,7 @@ export function renderFact(fact, mapping, roles) {
     return item.isProper ? iText : `the ${iText}`;
   };
   const wrapRole = (r) => `<span class="entity-role">${r}</span>`;
+  const pick = (...opts) => opts[Math.floor(random() * opts.length)];
   let text,
     fn,
     masks = [];
@@ -490,10 +491,18 @@ export function renderFact(fact, mapping, roles) {
 
       if (feats.length > 0 && random() > 0.5) {
         const feat = feats[Math.floor(random() * feats.length)];
-        text = `${name} was close to the ${feat.name}`;
+        text = pick(
+          `${name} was close to the ${feat.name}`,
+          `${name} was near the ${feat.name}`,
+          `${name} was found by the ${feat.name}`,
+        );
       } else {
         const rText = fmtRoom(fact.roomId);
-        text = `${name} was in ${rText}`;
+        text = pick(
+          `${name} was in ${rText}`,
+          `${name} was found in ${rText}`,
+          `${name} was spotted in ${rText}`,
+        );
       }
 
       fn = (a) => checkVal(a, fact.suspectId, "Room", fact.roomId);
@@ -505,7 +514,11 @@ export function renderFact(fact, mapping, roles) {
     case FACT_TYPES.SUSPECT_ITEM: {
       const name = fmt("suspects", fact.suspectId);
       const item = fmtItem(fact.itemId);
-      text = `${name} had ${item}`;
+      text = pick(
+        `${name} had ${item}`,
+        `${name} was carrying ${item}`,
+        `${name} was found with ${item}`,
+      );
       fn = (a) => checkVal(a, fact.suspectId, "Item", fact.itemId);
       masks = [
         { varIdx: numSuspects + fact.suspectId, mask: 1 << fact.itemId },
@@ -516,7 +529,11 @@ export function renderFact(fact, mapping, roles) {
       const name = fmt("suspects", fact.suspectId);
       const rText = fmtRoom(fact.roomId);
       const item = fmtItem(fact.itemId);
-      text = `${name} was in ${rText} with ${item}`;
+      text = pick(
+        `${name} was in ${rText} with ${item}`,
+        `${name} was found in ${rText}, carrying ${item}`,
+        `In ${rText}, ${name} had ${item}`,
+      );
       fn = (a) =>
         checkVal(a, fact.suspectId, "Room", fact.roomId) &&
         checkVal(a, fact.suspectId, "Item", fact.itemId);
@@ -537,7 +554,11 @@ export function renderFact(fact, mapping, roles) {
         fact.role === "Innocent"
           ? "innocent"
           : `the ${wrapRole(fact.role.toLowerCase())}`;
-      text = `${name} is ${rText}`;
+      text = pick(
+        `${name} is ${rText}`,
+        `${name} was found to be ${rText}`,
+        `Records confirm ${name} is ${rText}`,
+      );
       fn = (a) => checkVal(a, fact.suspectId, "Role", fact.role);
       masks = [{ varIdx: fact.suspectId, mask: roleMask }];
       break;
@@ -549,7 +570,11 @@ export function renderFact(fact, mapping, roles) {
         .filter((i) => i !== -1);
       let badMask = 0;
       badIndices.forEach((i) => (badMask |= 1 << i));
-      text = `${name} is not the ${wrapRole(fact.role.toLowerCase())}`;
+      text = pick(
+        `${name} is not the ${wrapRole(fact.role.toLowerCase())}`,
+        `${name} was not the ${wrapRole(fact.role.toLowerCase())}`,
+        `It is confirmed that ${name} is not the ${wrapRole(fact.role.toLowerCase())}`,
+      );
       fn = (a) => getVal(a, fact.suspectId, "Role") !== fact.role;
       masks = [{ varIdx: fact.suspectId, mask: ~badMask }];
       break;
@@ -557,7 +582,11 @@ export function renderFact(fact, mapping, roles) {
     case FACT_TYPES.ROOM_ITEM: {
       const rText = fmtRoom(fact.roomId);
       const item = fmtItem(fact.itemId);
-      text = `The person in ${rText} had ${item}`;
+      text = pick(
+        `The person in ${rText} had ${item}`,
+        `Whoever was in ${rText} had ${item}`,
+        `The occupant of ${rText} was carrying ${item}`,
+      );
       fn = (a) => {
         const occupants = Array.from({ length: numSuspects }, (_, i) => i);
         const r = occupants.filter((i) => getVal(a, i, "Room") === fact.roomId);
@@ -581,15 +610,13 @@ export function renderFact(fact, mapping, roles) {
         break;
       }
 
-      if (random() > 0.5) {
-        // "The Kitchen was empty."
-        text = `${rText.charAt(0).toUpperCase() + rText.slice(1)} was empty`;
-      } else {
-        // "There was nobody at the Kitchen" or "There was nobody at Kitchen"
-        const name = rObj.isProper ? rObj.name : rObj.name.toLowerCase();
-        const rName = `<span class="entity-room">${name}</span>`;
-        const atLocation = rObj.noArticle ? rName : `the ${rName}`;
-        text = `There was nobody at ${atLocation}`;
+      {
+        const capRText = rText.charAt(0).toUpperCase() + rText.slice(1);
+        text = pick(
+          `${capRText} was empty`,
+          `There was nobody at ${rText}`,
+          `No one was found in ${rText}`,
+        );
       }
 
       fn = (a) => {
@@ -606,7 +633,11 @@ export function renderFact(fact, mapping, roles) {
     case FACT_TYPES.ITEM_NOT_MURDER_WEAPON: {
       const item = fmtItem(fact.itemId);
       const capItem = item.charAt(0).toUpperCase() + item.slice(1);
-      text = `${capItem} was not the murder weapon`;
+      text = pick(
+        `${capItem} was not the murder weapon`,
+        `${capItem} was ruled out as the murder weapon`,
+        `The murder was not committed with ${item}`,
+      );
       fn = (a) => {
         const owner = Array.from({ length: numSuspects }, (_, i) => i).find(
           (pid) => checkVal(a, pid, "Item", fact.itemId),
@@ -617,7 +648,11 @@ export function renderFact(fact, mapping, roles) {
     }
     case FACT_TYPES.ROOM_NOT_CORPSE: {
       const rText = fmtRoom(fact.roomId);
-      text = `There is no corpse in ${rText}`;
+      text = pick(
+        `There is no corpse in ${rText}`,
+        `No body was found in ${rText}`,
+        `The victim was not in ${rText}`,
+      );
       fn = (a) => {
         const occupants = Array.from({ length: numSuspects }, (_, i) => i);
         const suspectsInRoom = occupants.filter((pid) =>
@@ -631,7 +666,11 @@ export function renderFact(fact, mapping, roles) {
     }
     case FACT_TYPES.ROLE_EXCLUSION: {
       const name = fmt("suspects", fact.suspectId);
-      text = `${name} is neither the ${wrapRole("killer")} nor the ${wrapRole("victim")} nor the ${wrapRole("accomplice")}`;
+      text = pick(
+        `${name} is neither the ${wrapRole("killer")} nor the ${wrapRole("victim")} nor the ${wrapRole("accomplice")}`,
+        `${name} is not the ${wrapRole("killer")}, not the ${wrapRole("victim")}, and not the ${wrapRole("accomplice")}`,
+        `${name} was cleared of being the ${wrapRole("killer")}, the ${wrapRole("victim")}, and the ${wrapRole("accomplice")}`,
+      );
       fn = (a) =>
         getVal(a, fact.suspectId, "Role") !== "Killer" &&
         getVal(a, fact.suspectId, "Role") !== "Victim" &&
@@ -654,7 +693,11 @@ export function renderFact(fact, mapping, roles) {
     }
     case FACT_TYPES.SCREAM_HEARD: {
       const name = fmt("suspects", fact.suspectId);
-      text = `${name} heard a scream coming from somewhere nearby`;
+      text = pick(
+        `${name} heard a scream coming from somewhere nearby`,
+        `${name} reported hearing a scream nearby`,
+        `${name} heard a scream from somewhere close by`,
+      );
 
       // No masks - this is a relational constraint between listener and victim
       masks = [];
@@ -694,7 +737,11 @@ export function renderFact(fact, mapping, roles) {
       const rText = fmtRoom(fact.roomId);
       const term = `<span class="entity-person">${fact.relationshipTerm}</span>`;
 
-      text = `The ${term} was in ${rText}`;
+      text = pick(
+        `The ${term} was in ${rText}`,
+        `The ${term} was found in ${rText}`,
+        `The ${term} was spotted in ${rText}`,
+      );
 
       // CSP constraint: Find which suspect has this term, check their room
       fn = (a) => {
@@ -716,7 +763,11 @@ export function renderFact(fact, mapping, roles) {
       const item = fmtItem(fact.itemId);
       const term = `<span class="entity-person">${fact.relationshipTerm}</span>`;
 
-      text = `The ${term} had ${item}`;
+      text = pick(
+        `The ${term} had ${item}`,
+        `The ${term} was carrying ${item}`,
+        `The ${term} was found with ${item}`,
+      );
 
       // CSP constraint: Find which suspect has this term, check their item
       fn = (a) => {
@@ -749,7 +800,11 @@ export function renderFact(fact, mapping, roles) {
       const rText = fmtRoom(fact.roomId);
       const feature = fact.featureName;
 
-      text = `There was blood spilled on the ${feature} in ${rText}`;
+      text = pick(
+        `There was blood spilled on the ${feature} in ${rText}`,
+        `Blood was found on the ${feature} in ${rText}`,
+        `The ${feature} in ${rText} was stained with blood`,
+      );
 
       // No masks - this is a relational constraint between weapon and victim's room
       masks = [];
@@ -1111,6 +1166,9 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
 
   // Post-Pruning Merge and Render
   await new Promise((r) => setTimeout(r, 0));
+  // Reset before rendering so phrase variants are seed-stable regardless of
+  // pruning changes or new clue types added in the future.
+  resetRng();
   const finalFacts = mergeFacts(keptFacts);
   const finalClues = finalFacts.map((f) => renderFact(f, gameMapping, roles));
 

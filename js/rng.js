@@ -23,6 +23,10 @@ export function initRng(seed) {
 export function getSeed() {
   return _seed;
 }
+
+export function resetRng() {
+  _rng = mulberry32(_seed);
+}
 export function random() {
   return _rng();
 }
