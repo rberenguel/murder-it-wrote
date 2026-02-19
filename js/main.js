@@ -56,9 +56,24 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Check for saved game
   const savedGame = await loadGame();
 
+  // Check for incoming game code in URL hash (#game:CODE) before buttons are set up
+  let incomingGameCode = null;
+  let incomingGameSeed = null;
+  {
+    const hash = window.location.hash;
+    if (hash.startsWith("#game:")) {
+      const code = hash.substring(6).trim();
+      const seed = codeToSeed(code);
+      if (seed != null) {
+        incomingGameCode = code;
+        incomingGameSeed = seed;
+        history.replaceState(null, null, window.location.pathname);
+      }
+    }
+  }
+
   // --- Intro Flow ---
   const beginInvestigation = async (restore = false, presetSeed = null) => {
-    await window.startAudio?.();
     const doorMs = (window.playDoor?.() ?? 0) * 1000; // random door creak
 
     // Fade the intro content out over the door duration.
@@ -106,11 +121,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     window.sampler?.("ding", 1.5); // case ready — overlay is fading out
   };
 
-  // Update intro screen based on saved game
+  // Update intro screen based on saved game (or incoming game code)
   const introButtons = document.getElementById("intro-buttons");
   const startBtn = document.getElementById("btn-start");
 
-  if (savedGame) {
+  if (incomingGameCode) {
+    // Shared link — show the game code, user clicks to begin
+    startBtn.innerHTML = `
+      <i class="ph-light ph-sign-in"></i>
+      <span>BEGIN</span>
+      <span class="scenario-subtitle">Cold Case #${String(incomingGameSeed).substring(0, 5)}</span>
+    `;
+    startBtn.addEventListener("click", async () => {
+      haptic();
+      await window.startAudio?.();
+      await clearGame();
+      beginInvestigation(false, incomingGameSeed);
+    });
+  } else if (savedGame) {
     // Apply saved theme to intro screen for font styling
     document.body.dataset.theme = savedGame.activeScenario.id;
 
@@ -136,21 +164,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     introButtons.appendChild(newCaseBtn);
 
     // Continue button
-    startBtn.addEventListener("click", () => {
+    startBtn.addEventListener("click", async () => {
       haptic();
+      await window.startAudio?.();
       beginInvestigation(true);
     });
 
     // New Case button
     newCaseBtn.addEventListener("click", async () => {
       haptic();
+      await window.startAudio?.();
       await clearGame();
       beginInvestigation(false);
     });
   } else {
     // Show only Begin button (default)
-    startBtn.addEventListener("click", () => {
+    startBtn.addEventListener("click", async () => {
       haptic();
+      await window.startAudio?.();
       beginInvestigation(false);
     });
   }
