@@ -96,6 +96,15 @@
   font-display: swap;
 }
 
+/* IM Fell English SC - Calliope */
+@font-face {
+  font-family: "IM Fell English SC";
+  src: url("./im-fell-english/IMFellEnglishSC-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Quicksand - Blue Prince */
 @font-face {
   font-family: "Quicksand";

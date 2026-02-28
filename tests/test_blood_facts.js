@@ -123,13 +123,15 @@ describe("Blood Spill Clues", function () {
       });
     });
 
-    it("firearms should be bloody", function () {
+    it("traditional firearms should be bloody", function () {
       const firearms = SCENARIOS.flatMap((s) =>
         s.items.filter(
           (i) =>
-            i.name.toLowerCase().includes("revolver") ||
-            i.name.toLowerCase().includes("pistol") ||
-            i.name.toLowerCase().includes("blaster"),
+            // Exclude energy/plasma weapons — they burn rather than bleed
+            !i.name.toLowerCase().includes("plasma") &&
+            (i.name.toLowerCase().includes("revolver") ||
+              i.name.toLowerCase().includes("pistol") ||
+              i.name.toLowerCase().includes("blaster")),
         ),
       );
       expect(firearms.length).to.be.greaterThan(0);

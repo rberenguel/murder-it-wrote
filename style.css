@@ -612,6 +612,51 @@
   border-bottom: 2px solid #8b0000;
 }
 
+[data-theme="calliope"] {
+  --app-bg: #080c1a;
+  --canvas-bg: #0c1220;
+  --surface-bg: #111827;
+  --surface-bg-alt: #161e30;
+  --font-sans: "IM Fell English SC", "Georgia", serif;
+
+  --text-primary: #e8e0d0;
+  --text-secondary: #c4b896;
+  --text-tertiary: #8a7d68;
+  --text-muted: #5a5048;
+
+  --accent-primary: #c4a855;
+  --accent-primary-alt: #e8c870;
+  --accent-primary-soft: rgba(196, 168, 85, 0.1);
+  --accent-secondary: #6b9fd4;
+
+  --border-base: #1e2840;
+  --border-subtle: #162038;
+  --border-focus: #c4a855;
+
+  --shadow-sm: 0 1px 3px rgba(196, 168, 85, 0.1);
+  --shadow-main: 0 2px 8px rgba(196, 168, 85, 0.15);
+  --shadow-xl: 0 8px 32px rgba(196, 168, 85, 0.1);
+
+  --scrollbar-track: #0c1220;
+  --scrollbar-thumb: #c4a855;
+}
+
+[data-theme="calliope"] .entity-person {
+  font-variant: small-caps;
+  color: var(--accent-secondary);
+}
+
+[data-theme="calliope"] .entity-item {
+  font-style: italic;
+  color: var(--accent-primary);
+}
+
+[data-theme="calliope"] .entity-room {
+  font-weight: bold;
+  text-decoration: underline;
+  text-decoration-color: rgba(196, 168, 85, 0.3);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -1181,7 +1226,7 @@ body {
   gap: 0.25rem;
 }
 .feature-badge {
-  font-size: 0.625rem;
+  font-size: 0.825rem;
   background-color: var(--surface-bg);
   border: 1px solid var(--border-base);
   padding: 0.25rem 0.5rem;
@@ -1190,7 +1235,7 @@ body {
 }
 
 .connection-badge {
-  font-size: 0.625rem;
+  font-size: 0.825rem;
   background-color: var(--accent-primary-soft);
   border: 1px solid var(--accent-primary-alt);
   padding: 0.25rem 0.5rem;
@@ -2183,4 +2228,38 @@ body {
 [data-theme="shadow_protocol"] #btn-reveal-confirm *,
 [data-theme="shadow_protocol"] #btn-new-case-confirm * {
   color: #fff;
+}
+
+/* === CALLIOPE === */
+[data-theme="calliope"] #btn-new-case * {
+  color: #000;
+}
+[data-theme="calliope"] #btn-verify * {
+  color: #e8e0d0;
+}
+[data-theme="calliope"] #btn-print * {
+  color: #e8e0d0;
+}
+[data-theme="calliope"] #btn-reveal * {
+  color: #e8e0d0;
+}
+[data-theme="calliope"] #btn-exit * {
+  color: #e8e0d0;
+}
+[data-theme="calliope"] #locations-tab * {
+  color: #000;
+}
+[data-theme="calliope"] #notebook-tab * {
+  color: #000;
+}
+[data-theme="calliope"] #btn-reveal-cancel *,
+[data-theme="calliope"] #btn-new-case-cancel * {
+  color: #e8e0d0;
+}
+[data-theme="calliope"] #btn-reveal-confirm *,
+[data-theme="calliope"] #btn-new-case-confirm * {
+  color: #000;
+}
+[data-theme="calliope"] .feature-badge {
+  color: #c4b896;
 }

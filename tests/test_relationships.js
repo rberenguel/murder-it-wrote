@@ -80,9 +80,13 @@ describe("Relationship Clues", function () {
       );
 
       scenariosWithRelationships.forEach((scenario) => {
+        // Suspects may be strings or objects with a name property
+        const suspectNames = scenario.suspects.map((s) =>
+          typeof s === "string" ? s : s.name,
+        );
         scenario.relationships.forEach((rel) => {
           rel.suspects.forEach((relSuspect) => {
-            expect(scenario.suspects).to.include(relSuspect.name);
+            expect(suspectNames).to.include(relSuspect.name);
           });
         });
       });

@@ -26,6 +26,9 @@ const FACT_TYPES = {
   RELATIONSHIP_ITEM: "RELATIONSHIP_ITEM",
   RELATIONSHIP_HAS_TRAIT: "RELATIONSHIP_HAS_TRAIT",
   BLOOD_ON_FEATURE: "BLOOD_ON_FEATURE",
+  SPOTTED_NEARBY: "SPOTTED_NEARBY",
+  NOT_NEAR_SCENE: "NOT_NEAR_SCENE",
+  SEEN_ARRIVING: "SEEN_ARRIVING",
 };
 
 // Probabilistic protection for special fact types during pruning
@@ -33,6 +36,9 @@ const FACT_TYPES = {
 const PROTECTED_FACT_TYPES = {
   [FACT_TYPES.SCREAM_HEARD]: 0.8, // 80% chance to keep proximity clues
   [FACT_TYPES.BLOOD_ON_FEATURE]: 0.85, // 85% chance to keep blood clues (atmospheric)
+  [FACT_TYPES.SPOTTED_NEARBY]: 0.8,
+  [FACT_TYPES.NOT_NEAR_SCENE]: 0.7,
+  [FACT_TYPES.SEEN_ARRIVING]: 0.8,
 };
 
 const getVal = (a, id, type) => a[`${id}_${type}`];
@@ -42,6 +48,12 @@ const checkVal = (a, subId, type, val) => getVal(a, subId, type) === val;
 function getAdjacentRooms(roomName, scenario) {
   if (!scenario.roomAdjacency) return [];
   return scenario.roomAdjacency[roomName] || [];
+}
+
+function getScreamAdjacentRooms(roomName, scenario) {
+  const adj = scenario.screamAdjacency ?? scenario.roomAdjacency;
+  if (!adj) return [];
+  return adj[roomName] || [];
 }
 
 // Helper: Find suspect ID by relationship term
@@ -64,7 +76,7 @@ function findSuspectByRelationshipTerm(mapping, term) {
   return -1; // Not found
 }
 
-export function generateTruth(numSuspects) {
+export function generateTruth(numSuspects, forcedConstraints = []) {
   const activeRoles = ["Killer", "Victim"];
   if (activeRoles.length < numSuspects && random() > 0.6)
     activeRoles.push("Witness");
@@ -74,6 +86,15 @@ export function generateTruth(numSuspects) {
 
   const sRoles = shuffle([...activeRoles]);
   const sItems = shuffle([...Array(numSuspects).keys()]);
+
+  // Apply forced-item constraints: swap so that suspect at suspectIdx gets itemIdx
+  for (const { suspectIdx, itemIdx } of forcedConstraints) {
+    const swapPos = sItems.indexOf(itemIdx);
+    [sItems[suspectIdx], sItems[swapPos]] = [
+      sItems[swapPos],
+      sItems[suspectIdx],
+    ];
+  }
   const sRooms = Array.from({ length: numSuspects }, () =>
     Math.floor(random() * numSuspects),
   );
@@ -198,27 +219,106 @@ function generateProximityFacts(truth, roles, mapping) {
 
   if (!victimRoom) return facts;
 
-  // Get adjacent room names
-  const adjacentRoomNames = getAdjacentRooms(victimRoom.name, mapping.scenario);
+  // Get scream-reachable room names (may differ from general adjacency)
+  const adjacentRoomNames = getScreamAdjacentRooms(
+    victimRoom.name,
+    mapping.scenario,
+  );
 
-  if (adjacentRoomNames.length === 0) return facts;
+  // SCREAM_HEARD requires non-empty scream adjacency
+  if (adjacentRoomNames.length > 0) {
+    // Find people in adjacent rooms (anyone could hear the scream)
+    const listeners = truth.filter((p) => {
+      if (p.role === "Victim") return false; // Victim can't hear their own scream
+      const personRoom = mapping.rooms[p.roomId];
+      return personRoom && adjacentRoomNames.includes(personRoom.name);
+    });
 
-  // Find people in adjacent rooms (anyone could hear the scream)
-  const listeners = truth.filter((p) => {
-    if (p.role === "Victim") return false; // Victim can't hear their own scream
+    // Generate scream fact if there are listeners (100% chance for testing)
+    if (listeners.length > 0) {
+      const listener = listeners[Math.floor(random() * listeners.length)];
+      console.log(
+        `✓ SCREAM FACT GENERATED: ${mapping.suspects[listener.id]} in ${mapping.rooms[truth[listener.id].roomId]?.name} heard scream from ${victimRoom.name}`,
+      );
+      facts.push({
+        type: FACT_TYPES.SCREAM_HEARD,
+        suspectId: listener.id,
+      });
+    }
+  }
+
+  // SPOTTED_NEARBY: non-victim suspect in a room that has scream-adjacent in-game neighbours
+  const nonVictims = truth.filter((p) => p.role !== "Victim");
+  const spottedCandidates = nonVictims.filter((p) => {
     const personRoom = mapping.rooms[p.roomId];
-    return personRoom && adjacentRoomNames.includes(personRoom.name);
-  });
-
-  // Generate scream fact if there are listeners (100% chance for testing)
-  if (listeners.length > 0) {
-    const listener = listeners[Math.floor(random() * listeners.length)];
-    console.log(
-      `✓ SCREAM FACT GENERATED: ${mapping.suspects[listener.id]} in ${mapping.rooms[truth[listener.id].roomId]?.name} heard scream from ${victimRoom.name}`,
+    if (!personRoom) return false;
+    const neighbours = getScreamAdjacentRooms(
+      personRoom.name,
+      mapping.scenario,
     );
+    return neighbours.some((n) => mapping.rooms.some((r) => r.name === n));
+  });
+  if (spottedCandidates.length > 0) {
+    const subject =
+      spottedCandidates[Math.floor(random() * spottedCandidates.length)];
+    const subjectRoom = mapping.rooms[subject.roomId];
+    const inGameNeighbours = getScreamAdjacentRooms(
+      subjectRoom.name,
+      mapping.scenario,
+    )
+      .map((n) => mapping.rooms.findIndex((r) => r.name === n))
+      .filter((idx) => idx !== -1);
+    const refRoomIdx =
+      inGameNeighbours[Math.floor(random() * inGameNeighbours.length)];
     facts.push({
-      type: FACT_TYPES.SCREAM_HEARD,
-      suspectId: listener.id,
+      type: FACT_TYPES.SPOTTED_NEARBY,
+      suspectId: subject.id,
+      roomId: refRoomIdx,
+    });
+  }
+
+  // NOT_NEAR_SCENE: only meaningful when the victim's room has scream-adjacent rooms;
+  // without adjacency the "near" concept is undefined and the clue has no deductive power
+  if (adjacentRoomNames.length > 0) {
+    const notNearCandidates = nonVictims.filter((p) => {
+      const personRoom = mapping.rooms[p.roomId];
+      if (!personRoom) return false;
+      if (p.roomId === victim.roomId) return false;
+      return !adjacentRoomNames.includes(personRoom.name);
+    });
+    if (notNearCandidates.length > 0) {
+      const subject =
+        notNearCandidates[Math.floor(random() * notNearCandidates.length)];
+      facts.push({
+        type: FACT_TYPES.NOT_NEAR_SCENE,
+        suspectId: subject.id,
+      });
+    }
+  }
+
+  // SEEN_ARRIVING: non-victim suspect whose room has in-game neighbours via roomAdjacency
+  const arrivingCandidates = nonVictims.filter((p) => {
+    const personRoom = mapping.rooms[p.roomId];
+    if (!personRoom) return false;
+    const neighbours = getAdjacentRooms(personRoom.name, mapping.scenario);
+    return neighbours.some((n) => mapping.rooms.some((r) => r.name === n));
+  });
+  if (arrivingCandidates.length > 0) {
+    const subject =
+      arrivingCandidates[Math.floor(random() * arrivingCandidates.length)];
+    const subjectRoom = mapping.rooms[subject.roomId];
+    const inGameNeighbours = getAdjacentRooms(
+      subjectRoom.name,
+      mapping.scenario,
+    )
+      .map((n) => mapping.rooms.findIndex((r) => r.name === n))
+      .filter((idx) => idx !== -1);
+    const refRoomIdx =
+      inGameNeighbours[Math.floor(random() * inGameNeighbours.length)];
+    facts.push({
+      type: FACT_TYPES.SEEN_ARRIVING,
+      suspectId: subject.id,
+      roomId: refRoomIdx,
     });
   }
 
@@ -634,12 +734,21 @@ export function renderFact(fact, mapping, roles, deck = null) {
 
       {
         const capRText = rText.charAt(0).toUpperCase() + rText.slice(1);
-        text = draw(
-          fact.type,
-          `${capRText} was empty`,
-          `There was nobody at ${rText}`,
-          `No one was found in ${rText}`,
-        );
+        if (rObj.large) {
+          text = draw(
+            fact.type,
+            `No one was on ${rText}`,
+            `None of the suspects visited ${rText}`,
+            `No suspect was present on ${rText}`,
+          );
+        } else {
+          text = draw(
+            fact.type,
+            `${capRText} was empty`,
+            `There was nobody at ${rText}`,
+            `No one was found in ${rText}`,
+          );
+        }
       }
 
       fn = (a) => {
@@ -743,8 +852,8 @@ export function renderFact(fact, mapping, roles, deck = null) {
         const listenerRoomObj = mapping.rooms[listenerRoom];
         if (!listenerRoomObj) return false;
 
-        // Get adjacent room names
-        const adjacentRoomNames = getAdjacentRooms(
+        // Get scream-reachable room names (may differ from general adjacency)
+        const adjacentRoomNames = getScreamAdjacentRooms(
           listenerRoomObj.name,
           mapping.scenario,
         );
@@ -762,6 +871,79 @@ export function renderFact(fact, mapping, roles, deck = null) {
 
         // Check if victim's room is adjacent to listener's room
         return adjacentRoomNames.includes(victimRoomObj.name);
+      };
+      break;
+    }
+    case FACT_TYPES.SPOTTED_NEARBY: {
+      const name = fmt("suspects", fact.suspectId);
+      const rText = fmtRoom(fact.roomId);
+      text = draw(
+        fact.type,
+        `${name} was spotted near ${rText}`,
+        `${name} was seen in the vicinity of ${rText}`,
+        `${name} was found close to ${rText}`,
+      );
+      masks = [];
+      fn = (a) => {
+        const suspectRoom = getVal(a, fact.suspectId, "Room");
+        if (suspectRoom === undefined) return true;
+        const suspectRoomObj = mapping.rooms[suspectRoom];
+        if (!suspectRoomObj) return false;
+        const refRoom = mapping.rooms[fact.roomId];
+        if (!refRoom) return false;
+        return getScreamAdjacentRooms(refRoom.name, mapping.scenario).includes(
+          suspectRoomObj.name,
+        );
+      };
+      break;
+    }
+    case FACT_TYPES.NOT_NEAR_SCENE: {
+      const name = fmt("suspects", fact.suspectId);
+      text = draw(
+        fact.type,
+        `${name} was nowhere near the murder scene`,
+        `${name} was far from where the victim was found`,
+        `${name} was located well away from the murder scene`,
+      );
+      masks = [];
+      fn = (a) => {
+        const suspectRoom = getVal(a, fact.suspectId, "Room");
+        if (suspectRoom === undefined) return true;
+        const victimIdx = roles.findIndex((r) => r === "Victim");
+        if (victimIdx === -1) return false;
+        const victimRoom = getVal(a, victimIdx, "Room");
+        if (victimRoom === undefined) return true;
+        if (suspectRoom === victimRoom) return false;
+        const victimRoomObj = mapping.rooms[victimRoom];
+        const suspectRoomObj = mapping.rooms[suspectRoom];
+        if (!victimRoomObj || !suspectRoomObj) return false;
+        return !getScreamAdjacentRooms(
+          victimRoomObj.name,
+          mapping.scenario,
+        ).includes(suspectRoomObj.name);
+      };
+      break;
+    }
+    case FACT_TYPES.SEEN_ARRIVING: {
+      const name = fmt("suspects", fact.suspectId);
+      const rText = fmtRoom(fact.roomId);
+      text = draw(
+        fact.type,
+        `${name} was seen arriving from ${rText}`,
+        `${name} had just come from ${rText}`,
+        `${name} was spotted heading in from ${rText}`,
+      );
+      masks = [];
+      fn = (a) => {
+        const suspectRoom = getVal(a, fact.suspectId, "Room");
+        if (suspectRoom === undefined) return true;
+        const suspectRoomObj = mapping.rooms[suspectRoom];
+        if (!suspectRoomObj) return false;
+        const refRoom = mapping.rooms[fact.roomId];
+        if (!refRoom) return false;
+        return getAdjacentRooms(refRoom.name, mapping.scenario).includes(
+          suspectRoomObj.name,
+        );
       };
       break;
     }
@@ -987,16 +1169,16 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
     overlay.classList.remove("hidden");
     overlay.classList.add("active");
 
-    // Show message after 30 seconds
+    // Show message after 15 seconds
     messageTimer = setTimeout(() => {
       if (loaderMessage) {
         loaderMessage.textContent =
           "If this is taking so long, it's going to be a complex one...";
         loaderMessage.classList.remove("hidden");
       }
-    }, 30000);
+    }, 15000);
 
-    // Show regenerate button after 60 seconds
+    // Show regenerate button after 30 seconds
     buttonTimer = setTimeout(() => {
       if (regenerateBtn && loaderMessage) {
         loaderMessage.textContent =
@@ -1014,7 +1196,7 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
           setTimeout(() => handleNewCase(uiCallbacks), 500);
         };
       }
-    }, 60000);
+    }, 30000);
 
     await new Promise((r) => setTimeout(r, 450));
   }
@@ -1033,10 +1215,52 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
 
   const getSubset = (arr, count) => shuffle([...arr]).slice(0, count);
 
+  // Build raw suspect subset — entries may be strings or { name, forcedItem } objects
+  const rawSuspects = getSubset(s.suspects, numSuspects);
+
+  // Extract forced-item requirements from object suspects
+  const forcedItemReqs = rawSuspects
+    .map((sus, idx) =>
+      typeof sus === "object" && sus.forcedItem
+        ? { suspectIdx: idx, itemName: sus.forcedItem }
+        : null,
+    )
+    .filter(Boolean);
+
+  // Normalize suspects to plain strings for the mapping
+  const normalizedSuspects = rawSuspects.map((sus) =>
+    typeof sus === "string" ? sus : sus.name,
+  );
+
+  // Build item subset: forced items first, then random fill from the rest
+  // Items with reservedFor are excluded unless their named suspect is in the game
+  const forcedItems = forcedItemReqs
+    .map((req) => s.items.find((item) => item.name === req.itemName))
+    .filter(Boolean);
+  const otherItems = shuffle(
+    s.items.filter((item) => {
+      if (forcedItems.includes(item)) return false;
+      if (item.reservedFor && !normalizedSuspects.includes(item.reservedFor))
+        return false;
+      return true;
+    }),
+  );
+  const selectedItems = [...forcedItems, ...otherItems].slice(0, numSuspects);
+
+  // Build index-based constraints for generateTruth
+  const forcedConstraints = forcedItemReqs
+    .map((req) => {
+      const itemIdx = selectedItems.findIndex(
+        (item) => item.name === req.itemName,
+      );
+      return itemIdx !== -1 ? { suspectIdx: req.suspectIdx, itemIdx } : null;
+    })
+    .filter(Boolean);
+
   const gameMapping = {
-    suspects: getSubset(s.suspects, numSuspects),
+    suspects: normalizedSuspects,
     rooms: getSubset(s.rooms, numSuspects),
-    items: getSubset(s.items, numSuspects),
+    items: selectedItems,
     scenario: s, // Store scenario for adjacency data
   };
 
@@ -1048,7 +1272,7 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
     gameMapping.features[room.name] = shuffle([...allFeats]).slice(0, count);
   });
 
-  const { truth, roles } = generateTruth(numSuspects);
+  const { truth, roles } = generateTruth(numSuspects, forcedConstraints);
 
   try {
     var allFacts = generateClues(truth, roles, numSuspects, gameMapping);
@@ -1101,6 +1325,10 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
       return true;
     if (f.type === FACT_TYPES.ITEM_NOT_MURDER_WEAPON && f.itemId === undefined)
       return true;
+    if (f.type === FACT_TYPES.SEEN_ARRIVING && f.roomId === undefined)
+      return true;
+    if (f.type === FACT_TYPES.SPOTTED_NEARBY && f.roomId === undefined)
+      return true;
 
     // Check for out of range IDs
     if (f.roomId !== undefined && (f.roomId < 0 || f.roomId >= numSuspects))
@@ -1144,6 +1372,9 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
 
   let keptFacts = [...allFacts];
   for (let i = keptFacts.length - 1; i >= 0; i--) {
+    // Yield every iteration so click events (e.g. abort button) can be processed
+    await new Promise((r) => setTimeout(r, 0));
+
     // Check if user requested abort
     if (shouldAbort) {
       addLog("Generation aborted by user");
@@ -1159,8 +1390,6 @@ export async function handleNewCase(uiCallbacks, restoredState = null) {
       const masks = f.masks || renderFact(f, gameMapping, roles).masks;
       if (masks) masks.forEach((m) => engine.restrict(m.varIdx, m.mask));
     });
-
-    if (i % 3 === 0) await new Promise((r) => setTimeout(r, 0));
 
     if (engine.solve(2).length === 1) {
       // Check if essential (covers a term not covered by others)
